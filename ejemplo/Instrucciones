@@ -1,0 +1,13 @@
+Aplicacion creada con Express generator
+http://expressjs.com/en/starter/generator.html
+
+Para instalar dependencia global de autodeploy
+>npm install -g nodemon
+
+Para instalar modulos del proyecto
+>npm install
+
+Para correr
+>npm start
+
+Probar entrando a http://localhost:3000/usuarios
