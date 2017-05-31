@@ -3,7 +3,9 @@ node_js:
   - "7"
 services:
   - "mongodb"
-before_install: npm install -g grunt-cli
+before_install:
+  - "npm install -g grunt-cli"
+  - "cd user"
 install: npm install
 notifications:
   email: false
