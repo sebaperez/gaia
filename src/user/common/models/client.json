@@ -2,7 +2,9 @@
   "name": "Client",
   "plural": "Clients",
   "base": "User",
-  "idInjection": true,
+  "idInjection": false,
+  "forceId": false,
+  "strict": true,
   "options": {
     "validateUpsert": true
   },
@@ -25,8 +27,11 @@
     },
     "creationDate": {
       "type": "date",
-      "required": true
-    }
+      "required": false,
+      "defaultFn": "now"
+    },
+    "realm": false,
+    "username": false
   },
   "validations": [],
   "relations": {},
