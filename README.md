@@ -15,3 +15,10 @@ npm start
 ```
 node src/user/.
 ```
+
+### Modulo de portal
+- FW: Expressjs
+- Puerto: 3001
+```
+node src/portal/app.js
+```

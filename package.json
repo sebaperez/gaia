@@ -4,7 +4,7 @@
   "description": "mail-bot para coordinar y agendar reuniones (Proyecto Final UTN FRBA - 2017)",
   "main": "index.js",
   "scripts": {
-    "start": "node src/user/."
+    "start": "node src/user/.; node src/portal/app.js"
   },
   "repository": {
     "type": "git",
@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/sebaperez/gaia/issues"
   },
-  "homepage": "https://github.com/sebaperez/gaia#readme"
+  "homepage": "https://github.com/sebaperez/gaia#readme",
+  "dependencies": {
+    "express": "^4.15.3"
+  }
 }
