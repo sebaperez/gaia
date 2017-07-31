@@ -27,3 +27,5 @@ boot(app, __dirname, function(err) {
   if (require.main === module)
     app.start();
 });
+
+app.models.Client.settings.acls = require('./user-acls.json');
