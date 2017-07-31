@@ -11,6 +11,7 @@ npm start
 ### Modulo de usuarios
 - FW: Loopback
 - Puerto: 3000
+- Doc API: http://localhost:3000/explorer/#/Client
 ```
 node src/user/.
 ```
