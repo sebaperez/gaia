@@ -1,0 +1,19 @@
+{
+  "name": "gaia",
+  "version": "1.0.0",
+  "description": "mail-bot para coordinar y agendar reuniones (Proyecto Final UTN FRBA - 2017)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/user/."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sebaperez/gaia.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sebaperez/gaia/issues"
+  },
+  "homepage": "https://github.com/sebaperez/gaia#readme"
+}
