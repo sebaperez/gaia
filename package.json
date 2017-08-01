@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/sebaperez/gaia#readme",
   "dependencies": {
-    "express": "^4.15.3"
+    "express": "^4.15.3",
     "loopback-cli": "^3.1.0"
   }
 }
