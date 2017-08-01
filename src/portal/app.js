@@ -52,6 +52,8 @@ var user = (function() {
 })();
 
 user.register("get", "/user/login", "/api/Clients/login");
+user.register("get", "/user/register", "/api/Clients");
+user.register("get", "/user/logout", "/api/Clients/logout");
 
 app.get('/', function (req, res) {
 	res.send('');
