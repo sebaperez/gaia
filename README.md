@@ -3,6 +3,14 @@ mail-bot para coordinar y agendar reuniones (Proyecto Final UTN FRBA - 2017)
 
 ## Inicialización
 
+### Instalación
+```
+cd
+npm install
+cd src/user/
+npm install
+```
+
 ### Inicializar todo
 ```
 npm start
