@@ -44,21 +44,51 @@ var user = (function() {
 				cb();
 			});
 		},
-		register: function(method, local, endpoint, cb) {
-			app[method](local, function(req, res) {
-				user.post(endpoint, req.query, function(error, response, body) {
-					if (cb) {
-						cb(error, response, body, res);
+		replaceMacros: function(string, query) {
+			var macros = {
+				"{userId}": function() {
+					if (query.accessToken && user.data.sessions[query.accessToken]) {
+						return user.data.sessions[query.accessToken].userId;
 					} else {
-						res.send(body);
+						return "";
 					}
-				});
+				}
+			}, i;
+			if (string) {
+				for (i in macros) {
+					string = string.replace(i, macros[i]());
+				}
+			}
+			return string || "";
+		},
+		register: function(method, local, endMethod, endpoint, cb) {
+			app[method](local, function(req, res) {
+				endpoint = user.replaceMacros(endpoint, req.query);
+				if (endMethod === "post") {
+					user.post(endpoint, req.query, function(error, response, body) {
+						if (cb) {
+							cb(error, response, body, res);
+						} else {
+							res.send(body);
+						}
+					});
+				} else {
+console.log(endpoint);
+					user.get(endpoint, function(error, response, body) {
+console.log(response);
+						if (cb) {
+							cb(error, response, body, res);
+						} else {
+							res.send(body);
+						}
+					});
+				}
 			});
 		}
 	}
 })();
 
-user.register("get", "/user/login", "/api/Clients/login", function(error, response, body, res) {
+user.register("get", "/user/login", "post", "/api/Clients/login", function(error, response, body, res) {
 	var d = JSON.parse(body);
 	if (d && !d.error && d.id && d.userId) {
 		user.data.sessions[d.id] = {
@@ -69,8 +99,9 @@ user.register("get", "/user/login", "/api/Clients/login", function(error, respon
 		res.send(body);
 	}
 });
-user.register("get", "/user/register", "/api/Clients");
-user.register("get", "/user/logout", "/api/Clients/logout");
+user.register("get", "/user/register", "post", "/api/Clients");
+user.register("get", "/user/logout", "post", "/api/Clients/logout");
+user.register("get", "/user/info", "get", "/api/Clients/{userId}");
 
 app.get('/', function (req, res) {
 	res.send('');
