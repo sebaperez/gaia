@@ -11,6 +11,9 @@ var user = (function() {
 			HOST: "localhost",
 			PORT: 3000
 		},
+		data: {
+			sessions: {}
+		},
 		get: function(path, cb) {
 			return this.request("get", path, cb);
 		},
@@ -41,17 +44,31 @@ var user = (function() {
 				cb();
 			});
 		},
-		register: function(method, local, endpoint) {
+		register: function(method, local, endpoint, cb) {
 			app[method](local, function(req, res) {
 				user.post(endpoint, req.query, function(error, response, body) {
-					res.send(body);
+					if (cb) {
+						cb(error, response, body, res);
+					} else {
+						res.send(body);
+					}
 				});
 			});
 		}
 	}
 })();
 
-user.register("get", "/user/login", "/api/Clients/login");
+user.register("get", "/user/login", "/api/Clients/login", function(error, response, body, res) {
+	var d = JSON.parse(body);
+	if (d && !d.error && d.id && d.userId) {
+		user.data.sessions[d.id] = {
+			userId: d.userId
+		};
+		res.send(JSON.stringify({"accessToken": d.id}));
+	} else {
+		res.send(body);
+	}
+});
 user.register("get", "/user/register", "/api/Clients");
 user.register("get", "/user/logout", "/api/Clients/logout");
 

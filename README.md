@@ -5,6 +5,11 @@ mail-bot para coordinar y agendar reuniones (Proyecto Final UTN FRBA - 2017)
 
 ### Instalación
 ```
+sudo apt-get install -y mongodb
+mongodb
+use gaia
+db.createUser({user:"gaia", pwd:"KJ3N42KJ3NKkldf4l", roles:[{role:"userAdmin",db:"gaia"}]})
+
 cd
 npm install
 cd src/user/
