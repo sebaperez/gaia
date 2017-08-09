@@ -1,0 +1,31 @@
+{
+  "name": "ia",
+  "version": "1.0.0",
+  "description": "API Intelgencia Artificial para Parsing de Mensajes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sebaperez/gaia.git"
+  },
+  "keywords": [
+    "ia",
+    "node",
+    "gaia",
+    "utn",
+    "proyecto"
+  ],
+  "author": "Nicolas Presta",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sebaperez/gaia/issues"
+  },
+  "homepage": "https://github.com/sebaperez/gaia#readme",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.4",
+    "node-wit": "^4.3.0"
+  }
+}
