@@ -1,1 +1,15 @@
-/nbproject/private/
+# Created by .ignore support plugin (hsz.mobi)
+/src/ia/node_modules/
+!/src/ia/server/index.js
+
+.idea/workspace.xml
+
+.idea/vcs.xml
+
+.idea/modules.xml
+
+.idea/misc.xml
+
+.idea/gaia.iml
+
+.idea/dbnavigator.xml
