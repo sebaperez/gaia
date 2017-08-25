@@ -1,6 +1,13 @@
 import { Router } from 'express'
+import usuario from './usuario'
+import ia from './IA'
+import mensaje from './mensaje'
 
 const router = new Router()
+
+router.use('/usuarios', usuario)
+router.use('/ia', ia)
+router.use('/mensajes', mensaje)
 
 /**
  * @apiDefine master Master access only
