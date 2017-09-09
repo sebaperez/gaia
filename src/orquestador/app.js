@@ -11,8 +11,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 
-var mensajes = require('./routes/mensajes');
-app.use('/mensajes', mensajes);
+var mensajesRoute = require('./routes/mensajesRoute');
+app.use('/mensajes', mensajesRoute);
 
 var testRouter = require('./routes/test');
 app.use('/test', testRouter);
