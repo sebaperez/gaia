@@ -4,7 +4,7 @@
   "description": "Orquestador de servicios de GAIA",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./bin/www",
+    "start": "nodemon ./config/www",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -24,7 +24,9 @@
   "homepage": "https://github.com/sebaperez/gaia#readme",
   "dependencies": {
     "body-parser": "^1.17.2",
+    "date-and-time": "^0.5.0",
     "express": "^4.15.4",
-    "morgan": "^1.8.2"
+    "morgan-body": "^0.10.9",
+    "request": "^2.81.0"
   }
 }

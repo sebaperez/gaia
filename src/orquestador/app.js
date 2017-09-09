@@ -1,21 +1,22 @@
 var express = require('express');
 var path = require('path');
-var logger = require('morgan');
+var morganBody = require('morgan-body');
 var bodyParser = require('body-parser');
 
 var app = express();
 
-app.use(logger('tiny'));
-
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+//app.use(logger('tiny'));
+morganBody(app);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
 
 var mensajes = require('./routes/mensajes');
 app.use('/mensajes', mensajes);
+
+var testRouter = require('./routes/test');
+app.use('/test', testRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
