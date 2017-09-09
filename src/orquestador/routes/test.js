@@ -2,7 +2,7 @@ var express = require('express');
 var date = require('date-and-time');
 var router = express.Router();
 
-router.get('/user', function (req, res, next) {
+router.get('/user/api/clientes', function (req, res, next) {
     res.send([
       {
         "name": "Juan",
@@ -15,7 +15,7 @@ router.get('/user', function (req, res, next) {
     ]);
 });
 
-router.post('/ia', function (req, res, next) {
+router.post('/ia/process', function (req, res, next) {
     res.send(
       {
         "original_response": "PARA DEBUG",
@@ -26,7 +26,7 @@ router.post('/ia', function (req, res, next) {
         "fechas": [{
            "fecha": "2017-08-22T00:00:00.000-03:00"
         }],
-        "inervalos": [
+        "intervalos": [
           {
              "desde": "2017-08-22T14:00:00.000-03:00",
              "hasta": "2017-08-22T15:00:00.000-03:00"
@@ -35,6 +35,41 @@ router.post('/ia', function (req, res, next) {
              "desde": "2017-08-17T00:00:00.000-03:00",
              "hasta": "2017-09-02T00:00:00.000-03:00"
           }],
+      }
+    );
+});
+
+router.post('/conversacion/conversaciones', function (req, res, next) {
+    res.send(
+      {
+         id: 11312,
+         owner: 'juan.perez@gmail.com',
+         guests: "mario.baracus@hotmail.com",
+         mensajes: [
+           {
+               contenido: "Te parece si nos juntamos mañana entre las 14hs y 15hs, o tambien puede ser entre jueves y viernes de la semana que viene. Si eso no te queda bien este martes tambien puede ser",
+               significado: {
+                 "original_response": "PARA DEBUG",
+                 "ok": true,
+                 "intents": [
+                    "solicitar_reunion"
+                 ],
+                 "fechas": [{
+                    "fecha": "2017-08-22T00:00:00.000-03:00"
+                 }],
+                 "intervalos": [
+                   {
+                      "desde": "2017-08-22T14:00:00.000-03:00",
+                      "hasta": "2017-08-22T15:00:00.000-03:00"
+                   },
+                   {
+                      "desde": "2017-08-17T00:00:00.000-03:00",
+                      "hasta": "2017-09-02T00:00:00.000-03:00"
+                   }
+                  ],
+               }
+           }
+         ]
       }
     );
 });

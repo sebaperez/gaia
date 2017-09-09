@@ -1,5 +1,11 @@
 module.exports.config = {
-  prod: false,
-  userApiUrl: "http://localhost:3000/api",
-  iaApiUrl: "http://localhost:3001"
+   userApiUrls: {
+      clientes: "http://localhost:5555/test/user/api/clientes"
+   },
+   iaApiUrls: {
+      procesar: "http://localhost:5555/test/ia/process"
+   },
+   conversacionApiUrls:{
+      conversaciones: "http://localhost:5555/test/conversacion/conversaciones"
+   }
 };
