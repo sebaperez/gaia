@@ -5,6 +5,11 @@ var request = require("request");
 var USER_HOST = "localhost";
 var USER_PORT = 3000;
 
+function cors(res) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+}
+
 var user = (function() {
 	return {
 		cons: {
@@ -79,6 +84,7 @@ console.log(response);
 						if (cb) {
 							cb(error, response, body, res);
 						} else {
+							cors(res);
 							res.send(body);
 						}
 					});
@@ -96,10 +102,12 @@ user.register("get", "/user/login", "post", "/api/Clients/login", function(error
 		};
 		res.send(JSON.stringify({"accessToken": d.id}));
 	} else {
+		cors(res);
 		res.send(body);
 	}
 });
 user.register("get", "/user/register", "post", "/api/Clients");
+user.register("get", "/user/login", "post", "/api/Clients/login");
 user.register("get", "/user/logout", "post", "/api/Clients/logout");
 user.register("get", "/user/info", "get", "/api/Clients/{userId}");
 
