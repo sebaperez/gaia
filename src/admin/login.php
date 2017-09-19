@@ -9,9 +9,11 @@
         <!-- Vendor CSS -->
         <link href="vendors/bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet">
         <link href="vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">
+	<link href="vendors/sweetalert2/sweetalert2.min.css" rel="stylesheet">
 
         <!-- CSS -->
         <link href="css/app_1.min.css" rel="stylesheet">
+	<link href="css/css.css" rel="stylesheet">
    </head>
 
     <body>
@@ -21,13 +23,13 @@
                 <div class="lcb-form">
                     <div class="form-group">
                         <div class="fg-line">
-                            <input type="text" id="email" class="form-control" placeholder="Correo electronico">
+                            <input type="text" id="email" class="form-control login" placeholder="Correo electronico">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <div class="fg-line">
-                            <input type="password" id="password" class="form-control" placeholder="Contraseña">
+                            <input type="password" id="password" class="form-control login" placeholder="Contraseña">
                         </div>
                     </div>
 
@@ -50,29 +52,34 @@
             <!-- Register -->
             <div class="lc-block" id="l-register">
                 <div class="lcb-form">
-                    <div class="form-group">
-                        <div class="fg-line">
-                            <input type="text" class="form-control" placeholder="Username">
-                        </div>
-                    </div>
+		<?php
+			$fields = [
+				[ "title" => "Nombre", "name" => "name", "type" => "text" ],
+				[ "title" => "Apellido", "name" => "lastname", "type" => "text" ],
+				[ "title" => "E-Mail", "name" => "email", "type" => "text" ],
+				[ "title" => "Contraseña", "name" => "password", "type" => "password" ],
+				[ "title" => "Nombre del asistente", "name" => "botName", "type" => "text" ],
+				[ "title" => "E-Mail del asistente", "name" => "botEmail", "type" => "text" ]
+			];
+
+			foreach ($fields as $field) {
+
+		?>
 
                     <div class="form-group">
                         <div class="fg-line">
-                            <input type="text" class="form-control" placeholder="Email Address">
+                            <input type="<?php echo($field["type"]); ?>" class="form-control register" placeholder="<?php echo($field["title"]); ?>" name="<?php echo($field["name"]); ?>">
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <div class="fg-line">
-                            <input type="password" class="form-control" placeholder="Password">
-                        </div>
-                    </div>
+		<?php } ?>
 
-                    <a href="" class="btn btn-login btn-success"><i class="zmdi zmdi-check"></i></a>
+
+                    <a href="#!" class="btn btn-login btn-success" id="registerBtn"><i class="zmdi zmdi-check"></i></a>
                 </div>
 
                 <div class="lcb-navigation">
-                    <a href="" data-ma-action="login-switch" data-ma-block="#l-login"><i class="zmdi zmdi-long-arrow-right"></i> <span>Sign in</span></a>
+                    <a href="" data-ma-action="login-switch" data-ma-block="#l-login"><i class="zmdi zmdi-long-arrow-right"></i> <span>Ingresar</span></a>
                 </div>
             </div>
 
@@ -99,6 +106,8 @@
         <script src="vendors/bower_components/jquery/dist/jquery.min.js"></script>
         <script src="vendors/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
         <script src="vendors/bower_components/Waves/dist/waves.min.js"></script>
+	<script src="vendors/bootstrap-growl/bootstrap-growl.min.js"></script>
+	<script src="vendors/notify.js"></script>
 
         <script src="js/app.min.js"></script>
 	<script src="js/base.js"></script>

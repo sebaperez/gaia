@@ -20,7 +20,7 @@ var user = (function() {
 			sessions: {}
 		},
 		get: function(path, cb) {
-			return this.request("get", path, cb);
+			return this.request("get", path, {}, cb);
 		},
 		post: function(path, data, cb) {
 			return this.request("post", path, data, cb);
@@ -28,9 +28,9 @@ var user = (function() {
 		request: function(method, path, data, cb) {
 			var url = "http://" + this.cons.HOST + ":" + this.cons.PORT + path;
 			if (method === "get") {
-				return request.get(url, function(res) {
+				return request.get(url, function(error, response, body) {
 					if (cb) {
-						cb(res);
+						cb(error, response, body);
 					}
 				});
 			} else if (method === "post") {
@@ -71,6 +71,7 @@ var user = (function() {
 				endpoint = user.replaceMacros(endpoint, req.query);
 				if (endMethod === "post") {
 					user.post(endpoint, req.query, function(error, response, body) {
+						cors(res);
 						if (cb) {
 							cb(error, response, body, res);
 						} else {
@@ -78,9 +79,7 @@ var user = (function() {
 						}
 					});
 				} else {
-console.log(endpoint);
 					user.get(endpoint, function(error, response, body) {
-console.log(response);
 						if (cb) {
 							cb(error, response, body, res);
 						} else {
@@ -110,6 +109,7 @@ user.register("get", "/user/register", "post", "/api/Clients");
 user.register("get", "/user/login", "post", "/api/Clients/login");
 user.register("get", "/user/logout", "post", "/api/Clients/logout");
 user.register("get", "/user/info", "get", "/api/Clients/{userId}");
+user.register("get", "/user/logout", "get", "/api/Clients/{userId}");
 
 app.get('/', function (req, res) {
 	res.send('');
