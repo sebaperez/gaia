@@ -18,6 +18,7 @@ var admin = {
 		}
 	},
 	register: function(data) {
+		localStorage.setItem("gaiaid", "");
 		base.req("register", data, function(r) {
 			var input, i;
 			if (r) {
@@ -27,6 +28,8 @@ var admin = {
 						input = document.querySelector("[name='" + i + "']");
 						$.notify($(input), r.error.details.messages[i][0]);
 					}
+				} else {
+					admin.login(document.querySelector("[name='email']").value, document.querySelector("[name='password']").value);
 				}
 			}
 		});

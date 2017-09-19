@@ -1,11 +1,6 @@
 var base = {
 	url: "http://localhost:3001",
 	req: function(action, params, cb) {
-		if (params) {
-			params.dataType = "json";
-		} else {
-			params = { dataType: "json" };
-		}
 		$.get(this.url + "/user/" + action, params, function(data) {
 			if (cb) {
 				cb(data);
@@ -33,3 +28,4 @@ var base = {
 		}
 	}
 };
+base.url = "http://" + location.hostname + ":3001";
