@@ -31,7 +31,7 @@ router.post('/', function (req, res, next) {
    var contenidoMail = req.body.text;
    var contenidoMailActual = req.body.text.split("----------", 1)[0].trim();
 
-   if(!contenidoMailActual){
+   if(!contenidoMailActual) {
       res.send({
          de: owner.botEmail, //validar cómo sale de usuarioApi
          para: guestMail,
@@ -51,12 +51,12 @@ router.post('/', function (req, res, next) {
             calendarioService.obtenerHueco(significado.intervalos, function(hueco) {
 
                respuestaService.obtenerMensajeCoordinacionAGuest(owner, hueco, function(respuesta){
-                  console.log(owner)
+
                   res.send({
-                     de: owner.botEmail, //validar cómo sale de usuarioApi
-                     para: guestMail,
-                     asunto: asuntoMail,
-                     contenido: respuesta.contenido + "\n\n" + contenidoMailActual + "\n\n" + contenidoMail
+                     from: owner.botEmail, //validar cómo sale de usuarioApi
+                     to: guestMail,
+                     subject: asuntoMail,
+                     text: respuesta + "\n\n" + contenidoMail
                   });
 
                });
