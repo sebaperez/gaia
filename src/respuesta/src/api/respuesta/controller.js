@@ -40,6 +40,6 @@ export const destroy = ({ params }, res, next) =>
 export const parser = ({ bodymen: { body }, params }, res, next) =>
   Respuesta.findOne( { motivo: params.motivo } )
     .then(notFound(res))
-	  .then((respuesta) => respuesta ? parseText(respuesta, body) : null)
+	  .then((respuesta) => respuesta ? parseText(respuesta, body, res) : null)
     .then(success(res))
     .catch(next)
