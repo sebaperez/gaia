@@ -4,12 +4,13 @@ var fs = require('fs');
 var readline = require('readline');
 var google = require('googleapis');
 var googleAuth = require('google-auth-library');
+var OAuth2 = google.auth.OAuth2;
 
 // If modifying these scopes, delete your previously saved credentials
 // at ~/.credentials/calendar-nodejs-quickstart.json
-var SCOPES = ['https://www.googleapis.com/auth/calendar.readonly'];
+var SCOPES = ['https://www.googleapis.com/auth/calendar'];
 var TOKEN_DIR = '../credentials/';
-var TOKEN_PATH = TOKEN_DIR + 'calendar-nodejs-quickstart.json';
+var TOKEN_PATH = TOKEN_DIR + '300.json';
 
 // Load client secrets from a local file.
 fs.readFile('client_secret.json', function processClientSecrets(err, content) {
@@ -17,7 +18,7 @@ fs.readFile('client_secret.json', function processClientSecrets(err, content) {
     console.log('Error loading client secret file: ' + err);
     return;
   }
-  console.log(JSON.parse(content))
+  /*console.log(JSON.parse(content))*/
   // Authorize a client with the loaded credentials, then call the
   // Google Calendar API.
   authorize(JSON.parse(content), listEvents);
@@ -35,7 +36,7 @@ function authorize(credentials, callback) {
   var clientId = credentials.web.client_id;
   var redirectUrl = credentials.web.redirect_uris[0];
   var auth = new googleAuth();
-  var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
+  var oauth2Client = new OAuth2(clientId, clientSecret, redirectUrl);
 
   // Check if we have previously stored a token.
   fs.readFile(TOKEN_PATH, function(err, token) {
@@ -43,6 +44,10 @@ function authorize(credentials, callback) {
       getNewToken(oauth2Client, callback);
     } else {
       oauth2Client.credentials = JSON.parse(token);
+      oauth2Client.refreshAccessToken(function(err, tokens) {
+    // your access_token is now refreshed and stored in oauth2Client
+    // store these new tokens in a safe place (e.g. database)
+    });
       callback(oauth2Client);
     }
   });
@@ -104,7 +109,7 @@ function storeToken(token) {
  */
 function listEvents(auth) {
   var calendar = google.calendar('v3');
-  console.log(auth)
+  /*console.log(auth)*/
   calendar.events.list({
     auth: auth,
     calendarId: 'primary',

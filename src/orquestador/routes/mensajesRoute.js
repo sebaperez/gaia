@@ -31,6 +31,15 @@ router.post('/', function (req, res, next) {
    var contenidoMail = req.body.text;
    var contenidoMailActual = req.body.text.split("----------", 1)[0].trim();
 
+   if(!contenidoMailActual){
+      res.send({
+         de: owner.botEmail, //validar cómo sale de usuarioApi
+         para: guestMail,
+         asunto: asuntoMail,
+         contenido: "Me llegó el mail vacío"
+      })
+   }
+
    usuarioService.obtenerUsuario(ownerMail, function (owner) {
 
       iaService.interpretarMensaje(contenidoMailActual, function (significado) {

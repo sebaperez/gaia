@@ -1,7 +1,7 @@
 const SMTPServer = require('smtp-server').SMTPServer;
 const getStream = require('get-stream');
 const simpleParser = require('mailparser').simpleParser;
-const request = require('request');
+const request = require('request'); 
 
 const server = new SMTPServer({
         authOptional: true,
