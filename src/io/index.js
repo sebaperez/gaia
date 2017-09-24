@@ -1,7 +1,7 @@
 const SMTPServer = require('smtp-server').SMTPServer;
 const getStream = require('get-stream');
 const simpleParser = require('mailparser').simpleParser;
-const request = require('request'); 
+const request = require('request');
 
 // Packages Imports
 const http = require('http');
@@ -53,7 +53,7 @@ const server = new SMTPServer({
 		callback(null, {user: 123}); // where 123 is the user id or similar property
 	},
 
-	onConnecit(session, callback){
+	onConnect(session, callback){
 		console.log("on connect")
 		return callback(); // Accept the connection
 	},
@@ -63,8 +63,8 @@ const server = new SMTPServer({
         	return callback(); // Accept the address
     	},
 
-	onClose(session){ 
-		console.log("close") 
+	onClose(session){
+		console.log("close")
 	},
 
 	onRcptTo(address, session, callback){
@@ -89,5 +89,3 @@ require('./api/router')(app);
 
 // Nos ponemos a escuchar... hello!
 server_out.listen(port, () => console.log(`Servidor server_out Iniciado en puerto ${port}`));
-
-

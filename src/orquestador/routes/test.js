@@ -78,8 +78,11 @@ router.post('/calendario/huecos', function (req, res, next) {
 });
 
 router.post('/respuesta/solicitarReunionAlGuest/parser', function (req, res, next) {
-   console.log(req.body)
    res.send("Mario, te parece coordinar la reunion para " + req.body.fechas[0] + "?");
+});
+
+router.post('/io/send', function (req, res, next) {
+   res.status(200).send();
 });
 
 module.exports = router;

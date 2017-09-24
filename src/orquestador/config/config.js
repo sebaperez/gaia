@@ -17,5 +17,8 @@ module.exports.config = {
    },
    calendarioApiUrls: {
       huecos: "http://localhost:5555/test/calendario/huecos"
+   },
+   ioApiUrls: {
+      enviar: prod ? urlBaseProd + ":4444/send" : "http://localhost:5555/test/io/send"
    }
 };
