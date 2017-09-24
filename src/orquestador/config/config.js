@@ -1,6 +1,6 @@
 module.exports.config = {
    userApiUrls: {
-      clientes: "http://localhost:5555/test/user/api/clientes"
+      clientes: "http://localhost:5555/test/user/api/Clientes"
    },
    iaApiUrls: {
       procesar: "http://localhost:5555/test/ia/process"
