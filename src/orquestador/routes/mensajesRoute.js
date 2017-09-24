@@ -4,6 +4,7 @@ var usuarioService = require('../service/usuario');
 var iaService = require('../service/ia');
 var conversacionService = require('../service/conversacion');
 var calendarioService = require('../service/calendario');
+var respuestaService = require('../service/respuesta');
 
 router.post('/', function (req, res, next) {
 
@@ -13,7 +14,7 @@ router.post('/', function (req, res, next) {
    var contenidoMailActual = req.body.contenidoActual;
    var contenidoMail = req.body.contenido;
 
-   usuarioService.obtenerUsuario(ownerMail, function (usuario) {
+   usuarioService.obtenerUsuario(ownerMail, function (owner) {
 
       iaService.interpretarMensaje(contenidoMailActual, function (significado) {
 
@@ -21,31 +22,20 @@ router.post('/', function (req, res, next) {
 
             conversacionService.crearConversacion(ownerMail, guestMail, contenidoMailActual, significado);
 
-            calendarioService.obtenerHueco(significado.intervalos, function(hueco){
+            calendarioService.obtenerHueco(significado.intervalos, function(hueco) {
 
-               res.send(hueco);
+               respuestaService.obtenerMensajeCoordinacionAGuest(owner, hueco, function(respuesta){
+                  console.log(owner)
+                  res.send({
+                     de: owner.botEmail, //validar cómo sale de usuarioApi
+                     para: guestMail,
+                     asunto: asuntoMail,
+                     contenido: respuesta.contenido + "\n\n" + contenidoMailActual + "\n\n" + contenidoMail
+                  });
+
+               });
 
             });
-
-
-            // var respuestaRequest = {
-            //    owner: {
-            //       nombre: usuario.name,
-            //       email: usuario.email
-            //    },
-            //    fechas: hueco.fechas
-            // };
-            //
-            // respuestaService.obtenerMensajeCoordinacionAGuest(respuestaRequest, function(respuesta){
-            //    var contenidoMailRespuesta = respuesta.contenido + contenidoMail;
-            //    res.send({
-            //       de: usuario.botEmail, //validar cómo sale de usuarioApi
-            //       para: guestMail,
-            //       asunto: asuntoMail,
-            //       contenido: contenidoMailRespuesta
-            //    });
-            // });
-
 
          } else {
             console.log("Flujo todavia no soportado.");

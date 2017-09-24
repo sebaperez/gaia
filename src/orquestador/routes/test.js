@@ -78,9 +78,10 @@ router.post('/calendario/huecos', function (req, res, next) {
 });
 
 router.post('/respuesta/solicitarReunionAlGuest/parser', function (req, res, next) {
+   console.log(req.body)
    res.send(
      {
-        contenido: "Mario, te parece coordinar la reunion para el dia 10/9 a las 13:00?"
+        contenido: "Mario, te parece coordinar la reunion para " + req.body.fechas[0] + "?"
      });
 });
 
