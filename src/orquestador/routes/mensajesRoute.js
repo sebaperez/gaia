@@ -19,20 +19,7 @@ router.post('/', function (req, res, next) {
 
          if(solicitaReunion(significado)){
 
-            var nuevaConversacion = {
-               owner: ownerMail,
-               guests: guestMail,
-               mensajes: [
-                  {
-                     contenido: contenidoMailActual,
-                     significado: significado
-                  }
-               ]
-            };
-
-            conversacionService.crearConversacion(nuevaConversacion, function (){
-
-            });
+            conversacionService.crearConversacion(ownerMail, guestMail, contenidoMailActual, significado);
 
             calendarioService.obtenerHueco(significado.intervalos, function(hueco){
 

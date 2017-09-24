@@ -1,17 +1,30 @@
 var request = require('request');
 var config = require('../config/config').config;
 
-function crearConversacion(conversacion, callback) {
+function crearConversacion(ownerMail, guestMail, contenidoMailActual, significado, callback) {
 
    var conversacionesUrl = config.conversacionApiUrls.conversaciones;
+
+   var nuevaConversacion = {
+      owner: ownerMail,
+      guests: guestMail,
+      mensajes: [
+         {
+            contenido: contenidoMailActual,
+            significado: significado
+         }
+      ]
+   };
 
    request.post({
       url: conversacionesUrl,
       json: true,
-      body: conversacion
+      body: nuevaConversacion
    }, function (error, response, body) {
 
-      callback(body);
+      if(callback){
+         callback(body);
+      }
 
    });
 
