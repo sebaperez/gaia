@@ -7,6 +7,8 @@ const client = new Wit({
 
 var exports = module.exports = {};
 
+// Posibles intents: no_identificado, solicitar_reunion, posponer_reunion, cancelar_reunion
+
 // Convierte la respuesta de wix al formato interno de gaia.
 function adaptar(data){
 
@@ -17,20 +19,28 @@ function adaptar(data){
     if (data.entities){
         retorno.ok = true
 
+        retorno.intents = []
+
         if (data.entities.intent){
             data.entities.intent.forEach((value, index)=>{
-                retorno.intent = value.value
+                retorno.intents.push(value.value)
             })
-
         } else {
-            retorno.intent = "no_identificado"
+            //retorno.intents.push("no_identificado")
         }
 
-        retorno.fecha_propuesta = []
+        retorno.fechas = [];
+        retorno.intervalos = [];
 
         if (data.entities.datetime){
             data.entities.datetime.forEach((value, index)=>{
-                retorno.fecha_propuesta.push(value.value)
+
+                if (value.type == "value")
+                    retorno.fechas.push({"fecha": value.value});
+
+                if (value.type == "interval")
+                    retorno.intervalos.push({"desde": value.from.value, "hasta": value.to.value});
+
             })
 
         }
@@ -46,8 +56,8 @@ exports.process = function(msj, callback) {
 
     client.message(msj, {})
     .then((data) => {
-      console.log('----> Wit nos responde: ' + JSON.stringify(data));
-        respuesta = adaptar(data)
+        console.log('----> Wit nos responde: ' + JSON.stringify(data));
+        respuesta = adaptar(data);
         callback(null, respuesta)
     })
     .catch(console.error);
