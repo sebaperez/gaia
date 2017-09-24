@@ -66,9 +66,9 @@ var user = (function() {
 			}
 			return string || "";
 		},
-		register: function(method, local, endMethod, endpoint, cb) {
+		register: function(method, local, endMethod, _endpoint, cb) {
 			app[method](local, function(req, res) {
-				endpoint = user.replaceMacros(endpoint, req.query);
+				var endpoint = user.replaceMacros(_endpoint, req.query);
 				if (endMethod === "post") {
 					user.post(endpoint, req.query, function(error, response, body) {
 						cors(res);
