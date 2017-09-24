@@ -1,7 +1,7 @@
 var base = {
 	url: "http://localhost",
 	req: function(action, params, cb) {
-		var p = [], i;
+		var p = [], i, url;
 
 		for (i in params) {
 			p.push(i + "=" + params[i]);
