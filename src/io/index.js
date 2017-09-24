@@ -1,5 +1,7 @@
 const SMTPServer = require('smtp-server').SMTPServer;
 const getStream = require('get-stream');
+const simpleParser = require('mailparser').simpleParser;
+const request = require('request');
 
 const server = new SMTPServer({
         authOptional: true,
@@ -7,7 +9,18 @@ const server = new SMTPServer({
 	onData(stream, session, callback){
 		const chunks = [];
 		getStream(stream).then(str => {
-			    console.log(str);
+			//console.log(str);
+			simpleParser(str, (err, mail)=>{
+				console.log(JSON.stringify(mail, null, 4))
+				request.post({
+					url: "localhost:5000/mensajes",
+					json: true,
+					body: mail},
+				function (error, responde, body){
+					console.log(JSON.stringify(body, null, 4))
+				})
+				callback()
+			})
 		});
 
 		//stream.on("data", function (chunk) {
