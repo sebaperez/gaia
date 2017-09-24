@@ -25,7 +25,7 @@ const server = new SMTPServer({
 			simpleParser(str, (err, mail)=>{
 				console.log(JSON.stringify(mail, null, 4))
 				request.post({
-					url: "localhost:5000/mensajes",
+					url: "http://" + process.env.IP + ":5555/mensajes",
 					json: true,
 					body: mail},
 				function (error, responde, body){
