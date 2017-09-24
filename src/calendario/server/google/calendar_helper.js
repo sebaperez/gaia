@@ -28,13 +28,15 @@ fs.readFile('client_secret.json', function processClientSecrets(err, content) {
 });
 
 // Funciones utiles para comunicarse con google.
+//Listar eventos
 exports.listar_eventos = function(auth, desde, hasta, callback) {
   var calendar = google.calendar('v3');
   //console.log(auth)
   calendar.events.list({
     auth: auth,
     calendarId: 'primary',
-    timeMin: (new Date()).toISOString(),
+    timeMin: desde,
+    timeMax: hasta,
     maxResults: 10,
     singleEvents: true,
     orderBy: 'startTime'
@@ -51,7 +53,33 @@ exports.listar_eventos = function(auth, desde, hasta, callback) {
 
   });
 }
-
+//Agregar un evento
+exports.agregar_evento = function(auth, description,desde,hasta,callback){
+  var calendar = google.calendar('v3');
+  calendar.events.insert({
+    auth: auth,
+    calendarId: 'primary',
+    resource: {
+      'summary': description,
+      'description': 'Reunion registrada por GAIA',
+      'start': {
+        'dateTime': desde,
+        'timeZone': 'GMT',
+      },
+      'end': {
+        'dateTime': hasta,
+        'timeZone': 'GMT',
+      },
+    },
+  }, function(err, res) {
+    if (err) {
+      console.log('Error: ' + err);
+      return;
+    }
+    console.log(res);
+    callback(res)
+  });
+}
 // Levantar credenciales
 exports.load_credential = function(user_id, callback) {
 
@@ -81,6 +109,3 @@ exports.load_credential = function(user_id, callback) {
       return reject('error in authenticating calendar oAuth client.');  }*/
       callback(oauth2Client);
     };
-
-
-// Listar eventos
