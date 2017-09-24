@@ -24,3 +24,5 @@ npm install
 forever start ./config/www
 cd ..
 echo ============== Desplegado ==============
+
+cd ..
