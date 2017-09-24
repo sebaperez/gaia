@@ -75,7 +75,7 @@
 		}
 		$opt = array(
 			CURLOPT_URL => "http://localhost:3000/api/Clients/" . $userId . "?access_token=" . $gaiaToken,
-			CURLOPT_CUSTOMREQUEST => "PUT",
+			CURLOPT_CUSTOMREQUEST => "PATCH",
 			CURLOPT_RETURNTRANSFER => 1,
 			CURLOPT_HTTPHEADER => array(
 				"Content-Type" => "application/json",
@@ -85,8 +85,6 @@
 		);
 		curl_setopt_array($c, $opt);
 		$response = curl_exec($c);
-		var_dump($response);
-exit();
 		curl_close($c);
 	}
 

@@ -17,7 +17,7 @@ var admin = {
 			return this.get("accessToken");
 		},
 		hasCalendar: function() {
-			return this.data.googleCalendar;
+			return this.data.googleAccessToken;
 		}
 	},
 	logout: function() {
