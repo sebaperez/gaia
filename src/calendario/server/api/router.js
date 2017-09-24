@@ -10,7 +10,8 @@ function buscarhueco(auth, fecha_desde, fecha_hasta){
       for (var i = 0; i < eventos.length; i++) {
         var event = eventos[i];
         var start = event.start.dateTime || event.start.date;
-        console.log('%s - %s', start, event.summary);
+        var end = event.end.dateTime || event.start.date
+        console.log('%s - %s', start,'%s - %s', end, '%s - %s', event.summary);
       }
 
     }
