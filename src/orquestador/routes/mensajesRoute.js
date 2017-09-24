@@ -3,36 +3,65 @@ var router = express.Router();
 var usuarioService = require('../service/usuario');
 var iaService = require('../service/ia');
 var conversacionService = require('../service/conversacion');
+var calendarioService = require('../service/calendario');
 
 router.post('/', function (req, res, next) {
 
-   usuarioService.obtenerUsuario(req.body.de, function (usuario) {
+   var ownerMail = req.body.de;
+   var guestMail = req.body.para;
+   var asuntoMail = req.body.asunto;
+   var contenidoMailActual = req.body.contenidoActual;
+   var contenidoMail = req.body.contenido;
 
-      iaService.interpretarMensaje(req.body.contenido, function (significado) {
+   usuarioService.obtenerUsuario(ownerMail, function (usuario) {
+
+      iaService.interpretarMensaje(contenidoMailActual, function (significado) {
 
          if(solicitaReunion(significado)){
 
             var nuevaConversacion = {
-               owner: req.body.de,
-               guests: req.body.para,
+               owner: ownerMail,
+               guests: guestMail,
                mensajes: [
                   {
-                     contenido: req.body.contenido,
+                     contenido: contenidoMailActual,
                      significado: significado
                   }
                ]
             };
 
-            conversacionService.crearConversacion(nuevaConversacion, function (conversacionCreada){
-               res.send(conversacionCreada);
-               //calendarioService.obtenerHueco(significado.intervalos)
-               //respuestaService.obtenerMensajeCoordinacionAGuest(nombreGuest, fechaHora)
-               //conversacionService.agregarMensaje(conversacionId, textoRespuesta)
-               //res.send(mensaje:{de, para, mensaje});
+            conversacionService.crearConversacion(nuevaConversacion, function (){
+
             });
 
+            calendarioService.obtenerHueco(significado.intervalos, function(hueco){
+
+               res.send(hueco);
+
+            });
+
+
+            // var respuestaRequest = {
+            //    owner: {
+            //       nombre: usuario.name,
+            //       email: usuario.email
+            //    },
+            //    fechas: hueco.fechas
+            // };
+            //
+            // respuestaService.obtenerMensajeCoordinacionAGuest(respuestaRequest, function(respuesta){
+            //    var contenidoMailRespuesta = respuesta.contenido + contenidoMail;
+            //    res.send({
+            //       de: usuario.botEmail, //validar cómo sale de usuarioApi
+            //       para: guestMail,
+            //       asunto: asuntoMail,
+            //       contenido: contenidoMailRespuesta
+            //    });
+            // });
+
+
          } else {
-            console.log("Flujo todavia no soportado");
+            console.log("Flujo todavia no soportado.");
          }
 
       });
@@ -43,7 +72,11 @@ router.post('/', function (req, res, next) {
 });
 
 function solicitaReunion(significado) {
-   return significado.intents.indexOf("solicitar_reunion") >= 0;
+   if(significado && significado.intents){
+      return significado.intents.indexOf("solicitar_reunion") >= 0;
+   } else {
+      return false;
+   }
 }
 
 module.exports = router;

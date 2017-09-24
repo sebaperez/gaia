@@ -7,13 +7,11 @@ function crearConversacion(conversacion, callback) {
 
    request.post({
       url: conversacionesUrl,
-      form: conversacion
+      json: true,
+      body: conversacion
    }, function (error, response, body) {
 
-      var parsedBody = JSON.parse(body);
-
-      callback(parsedBody);
-
+      callback(body);
 
    });
 
