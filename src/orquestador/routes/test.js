@@ -39,12 +39,11 @@ router.post('/ia/process', function (req, res, next) {
     );
 });
 
-router.post('/conversacion/conversaciones', function (req, res, next) {
+router.post('/conversacion', function (req, res, next) {
     res.send(
       {
-         id: 11312,
          owner: 'juan.perez@gmail.com',
-         guests: "mario.baracus@hotmail.com",
+         guest: "mario.baracus@hotmail.com",
          mensajes: [
            {
                contenido: "Te parece si nos juntamos mañana entre las 14hs y 15hs, o tambien puede ser entre jueves y viernes de la semana que viene. Si eso no te queda bien este martes tambien puede ser",
@@ -66,12 +65,24 @@ router.post('/conversacion/conversaciones', function (req, res, next) {
                       "desde": "2017-08-17T00:00:00.000-03:00",
                       "hasta": "2017-09-02T00:00:00.000-03:00"
                    }
-                  ],
+                  ]
                }
            }
          ]
       }
     );
+});
+
+router.post('/calendario/huecos', function (req, res, next) {
+   res.send([req.body[0].desde]);
+});
+
+router.post('/respuesta/solicitarReunionAlGuest/parser', function (req, res, next) {
+   console.log(req.body)
+   res.send(
+     {
+        contenido: "Mario, te parece coordinar la reunion para " + req.body.fechas[0] + "?"
+     });
 });
 
 module.exports = router;

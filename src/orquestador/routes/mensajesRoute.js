@@ -3,36 +3,42 @@ var router = express.Router();
 var usuarioService = require('../service/usuario');
 var iaService = require('../service/ia');
 var conversacionService = require('../service/conversacion');
+var calendarioService = require('../service/calendario');
+var respuestaService = require('../service/respuesta');
 
 router.post('/', function (req, res, next) {
 
-   usuarioService.obtenerUsuario(req.body.de, function (usuario) {
+   var ownerMail = req.body.de;
+   var guestMail = req.body.para;
+   var asuntoMail = req.body.asunto;
+   var contenidoMailActual = req.body.contenidoActual;
+   var contenidoMail = req.body.contenido;
 
-      iaService.interpretarMensaje(req.body.contenido, function (significado) {
+   usuarioService.obtenerUsuario(ownerMail, function (owner) {
+
+      iaService.interpretarMensaje(contenidoMailActual, function (significado) {
 
          if(solicitaReunion(significado)){
 
-            var nuevaConversacion = {
-               owner: req.body.de,
-               guests: req.body.para,
-               mensajes: [
-                  {
-                     contenido: req.body.contenido,
-                     significado: significado
-                  }
-               ]
-            };
+            conversacionService.crearConversacion(ownerMail, guestMail, contenidoMailActual, significado);
 
-            conversacionService.crearConversacion(nuevaConversacion, function (conversacionCreada){
-               res.send(conversacionCreada);
-               //calendarioService.obtenerHueco(significado.intervalos)
-               //respuestaService.obtenerMensajeCoordinacionAGuest(nombreGuest, fechaHora)
-               //conversacionService.agregarMensaje(conversacionId, textoRespuesta)
-               //res.send(mensaje:{de, para, mensaje});
+            calendarioService.obtenerHueco(significado.intervalos, function(hueco) {
+
+               respuestaService.obtenerMensajeCoordinacionAGuest(owner, hueco, function(respuesta){
+                  console.log(owner)
+                  res.send({
+                     de: owner.botEmail, //validar cómo sale de usuarioApi
+                     para: guestMail,
+                     asunto: asuntoMail,
+                     contenido: respuesta.contenido + "\n\n" + contenidoMailActual + "\n\n" + contenidoMail
+                  });
+
+               });
+
             });
 
          } else {
-            console.log("Flujo todavia no soportado");
+            console.log("Flujo todavia no soportado.");
          }
 
       });
@@ -43,7 +49,11 @@ router.post('/', function (req, res, next) {
 });
 
 function solicitaReunion(significado) {
-   return significado.intents.indexOf("solicitar_reunion") >= 0;
+   if(significado && significado.intents){
+      return significado.intents.indexOf("solicitar_reunion") >= 0;
+   } else {
+      return false;
+   }
 }
 
 module.exports = router;

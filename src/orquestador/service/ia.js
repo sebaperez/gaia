@@ -7,15 +7,12 @@ function interpretarMensaje(contenido, callback) {
 
    request.post({
       url: iaProcessUrl,
-      form: {msj: contenido}
+      json: true,
+      body: {msj: contenido}
    }, function (error, response, body) {
 
-      var parsedBody = JSON.parse(body);
-
-      if(parsedBody.ok){
-
-         callback(parsedBody);
-
+      if(body.ok){
+         callback(body);
       } else {
          console.log("El modulo de IA no pudo procesar el mensaje: " + contenido);
       }
