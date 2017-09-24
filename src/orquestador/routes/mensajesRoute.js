@@ -29,7 +29,7 @@ router.post('/', function (req, res, next) {
    var guestMail = req.body.to.value.address;
    var asuntoMail = req.body.subject;
    var contenidoMail = req.body.text;
-   var contenidoMailActual = req.body.text.split("----------", 1).trim();
+   var contenidoMailActual = req.body.text.split("----------", 1)[0].trim();
 
    usuarioService.obtenerUsuario(ownerMail, function (owner) {
 
