@@ -1,7 +1,14 @@
 var base = {
-	url: "http://localhost:3001",
+	url: "http://localhost",
 	req: function(action, params, cb) {
-		$.get(this.url + "/user/" + action, params, function(data) {
+		var p = [], i;
+
+		for (i in params) {
+			p.push(i + "=" + params[i]);
+		}
+		url = encodeURIComponent(this.url + "/user/" + action + "?" + p.join("&"));
+
+		$.get(this.proxy + url, {}, function(data) {
 			if (cb) {
 				cb(data);
 			}
@@ -28,4 +35,4 @@ var base = {
 		}
 	}
 };
-base.url = "http://" + location.hostname + ":3001";
+base.proxy = "http://" + location.hostname + "/proxy.php?url=";
