@@ -7,9 +7,9 @@ const conversacionSchema = new Schema({
   guest: {
     type: String
   },
-  mensajes: [ {
+  mensajes: {
     type: Object
-  } ]
+  }
 }, {
   timestamps: true
 })

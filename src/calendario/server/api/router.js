@@ -1,16 +1,19 @@
 const calendar_helper = require('../google/calendar_helper.js');
-
+const request = require('request');
 
 function buscarhueco(auth, fecha_desde, fecha_hasta){
-  console.log(auth)
+  //console.log(auth)
   calendar_helper.listar_eventos(auth, fecha_desde, fecha_hasta, function(eventos){
 
     // la logica del for
+    if(eventos =! null){
+      for (var i = 0; i < eventos.length; i++) {
+        var event = eventos[i];
+        var start = event.start.dateTime || event.start.date;
+        var end = event.end.dateTime || event.start.date
+        console.log('%s - %s', start,'%s - %s', end, '%s - %s', event.summary);
+      }
 
-    for (var i = 0; i < eventos.length; i++) {
-      var event = eventos[i];
-      var start = event.start.dateTime || event.start.date;
-      console.log('%s - %s', start, event.summary);
     }
 
   })
@@ -34,7 +37,7 @@ module.exports = function(app) {
   //        -- Fecha hora hasta
   app.get('/proximodisponible', (req, res) => {
 
-    console.log("--> proximodisponible " + req);
+    //console.log("--> proximodisponible " + req);
 
     usuario = req.query.usuario
     fecha_desde = req.query.desde

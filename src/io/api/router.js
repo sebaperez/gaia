@@ -1,11 +1,40 @@
+let smtpConfig = {
+    port: 587,
+    secure: false, // upgrade later with STARTTLS
+    auth: {
+        user: 'username',
+        pass: 'password'
+    }
+};
+
+let transporter = nodemailer.createTransport(smtpConfig)
+
+
 module.exports = function(app) {
 
-  app.post('/newmail', (req, res) => {
+  app.post('/send', (req, res) => {
 
-      console.log("--> sender " + req.body.sender);
-      console.log("--> size " + req.body.size);
-      console.log("--> recipient " + req.body.recipient);
-      
+      console.log("--> to " + req.body.to);
+      console.log("--> from " + req.body.from);
+      console.log("--> text " + req.body.text);
+      console.log("--> subject " + req.body.subject);
+      console.log("--> inReplyTo " + req.body.inReplyTo);
+
+      var message = {
+          from: from,
+          to: to,
+          subject: subject,
+          text: text,
+          inReplyTo: inReplyTo
+      };
+
+      transporter.sendMail(message, (err, info) => {
+
+        console.log(JSON.stringify(err, null, 4))
+        console.log(JSON.stringify(info, null, 4))
+
+      }])
+
       res.status(200).json({"ok":"ok"});
   });
 
