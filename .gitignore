@@ -1,5 +1,6 @@
 # Created by .ignore support plugin (hsz.mobi)
 /src/ia/node_modules/
+/src/calendario/node_modules/
 !/src/ia/server/index.js
 
 .idea/workspace.xml
@@ -13,4 +14,3 @@
 .idea/gaia.iml
 
 .idea/dbnavigator.xml
-/nbproject/private/

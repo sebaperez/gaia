@@ -1,0 +1,32 @@
+{
+  "name": "calendar",
+  "version": "1.0.0",
+  "description": "API Calendario Vinculado",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sebaperez/gaia.git"
+  },
+  "keywords": [
+    "calendar",
+    "node",
+    "gaia",
+    "utn",
+    "proyecto"
+  ],
+  "author": "Ignacio Lascurain",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sebaperez/gaia/issues"
+  },
+  "homepage": "https://github.com/sebaperez/gaia#readme",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.4",
+    "google-auth-library": "^0.11.0",
+    "googleapis": "^21.3.0"
+  }
+}

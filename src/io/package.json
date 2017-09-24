@@ -1,0 +1,35 @@
+{
+  "name": "io",
+  "version": "1.0.0",
+  "description": "API para enviar y recibir mensajes",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sebaperez/gaia.git"
+  },
+  "keywords": [
+    "ia",
+    "node",
+    "gaia",
+    "utn",
+    "proyecto"
+  ],
+  "author": "Nicolas Presta",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sebaperez/gaia/issues"
+  },
+  "homepage": "https://github.com/sebaperez/gaia#readme",
+  "dependencies": {
+    "body-parser": "^1.17.2",
+    "express": "^4.15.4",
+    "get-stream": "^3.0.0",
+    "mailparser": "^2.0.5",
+    "request": "^2.82.0",
+    "simplesmtp": "^0.3.35",
+    "smtp-server": "^3.1.0"
+  }
+}
