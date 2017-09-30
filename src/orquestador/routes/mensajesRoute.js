@@ -50,13 +50,11 @@ router.post('/', function (req, res, next) {
       iaService.interpretarMensaje(contenidoMailActual, function (significado) {
 
          if(solicitaReunion(significado)){
-
             conversacionService.crearConversacion(ownerMail, guestMail, contenidoMailActual, significado);
 
             calendarioService.obtenerHueco(significado.intervalos, function(hueco) {
 
                respuestaService.obtenerMensajeCoordinacionAGuest(owner, hueco, function(respuesta){
-
                   var mailRespuesta = {
                      from: owner.botEmail, //validar cómo sale de usuarioApi
                      to: guestMail,
@@ -65,19 +63,19 @@ router.post('/', function (req, res, next) {
                      inReplyTo: idMensaje,
                      text: respuesta + "\n\n" + contenidoMail
                   }
-
                   ioService.enviarMail(mailRespuesta, res);
                });
 
             });
-
          } else {
             console.error('Flujo todavia no soportado. ', error);
             res.status(501);
          }
-
       });
 
+   }, function(mensajeError){
+      res.status(400);
+      res.send(mensajeError);
    });
 
 

@@ -82,6 +82,7 @@ router.post('/respuesta/solicitarReunionAlGuest/parser', function (req, res, nex
 });
 
 router.post('/io/send', function (req, res, next) {
+   console.log(req.body);
    res.status(200).send();
 });
 
