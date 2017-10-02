@@ -8,8 +8,6 @@ var smtp = nodemailer.createTransport({
 		      pass: "UTNfrba1"
 		    }
 });
-
-
   smtp.sendMail({
 	      from: "clara@gaiameet.com",
 	      to: "presta.nico@gmail.com",
@@ -59,6 +57,17 @@ client.on("new", function(message){
 
 });
 
+<<<<<<< HEAD
 client.connect();
 
 */
+=======
+// Middlewares
+app.use(bodyParser.json());
+
+// Puntos de entrada REST
+require('./api/router')(app);
+
+// Nos ponemos a escuchar... hello!
+server_out.listen(port, () => console.log(`Servidor server_out Iniciado en puerto ${port}`));
+>>>>>>> ece12654e05cdea6100e02820df733d82e3b8442

@@ -5,6 +5,10 @@ var iaService = require('../service/ia');
 var conversacionService = require('../service/conversacion');
 var calendarioService = require('../service/calendario');
 var respuestaService = require('../service/respuesta');
+var ioService = require('../service/io');
+var request = require('request');
+var config = require('../config/config').config;
+
 
 router.post('/', function (req, res, next) {
 
@@ -30,6 +34,7 @@ router.post('/', function (req, res, next) {
    var asuntoMail = req.body.subject;
    var contenidoMail = req.body.text;
    var contenidoMailActual = req.body.text.split("----------", 1)[0].trim();
+   var idMensaje = req.body.messageId;
 
    if(!contenidoMailActual) {
       res.send({
@@ -45,30 +50,32 @@ router.post('/', function (req, res, next) {
       iaService.interpretarMensaje(contenidoMailActual, function (significado) {
 
          if(solicitaReunion(significado)){
-
             conversacionService.crearConversacion(ownerMail, guestMail, contenidoMailActual, significado);
 
             calendarioService.obtenerHueco(significado.intervalos, function(hueco) {
 
                respuestaService.obtenerMensajeCoordinacionAGuest(owner, hueco, function(respuesta){
-
-                  res.send({
+                  var mailRespuesta = {
                      from: owner.botEmail, //validar cómo sale de usuarioApi
                      to: guestMail,
+                     cc: owner.email,
                      subject: asuntoMail,
+                     inReplyTo: idMensaje,
                      text: respuesta + "\n\n" + contenidoMail
-                  });
-
+                  }
+                  ioService.enviarMail(mailRespuesta, res);
                });
 
             });
-
          } else {
-            console.log("Flujo todavia no soportado.");
+            console.error('Flujo todavia no soportado. ', error);
+            res.status(501);
          }
-
       });
 
+   }, function(mensajeError){
+      res.status(400);
+      res.send(mensajeError);
    });
 
 
