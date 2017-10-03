@@ -2,10 +2,29 @@ const calendar_helper = require('../google/calendar_helper.js');
 const request = require('request');
 
 function buscarhueco(auth, fecha_desde, fecha_hasta){
-  //console.log(auth)
   calendar_helper.listar_eventos(auth, fecha_desde, fecha_hasta, function(eventos){
 
-    // la logica del for
+    // parsear desde y hasta y asignar a variable
+    //sacar horas de diferencia entre desde y hasta -> horas
+    /* for var i = 0 ; i < horas ; i++) {
+      hasta = desde + ( i + 1)
+      calendar_helper.listar_eventos(auth,desde,hasta, function (eventos))
+      {
+        if (eventos =! null)
+        {
+          if (eventos.lenght = 0)
+          {
+            encontre un hueco
+            cortar! return! salir! explotar todo!
+          }
+        }
+        if (err) {
+          console.log('error: ' + err);
+          callback(null);
+          return;
+        }
+      }
+    }*/
     if(eventos =! null){
       for (var i = 0; i < eventos.length; i++) {
         var event = eventos[i];
@@ -37,16 +56,25 @@ module.exports = function(app) {
   //        -- Fecha hora hasta
   app.get('/proximodisponible', (req, res) => {
 
-    //console.log("--> proximodisponible " + req);
-
+    //ID de usuario
     usuario = req.query.usuario
-    fecha_desde = req.query.desde
-    fecha_hasta = req.query.hasta
-
-    // Levantar las credenciales para ese usuario
+    //req de preferencias de usuario (token y horario)
     calendar_helper.load_credential(usuario, function(auth){
-      buscarhueco(auth, fecha_desde, fecha_hasta)
-    })
+    //coleccion de fechas
+    fechas = req.query.fechas
+    if (fechas =! null){
+      for (var i= 0 ; i < fechas.lenght; i++) {
+        var intervaloFecha = fechas[i]
+        var desde = intervaloFecha.desde;
+        var hasta = intervaloFecha.hasta;
+
+        if (true) //dentro de preferencias)
+        {
+          buscarhueco(auth,desde,hasta)
+        }
+      }
+    }
+    }
 
     // Buscar en el calendario los eventos entre fecha desde y fecha hasta
 
