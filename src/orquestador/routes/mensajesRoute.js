@@ -5,6 +5,10 @@ var iaService = require('../service/ia');
 var conversacionService = require('../service/conversacion');
 var calendarioService = require('../service/calendario');
 var respuestaService = require('../service/respuesta');
+var ioService = require('../service/io');
+var request = require('request');
+var config = require('../config/config').config;
+
 
 router.post('/', function (req, res, next) {
 
@@ -25,58 +29,95 @@ router.post('/', function (req, res, next) {
    // textAsHtml is the plaintext body of the message formatted as HTML
    // attachments
 
-   var ownerMail = req.body.from.value.address;
-   var guestMail = req.body.to.value.address;
+   var mailRemitente = req.body.from.value.address;
+   var mailDestinatario = req.body.to.value.address;
    var asuntoMail = req.body.subject;
    var contenidoMail = req.body.text;
    var contenidoMailActual = req.body.text.split("----------", 1)[0].trim();
+   var idMensaje = req.body.messageId;
+   var idMensajeAnterior = req.body.inReplyTo;
 
-   if(!contenidoMailActual){
-      res.send({
-         de: owner.botEmail, //validar cómo sale de usuarioApi
-         para: guestMail,
-         asunto: asuntoMail,
-         contenido: "Me llegó el mail vacío"
-      })
-   }
-
-   usuarioService.obtenerUsuario(ownerMail, function (owner) {
-
+   usuarioService.obtenerUsuario(mailRemitente, mailDestinatario, function (owner) {
+      if(!contenidoMailActual) {
+         var mensajeMailVacio = 'Me llegó el mail vacío.'
+         console.error(mensajeMailVacio);
+         res.send({
+            de: owner.botEmail,
+            para: mailRemitente,
+            asunto: 'Re: ' + asuntoMail,
+            contenido: mensajeMailVacio
+         })
+      }
       iaService.interpretarMensaje(contenidoMailActual, function (significado) {
 
          if(solicitaReunion(significado)){
-
-            conversacionService.crearConversacion(ownerMail, guestMail, contenidoMailActual, significado);
-
             calendarioService.obtenerHueco(significado.intervalos, function(hueco) {
+               conversacionService.crearConversacion(mailRemitente, mailDestinatario, contenidoMailActual, significado);
 
+               //TODO necesito guardar el hueco en el mensaje para obtenerlo despues
                respuestaService.obtenerMensajeCoordinacionAGuest(owner, hueco, function(respuesta){
-                  console.log(owner)
-                  res.send({
-                     de: owner.botEmail, //validar cómo sale de usuarioApi
-                     para: guestMail,
-                     asunto: asuntoMail,
-                     contenido: respuesta.contenido + "\n\n" + contenidoMailActual + "\n\n" + contenidoMail
-                  });
-
+                  var mailRespuesta = {
+                     from: owner.botEmail, //validar cómo sale de usuarioApi
+                     to: mailDestinatario,
+                     cc: mailRemitente,
+                     subject: 'Re: ' + asuntoMail,
+                     inReplyTo: idMensaje,
+                     text: respuesta + "\n\n" + contenidoMail
+                  }
+                  ioService.enviarMail(mailRespuesta, res);
                });
+            });
+         } else if (aceptaReunion(significado)) {
 
+            conversacionService.obtenerConversacion(idMensajeAnterior, function(conversacion){
+               //TODO necesito traerme el ultimo mensaje de la conversacion para ver el hueco
+               conversacionService.agregarMensajeAConversacion(conversacion.id, contenidoMailActual, significado);
+               //TODO guardar el mensaje nuevo con su intencion
+               var huecoAceptado = conversacion.mensajes[0].hueco;
+               respuestaService.obtenerMensajeConfirmacionReunion(owner, huecoAceptado, function(respuesta){
+                  //TODO
+                  var mailRespuesta = {
+                     from: owner.botEmail, //validar cómo sale de usuarioApi
+                     to: mailDestinatario,
+                     cc: mailRemitente,
+                     subject: 'Re: ' + asuntoMail,
+                     inReplyTo: idMensaje,
+                     text: respuesta + "\n\n" + contenidoMail
+                  }
+                  ioService.enviarMail(mailRespuesta, res);
+               });
+            }, function(error) {
+               console.error(error);
+               res.status(501);
+               res.send();
             });
 
          } else {
-            console.log("Flujo todavia no soportado.");
+               console.error('Intenciones ' + significado.intents + 'no soportadas.');
+               res.status(501);
+               res.send();
          }
-
       });
 
+   }, function(mensajeError){
+      res.status(400);
+      res.send(mensajeError);
    });
 
 
 });
 
 function solicitaReunion(significado) {
+   return chequearContieneIntencion("solicitar_reunion");
+}
+
+function aceptaReunion(significado) {
+   return chequearContieneIntencion("aceptar_reunion");
+}
+
+function chequearContieneIntencion (nombreIntencion) {
    if(significado && significado.intents){
-      return significado.intents.indexOf("solicitar_reunion") >= 0;
+      return significado.intents.indexOf(nombreIntencion) >= 0;
    } else {
       return false;
    }

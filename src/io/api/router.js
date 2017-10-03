@@ -1,21 +1,43 @@
+const nodemailer = require("nodemailer");
+
 module.exports = function(app) {
 
-  app.post('/newmail', (req, res) => {
+	app.post('/send', (req, res) => {
 
-      console.log("--> sender " + req.body.sender);
-      console.log("--> size " + req.body.size);
-      console.log("--> recipient " + req.body.recipient);
-      
-      res.status(200).json({"ok":"ok"});
-  });
+		console.log("--> to " + req.body.to);
+		console.log("--> from " + req.body.from);
+		console.log("--> text " + req.body.text);
+		console.log("--> subject " + req.body.subject);
+		console.log("--> inReplyTo " + req.body.inReplyTo);
 
-  app.get('/dummy', (req, res) => {
+		var smtp = nodemailer.createTransport({
+						service: "Zoho",
+						auth: {
+							user: req.body.from,
+							pass: "UTNfrba1"
+						}
+					});
 
-    console.log("--> dummy " + req.body);
+		smtp.sendMail({
+					from: req.body.from,
+					to: req.body.to,
+					subject: req.body.subject,
+					text: req.body.text,
+					inReplyTo: req.body.inReplyTo
+	 			}, function(error, info){
+					if(error){
+						console.log(error);
+					}else{
+						console.log('Message sent: ' + info.response);
+					}
+		});
 
-    respuesta = "vos me mandaste: " + req.body;
+		res.status(200).json({"ok":"ok"});
 
-	res.status(200).json(respuesta);
-  });
+	});
+
+	app.get('/dummy', (req, res) => {
+		res.status(200).json({"ok":"ok"});
+	});
 
 };

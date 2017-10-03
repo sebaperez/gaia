@@ -1,9 +1,10 @@
 var request = require('request');
 var config = require('../config/config').config;
 
+var conversacionesUrl = config.conversacionApiUrls.conversaciones;
+
 function crearConversacion(ownerMail, guestMail, contenidoMailActual, significado, callback) {
 
-   var conversacionesUrl = config.conversacionApiUrls.conversaciones;
 
    // ej significado: {
    //   "original_response": "PARA DEBUG",
@@ -37,13 +38,23 @@ function crearConversacion(ownerMail, guestMail, contenidoMailActual, significad
       json: true,
       body: nuevaConversacion
    }, function (error, response, body) {
-
       if(callback){
          callback(body);
       }
-
    });
+}
 
+function obtenerConversacion(idMensaje, callback, err) {
+   request.get(conversacionesUrl + '/' + idMensaje, function (error, response, body) {
+      if(callback){
+         if(error){
+            err('No pude obtener la conversacion del mensaje con ID ' + idMensaje);
+         } else {
+            callback(JSON.parse(body));
+         }
+      }
+   });
 }
 
 module.exports.crearConversacion = crearConversacion;
+module.exports.obtenerConversacion = obtenerConversacion;
