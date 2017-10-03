@@ -1,0 +1,6 @@
+[data-ma-action="login-switch"] {
+	width: 95px !important;
+}
+	[data-ma-action="login-switch"] span {
+		width: inherit !important;
+	}

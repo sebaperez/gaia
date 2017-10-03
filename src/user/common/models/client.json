@@ -6,7 +6,10 @@
   "forceId": false,
   "strict": true,
   "options": {
-    "validateUpsert": true
+    "validateUpsert": true,
+    "mongodb": {
+      "collection": "client"
+    }
   },
   "properties": {
     "name": {

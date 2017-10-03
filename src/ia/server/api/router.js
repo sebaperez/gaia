@@ -6,7 +6,10 @@ module.exports = function(app) {
 	console.log("--> process " + req.body.msj);
 
     ia_adapter.process(req.body.msj, function(err, respuesta) {
-        if (err) res.status(500).json("Hubo un error :( ");
+
+        if (err)
+            res.status(500).json(respuesta);
+
         res.status(200).json(respuesta);
     });
 

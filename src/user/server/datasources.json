@@ -1,6 +1,11 @@
 {
   "db": {
-    "name": "db",
-    "connector": "memory"
+    "name": "accountDS",
+    "connector": "mongodb",
+    "host": "localhost",
+    "port": 27017,
+    "database": "gaia",
+    "username": "gaia",
+    "password": "KJ3N42KJ3NKkldf4l"
   }
 }
