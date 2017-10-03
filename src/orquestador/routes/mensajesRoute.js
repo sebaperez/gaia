@@ -35,41 +35,67 @@ router.post('/', function (req, res, next) {
    var contenidoMail = req.body.text;
    var contenidoMailActual = req.body.text.split("----------", 1)[0].trim();
    var idMensaje = req.body.messageId;
-
-   if(!contenidoMailActual) {
-      res.send({
-         de: owner.botEmail,
-         para: mailDestinatario,
-         asunto: asuntoMail,
-         contenido: "Me llegó el mail vacío"
-      })
-   }
+   var idMensajeAnterior = req.body.inReplyTo;
 
    usuarioService.obtenerUsuario(mailRemitente, mailDestinatario, function (owner) {
-
+      if(!contenidoMailActual) {
+         var mensajeMailVacio = 'Me llegó el mail vacío.'
+         console.error(mensajeMailVacio);
+         res.send({
+            de: owner.botEmail,
+            para: mailRemitente,
+            asunto: 'Re: ' + asuntoMail,
+            contenido: mensajeMailVacio
+         })
+      }
       iaService.interpretarMensaje(contenidoMailActual, function (significado) {
 
          if(solicitaReunion(significado)){
-            conversacionService.crearConversacion(mailRemitente, mailDestinatario, contenidoMailActual, significado);
-
             calendarioService.obtenerHueco(significado.intervalos, function(hueco) {
+               conversacionService.crearConversacion(mailRemitente, mailDestinatario, contenidoMailActual, significado);
 
+               //TODO necesito guardar el hueco en el mensaje para obtenerlo despues
                respuestaService.obtenerMensajeCoordinacionAGuest(owner, hueco, function(respuesta){
                   var mailRespuesta = {
                      from: owner.botEmail, //validar cómo sale de usuarioApi
                      to: mailDestinatario,
-                     cc: owner.email,
-                     subject: asuntoMail,
+                     cc: mailRemitente,
+                     subject: 'Re: ' + asuntoMail,
                      inReplyTo: idMensaje,
                      text: respuesta + "\n\n" + contenidoMail
                   }
                   ioService.enviarMail(mailRespuesta, res);
                });
-
             });
+         } else if (aceptaReunion(significado)) {
+
+            conversacionService.obtenerConversacion(idMensajeAnterior, function(conversacion){
+               //TODO necesito traerme el ultimo mensaje de la conversacion para ver el hueco
+               conversacionService.agregarMensajeAConversacion(conversacion.id, contenidoMailActual, significado);
+               //TODO guardar el mensaje nuevo con su intencion
+               var huecoAceptado = conversacion.mensajes[0].hueco;
+               respuestaService.obtenerMensajeConfirmacionReunion(owner, huecoAceptado, function(respuesta){
+                  //TODO
+                  var mailRespuesta = {
+                     from: owner.botEmail, //validar cómo sale de usuarioApi
+                     to: mailDestinatario,
+                     cc: mailRemitente,
+                     subject: 'Re: ' + asuntoMail,
+                     inReplyTo: idMensaje,
+                     text: respuesta + "\n\n" + contenidoMail
+                  }
+                  ioService.enviarMail(mailRespuesta, res);
+               });
+            }, function(error) {
+               console.error(error);
+               res.status(501);
+               res.send();
+            });
+
          } else {
-            console.error('Flujo todavia no soportado. ', error);
-            res.status(501);
+               console.error('Intenciones ' + significado.intents + 'no soportadas.');
+               res.status(501);
+               res.send();
          }
       });
 
@@ -82,8 +108,16 @@ router.post('/', function (req, res, next) {
 });
 
 function solicitaReunion(significado) {
+   return chequearContieneIntencion("solicitar_reunion");
+}
+
+function aceptaReunion(significado) {
+   return chequearContieneIntencion("aceptar_reunion");
+}
+
+function chequearContieneIntencion (nombreIntencion) {
    if(significado && significado.intents){
-      return significado.intents.indexOf("solicitar_reunion") >= 0;
+      return significado.intents.indexOf(nombreIntencion) >= 0;
    } else {
       return false;
    }
