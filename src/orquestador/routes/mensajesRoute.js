@@ -29,8 +29,8 @@ router.post('/', function (req, res, next) {
    // textAsHtml is the plaintext body of the message formatted as HTML
    // attachments
 
-   var ownerMail = req.body.from.value.address;
-   var guestMail = req.body.to.value.address;
+   var mailRemitente = req.body.from.value.address;
+   var mailDestinatario = req.body.to.value.address;
    var asuntoMail = req.body.subject;
    var contenidoMail = req.body.text;
    var contenidoMailActual = req.body.text.split("----------", 1)[0].trim();
@@ -38,26 +38,26 @@ router.post('/', function (req, res, next) {
 
    if(!contenidoMailActual) {
       res.send({
-         de: owner.botEmail, //validar cómo sale de usuarioApi
-         para: guestMail,
+         de: owner.botEmail,
+         para: mailDestinatario,
          asunto: asuntoMail,
          contenido: "Me llegó el mail vacío"
       })
    }
 
-   usuarioService.obtenerUsuario(ownerMail, function (owner) {
+   usuarioService.obtenerUsuario(mailRemitente, mailDestinatario, function (owner) {
 
       iaService.interpretarMensaje(contenidoMailActual, function (significado) {
 
          if(solicitaReunion(significado)){
-            conversacionService.crearConversacion(ownerMail, guestMail, contenidoMailActual, significado);
+            conversacionService.crearConversacion(mailRemitente, mailDestinatario, contenidoMailActual, significado);
 
             calendarioService.obtenerHueco(significado.intervalos, function(hueco) {
 
                respuestaService.obtenerMensajeCoordinacionAGuest(owner, hueco, function(respuesta){
                   var mailRespuesta = {
                      from: owner.botEmail, //validar cómo sale de usuarioApi
-                     to: guestMail,
+                     to: mailDestinatario,
                      cc: owner.email,
                      subject: asuntoMail,
                      inReplyTo: idMensaje,
