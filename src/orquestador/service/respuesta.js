@@ -1,7 +1,7 @@
 var request = require('request');
 var config = require('../config/config').config;
 
-function obtenerMensajeCoordinacionAGuest(owner, fechas, callback) {
+function obtenerMensajeCoordinacionAGuest(owner, hueco, callback) {
 
    var respuestaUrl = config.respuestaApiUrls.solicitarReunionAlGuest;
 
@@ -24,7 +24,7 @@ function obtenerMensajeCoordinacionAGuest(owner, fechas, callback) {
       json: true,
       body: {
          owner: owner,
-         fechas: fechas
+         hueco: hueco
       }
    }, function (error, response, body) {
 
