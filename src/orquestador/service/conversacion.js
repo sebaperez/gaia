@@ -47,7 +47,7 @@ function crearConversacion(ownerMail, guestMail, contenidoMailActual, significad
 
 function obtenerConversacion (ownerMail, guestMail, callback){
    request.get(conversacionesUrl + '/' + ownerMail + '/' + guestMail, function (error, response, body) {
-      var conversacion = JSON.parse(body);
+       var conversacion = JSON.parse(body);
       if(callback) {
          callback(conversacion);
       }
@@ -100,8 +100,16 @@ function armarMensajeConfirmarReunion (respuesta, desde) {
    }
 }
 
+function obtenerUltimoMensajeConSignificado(conversacion, significado){
+   var mensajesConSignificado = conversacion.mensajes.filter(function(m){
+      return m.intents.indexOf(significado) > -1;
+   })
+   return mensajesConSignificado[0].;
+}
+
 module.exports.obtenerConversacion = obtenerConversacion;
 module.exports.crearConversacion = crearConversacion;
 module.exports.agregarMensajeAConversacion = agregarMensajeAConversacion;
 module.exports.armarMensajeProponerHorario = armarMensajeProponerHorario;
 module.exports.armarMensajeConfirmarReunion = armarMensajeConfirmarReunion;
+module.exports.obtenerUltimoMensajeConSignificado = obtenerUltimoMensajeConSignificado;

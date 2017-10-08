@@ -28,12 +28,14 @@ function obtenerMensajeCoordinacionAGuest(owner, hueco, callback) {
       callback(body);
    });
 }
-function obtenerMensajeConfirmacionReunion(hueco){
+function obtenerMensajeConfirmacionReunion(owner, hueco, callback){
    var respuestaUrl = config.respuestaApiUrls.confirmarReunion;
+   console.log(hueco);
    request.post({
       url: respuestaUrl,
       json: true,
       body: {
+         owner: owner,
          hueco: hueco
       }
    }, function (error, response, body) {
@@ -42,3 +44,4 @@ function obtenerMensajeConfirmacionReunion(hueco){
 }
 
 module.exports.obtenerMensajeCoordinacionAGuest = obtenerMensajeCoordinacionAGuest;
+module.exports.obtenerMensajeConfirmacionReunion = obtenerMensajeConfirmacionReunion;

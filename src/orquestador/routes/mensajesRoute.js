@@ -50,6 +50,9 @@ router.post('/', function (req, res, next) {
    var idMensaje = req.body.messageId;
 
    usuarioService.obtenerUsuario(mailRemitente, mailDestinatario, function (owner) {
+      var ownerMail = owner.email;
+      var guestMail = owner.email == mailRemitente? mailDestinatario : mailRemitente;
+
       if(!contenidoMailActual) {
          var mensajeMailVacio = 'Me llegó el mail vacío.'
          console.error(mensajeMailVacio);
@@ -61,7 +64,7 @@ router.post('/', function (req, res, next) {
          })
       }
       iaService.interpretarMensaje(contenidoMailActual, function (significado) {
-
+         console.log(contenidoMailActual);
          console.log("El significado es: " + significado.intents);
          if(solicitaReunion(significado)){
             calendarioService.obtenerHueco(significado.intervalos, function(hueco) {
@@ -84,9 +87,9 @@ router.post('/', function (req, res, next) {
 
          } else if (aceptaReunion(significado)) {
 
-            conversacionService.agregarMensajeAConversacion(ownerMail, guestMail, mensaje, function(conversacion){
-               var huecoAceptado = conversacion.mensajes[1].hueco;
-               respuestaService.obtenerMensajeConfirmacionReunion(huecoAceptado, function(respuesta){
+            conversacionService.agregarMensajeAConversacion(ownerMail, guestMail, contenidoMailActual, function(conversacion){
+               var huecoAceptado = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario").intervalos[0].desde;
+               respuestaService.obtenerMensajeConfirmacionReunion(owner, huecoAceptado, function(respuesta){
                   var mailRespuesta = {
                      from: owner.botEmail, //validar cómo sale de usuarioApi
                      to: mailDestinatario,
@@ -96,7 +99,7 @@ router.post('/', function (req, res, next) {
                      text: respuesta + "\n\n" + contenidoMail
                   }
                   ioService.enviarMail(mailRespuesta, res);
-                  var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, hueco);
+                  var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, huecoAceptado);
                   conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia);
                });
             }, function() {
