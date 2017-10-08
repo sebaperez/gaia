@@ -77,7 +77,7 @@ exports.agregar_evento = function(auth, description,desde,hasta,callback){
   }, function(err, res) {
     if (err) {
       console.log('Error: ' + err);
-      return;
+      callback(err)
     }
     console.log(res);
     callback(res)

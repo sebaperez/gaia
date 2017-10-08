@@ -136,4 +136,32 @@ module.exports = function(app) {
     }
   })
   });
+
+  // Dado una fecha se la agrega al calendario
+  // Input: -- Id usuario
+  //        -- Fecha hora desde (2011-06-03T10:00:00-07:00) verificar
+  //        -- Fecha hora hasta
+  app.post('/agregarEvento', (req, res) => {
+    var respuesta = null
+    //ID de usuario
+    usuario = req.query.usuario
+    description = req.body.description
+    desde = req.body.fecha_desde
+    hasta = req.body.fecha_hasta
+
+    calendar_helper.load_credential(usuario, function(auth, intervalo){
+
+      calendar_helper.agregar_evento(auth,description,desde,hasta,function(e){
+        if(e){
+          res.status(200).json(e)
+        }
+        else{
+          res.status(400).json(e)
+        }
+      })
+
+    })
+
+
+})
 }
