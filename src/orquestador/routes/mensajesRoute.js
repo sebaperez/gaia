@@ -42,7 +42,6 @@ router.post('/', function (req, res, next) {
    // },
    // "messageId": "<CAEfck2BKvKwU57rO1NBDdMic5EOmHBsRy=Y+aW5p3coYsfXtJQ@mail.gmail.com>"
 
-   console.log(JSON.stringify(req.body));
    var mailRemitente = req.body.from.value.address;
    var mailDestinatario = req.body.to.value.address;
    var asuntoMail = req.body.subject;
@@ -63,6 +62,7 @@ router.post('/', function (req, res, next) {
       }
       iaService.interpretarMensaje(contenidoMailActual, function (significado) {
 
+         console.log("El significado es: " + significado.intents);
          if(solicitaReunion(significado)){
             calendarioService.obtenerHueco(significado.intervalos, function(hueco) {
                conversacionService.crearConversacion(mailRemitente, mailDestinatario, contenidoMailActual, significado, hueco);

@@ -214,7 +214,7 @@ router.get('/conversacion/:ownerMail/:guestMail', function (req, res, next) {
 });
 
 router.post('/calendario/huecos', function (req, res, next) {
-   res.send([req.body[0].desde]);
+   res.send(req.body[0].desde);
 });
 
 router.post('/respuesta/solicitarReunionAlGuest/parser', function (req, res, next) {
