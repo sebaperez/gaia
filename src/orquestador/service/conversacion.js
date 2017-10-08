@@ -45,11 +45,26 @@ function crearConversacion(ownerMail, guestMail, contenidoMailActual, significad
    });
 }
 
+function obtenerConversacion (ownerMail, guestMail, callback){
+   request.get(conversacionesUrl + '/' + ownerMail + '/' + guestMail, function (error, response, body) {
+      var conversacion = JSON.parse(body);
+      if(callback) {
+         callback(conversacion);
+      }
+      if(error){
+         console.error("No se pudo obtener la conversacion de owner " + ownerMail + " y guest " + guestMail);
+      }
+   });
+}
+
 function agregarMensajeAConversacion(ownerMail, guestMail, mensaje, callback, err) {
+   obtenerConversacion(ownerMail, guestMail, function(conversacion) {
+      conversacion.mensajes = conversacion.mensajes? conversacion.mensajes : [];
+      conversacion.mensajes.push(mensaje);
       request.put({
-         url: conversacionesUrl + '/' + ownerMail + '/' + guestMail,
+         url: conversacionesUrl + '/' + conversacion.id,
          json: true,
-         body: {"mensajes": mensaje}
+         body: conversacion
       }, function (error, response, body) {
          if(error){
             err();
@@ -58,6 +73,7 @@ function agregarMensajeAConversacion(ownerMail, guestMail, mensaje, callback, er
             callback(body);
          }
       });
+   });
 }
 
 function armarMensajeProponerHorario(respuesta, desde){
@@ -72,6 +88,7 @@ function armarMensajeProponerHorario(respuesta, desde){
    }
 }
 
+module.exports.obtenerConversacion = obtenerConversacion;
 module.exports.crearConversacion = crearConversacion;
 module.exports.agregarMensajeAConversacion = agregarMensajeAConversacion;
 module.exports.armarMensajeProponerHorario = armarMensajeProponerHorario;
