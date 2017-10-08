@@ -22,6 +22,7 @@ module.exports = {
     })
     */
     texto = texto.replace(/@name/g, res.req.body.owner.name);
+    console.log("La fecha para agendar es: " + body.hueco)
     var date = new Date(Date.parse(body.hueco))
     var dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
     var meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Disciembre"]
