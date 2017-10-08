@@ -33,6 +33,21 @@
       "required": false,
       "defaultFn": "now"
     },
+    "timeStart": {
+      "type": "string",
+      "required": false,
+      "default": "9"
+    },
+    "timeEnd": {
+      "type": "string",
+      "required": false,
+      "default": "18"
+    },
+    "blacklistedContacts": {
+      "type": "array",
+      "required": false,
+      "default": []
+    },
     "realm": false,
     "username": false
   },
