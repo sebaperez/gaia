@@ -89,6 +89,7 @@ exports.load_credential = function(user_id, callback) {
   var auth = new googleAuth();
   var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
  /*
+     //req localhost:3000/api/Clients/iduser por get
   var http = require('http');
   var options = {
   host: 'http://gaiameet.com:3000',
@@ -98,6 +99,7 @@ exports.load_credential = function(user_id, callback) {
     console.log('STATUS: ' + res.statusCode);
     console.log('HEADERS: ' + JSON.stringify(res.headers));
   });*/
+
   //En Archivo
   token_path = "../credentials/" + 300 + ".json"
   fs.readFile(token_path, function(err, token) {
@@ -111,8 +113,8 @@ exports.load_credential = function(user_id, callback) {
         console.log(err);
         return reject('error in authenticating calendar oAuth client.');
       }
-      console.log(oauth2Client)
-      callback(oauth2Client);
+      intervalo = {hora_inicio: 9, hora_fin: 18}
+      callback(oauth2Client,intervalo);
     });
   });
 }
