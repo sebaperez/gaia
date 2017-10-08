@@ -14,7 +14,7 @@ module.exports.config = {
    },
    respuestaApiUrls: {
       solicitarReunionAlGuest: prod ? urlBaseProd + ":9000/respuesta/solicitarReunionAlGuest/parser" : "http://localhost:5555/test/respuesta/solicitarReunionAlGuest/parser",
-      solicitarReunionAlGuest: "http://localhost:5555/test/respuesta/confirmarReunion/parser",
+      solicitarReunionAlGuest: prod ? urlBaseProd + ":9000/respuesta/confirmarReunion/parser" : "http://localhost:5555/test/respuesta/confirmarReunion/parser"
    },
    calendarioApiUrls: {
       huecos: "http://localhost:5555/test/calendario/huecos"

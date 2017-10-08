@@ -73,7 +73,7 @@ router.post('/', function (req, res, next) {
 
             conversacionService.agregarMensajeAConversacion(ownerMail, guestMail, mensaje, function(conversacion){
                var huecoAceptado = conversacion.mensajes[1].hueco;
-               respuestaService.obtenerMensajeConfirmacionReunion(owner, huecoAceptado, function(respuesta){
+               respuestaService.obtenerMensajeConfirmacionReunion(huecoAceptado, function(respuesta){
                   var mailRespuesta = {
                      from: owner.botEmail, //validar cómo sale de usuarioApi
                      to: mailDestinatario,
@@ -83,6 +83,8 @@ router.post('/', function (req, res, next) {
                      text: respuesta + "\n\n" + contenidoMail
                   }
                   ioService.enviarMail(mailRespuesta, res);
+                  var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, hueco);
+                  conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia);
                });
             }, function() {
                console.error('No pude agregar el mensaje a la conversacion del owner ' + ownerMail + ' y guest ' + guestMail);

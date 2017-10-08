@@ -88,7 +88,20 @@ function armarMensajeProponerHorario(respuesta, desde){
    }
 }
 
+function armarMensajeConfirmarReunion (respuesta, desde) {
+   return {
+      "contenido": respuesta,
+      "intents": [
+         "confirmar_reunion"
+      ],
+      "intervalos": [{
+          "desde": desde
+      }]
+   }
+}
+
 module.exports.obtenerConversacion = obtenerConversacion;
 module.exports.crearConversacion = crearConversacion;
 module.exports.agregarMensajeAConversacion = agregarMensajeAConversacion;
 module.exports.armarMensajeProponerHorario = armarMensajeProponerHorario;
+module.exports.armarMensajeConfirmarReunion = armarMensajeConfirmarReunion;
