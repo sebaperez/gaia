@@ -59,6 +59,7 @@ router.post('/ia/process', function (req, res, next) {
 router.post('/conversacion', function (req, res, next) {
     res.send(
       {
+         id: 21312321312,
          owner: 'juan.perez@gmail.com',
          guest: "mario.baracus@hotmail.com",
          mensajes: [
@@ -91,9 +92,10 @@ router.post('/conversacion', function (req, res, next) {
 });
 
 //agregarMensajeAConversacion
-router.put('/conversacion/:ownerMail/:guestMail', function (req, res, next) {
+router.put('/conversacion/:id', function (req, res, next) {
     res.send(
       {
+         id: 21312321312,
           owner: 'juan.perez@gmail.com',
           guest: "mario.baracus@hotmail.com",
           mensajes: [
@@ -155,8 +157,64 @@ router.put('/conversacion/:ownerMail/:guestMail', function (req, res, next) {
       });
 });
 
+//obtenerConversacion
+router.get('/conversacion/:ownerMail/:guestMail', function (req, res, next) {
+    res.send(
+      {
+         id: 21312321312,
+          owner: 'juan.perez@gmail.com',
+          guest: "mario.baracus@hotmail.com",
+          mensajes: [
+             {
+                contenido: "Guest, mañana el owner esta libre a las 15hs",
+                significado: {
+                  "intents": [
+                     "proponer_horario"
+                  ],
+                  "fechas": [{
+                     "fecha": "2017-08-22T00:00:00.000-03:00"
+                  }],
+                  "intervalos": [
+                    {
+                       "desde": "2017-08-22T14:00:00.000-03:00",
+                       "hasta": "2017-08-22T15:00:00.000-03:00"
+                    },
+                    {
+                       "desde": "2017-08-17T00:00:00.000-03:00",
+                       "hasta": "2017-09-02T00:00:00.000-03:00"
+                    }
+                  ]
+                }
+             },
+             {
+                contenido: "solicito una reunion para mañana, pongo en copia a Gaia para que coordine",
+                significado: {
+                  "original_response": "PARA DEBUG",
+                  "ok": true,
+                  "intents": [
+                     "solicitar_reunion"
+                  ],
+                  "fechas": [{
+                     "fecha": "2017-08-22T00:00:00.000-03:00"
+                  }],
+                  "intervalos": [
+                    {
+                       "desde": "2017-08-22T14:00:00.000-03:00",
+                       "hasta": "2017-08-22T15:00:00.000-03:00"
+                    },
+                    {
+                       "desde": "2017-08-17T00:00:00.000-03:00",
+                       "hasta": "2017-09-02T00:00:00.000-03:00"
+                    }
+                   ]
+               }
+            }
+         ]
+      });
+});
+
 router.post('/calendario/huecos', function (req, res, next) {
-   res.send([req.body[0].desde]);
+   res.send(req.body[0].desde);
 });
 
 router.post('/respuesta/solicitarReunionAlGuest/parser', function (req, res, next) {

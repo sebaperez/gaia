@@ -5,6 +5,8 @@ function enviarMail(mail, res, callback) {
 
    var enviarMailUrl = config.ioApiUrls.enviar;
 
+   console.log(JSON.stringify(mail));
+   
    request.post({
       url: enviarMailUrl,
       json: true,

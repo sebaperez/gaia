@@ -13,21 +13,34 @@ var config = require('../config/config').config;
 router.post('/', function (req, res, next) {
 
    //ej mailParseado:
-   // headers – a Map object with lowercase header keys
-   // subject is the subject line (also available from the header mail.headers.get(‘subject’))
-   // from is an address object for the From: header
-   // to is an address object for the To: header
-   // cc is an address object for the Cc: header
-   // bcc is an address object for the Bcc: header (usually not present)
-   // date is a Date object for the Date: header
-   // messageId is the Message-ID value string
-   // inReplyTo is the In-Reply-To value string
-   // reply-to is an address object for the Cc: header
-   // references is an array of referenced Message-ID values
-   // html is the HTML body of the message. If the message included embedded images as cid: urls then these are all replaced with base64 formatted data: URIs
-   // text is the plaintext body of the message
-   // textAsHtml is the plaintext body of the message formatted as HTML
-   // attachments
+   // "attachments": [],
+   // "headers": {},
+   // "html": "<div dir=\"ltr\">teaaegafa ag aeg </div>\n",
+   // "text": "teaaegafa ag aeg\n",
+   // "textAsHtml": "<p>teaaegafa ag aeg</p>",
+   // "subject": "test",
+   // "date": "2017-10-08T16:20:00.000Z",
+   // "to": {
+   //    "value": [
+   //         {
+   //             "address": "clara@gaiameet.com",
+   //             "name": ""
+   //         }
+   //    ],
+   //    "html": "<span class=\"mp_address_group\"><a href=\"mailto:clara@gaiameet.com\" class=\"mp_address_email\">clara@gaiameet.com</a></span>",
+   //    "text": "clara@gaiameet.com"
+   // },
+   // "from": {
+   //    "value": [
+   //         {
+   //             "address": "nicolas.presta@mercadolibre.com",
+   //             "name": "Nicolas Rodriguez Presta"
+   //         }
+   //    ],
+   //    "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Nicolas Rodriguez Presta</span> &lt;<a href=\"mailto:nicolas.presta@mercadolibre.com\" class=\"mp_address_email\">nicolas.presta@mercadolibre.com</a>&gt;</span>",
+   //    "text": "Nicolas Rodriguez Presta <nicolas.presta@mercadolibre.com>"
+   // },
+   // "messageId": "<CAEfck2BKvKwU57rO1NBDdMic5EOmHBsRy=Y+aW5p3coYsfXtJQ@mail.gmail.com>"
 
    var mailRemitente = req.body.from.value.address;
    var mailDestinatario = req.body.to.value.address;
@@ -35,7 +48,6 @@ router.post('/', function (req, res, next) {
    var contenidoMail = req.body.text;
    var contenidoMailActual = req.body.text.split("----------", 1)[0].trim();
    var idMensaje = req.body.messageId;
-   var idMensajeAnterior = req.body.inReplyTo;
 
    usuarioService.obtenerUsuario(mailRemitente, mailDestinatario, function (owner) {
       if(!contenidoMailActual) {
@@ -50,6 +62,7 @@ router.post('/', function (req, res, next) {
       }
       iaService.interpretarMensaje(contenidoMailActual, function (significado) {
 
+         console.log("El significado es: " + significado.intents);
          if(solicitaReunion(significado)){
             calendarioService.obtenerHueco(significado.intervalos, function(hueco) {
                conversacionService.crearConversacion(mailRemitente, mailDestinatario, contenidoMailActual, significado, hueco);
@@ -73,7 +86,7 @@ router.post('/', function (req, res, next) {
 
             conversacionService.agregarMensajeAConversacion(ownerMail, guestMail, mensaje, function(conversacion){
                var huecoAceptado = conversacion.mensajes[1].hueco;
-               respuestaService.obtenerMensajeConfirmacionReunion(owner, huecoAceptado, function(respuesta){
+               respuestaService.obtenerMensajeConfirmacionReunion(huecoAceptado, function(respuesta){
                   var mailRespuesta = {
                      from: owner.botEmail, //validar cómo sale de usuarioApi
                      to: mailDestinatario,
@@ -83,6 +96,8 @@ router.post('/', function (req, res, next) {
                      text: respuesta + "\n\n" + contenidoMail
                   }
                   ioService.enviarMail(mailRespuesta, res);
+                  var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, hueco);
+                  conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia);
                });
             }, function() {
                console.error('No pude agregar el mensaje a la conversacion del owner ' + ownerMail + ' y guest ' + guestMail);
