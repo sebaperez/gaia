@@ -52,8 +52,7 @@ router.post('/', function (req, res, next) {
 
          if(solicitaReunion(significado)){
             calendarioService.obtenerHueco(significado.intervalos, function(hueco) {
-               conversacionService.crearConversacion(mailRemitente, mailDestinatario, contenidoMailActual, significado);
-
+               conversacionService.crearConversacion(mailRemitente, mailDestinatario, contenidoMailActual, significado, hueco);
                //TODO necesito guardar el hueco en el mensaje para obtenerlo despues
                respuestaService.obtenerMensajeCoordinacionAGuest(owner, hueco, function(respuesta){
                   var mailRespuesta = {
@@ -65,17 +64,16 @@ router.post('/', function (req, res, next) {
                      text: respuesta + "\n\n" + contenidoMail
                   }
                   ioService.enviarMail(mailRespuesta, res);
+                  var mensajeDeGaia = conversacionService.armarMensajeProponerHorario(respuesta, hueco);
+                  conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia)
                });
             });
+
          } else if (aceptaReunion(significado)) {
 
-            conversacionService.obtenerConversacion(idMensajeAnterior, function(conversacion){
-               //TODO necesito traerme el ultimo mensaje de la conversacion para ver el hueco
-               conversacionService.agregarMensajeAConversacion(conversacion.id, contenidoMailActual, significado);
-               //TODO guardar el mensaje nuevo con su intencion
-               var huecoAceptado = conversacion.mensajes[0].hueco;
+            conversacionService.agregarMensajeAConversacion(ownerMail, guestMail, mensaje, function(conversacion){
+               var huecoAceptado = conversacion.mensajes[1].hueco;
                respuestaService.obtenerMensajeConfirmacionReunion(owner, huecoAceptado, function(respuesta){
-                  //TODO
                   var mailRespuesta = {
                      from: owner.botEmail, //validar cómo sale de usuarioApi
                      to: mailDestinatario,
@@ -86,8 +84,8 @@ router.post('/', function (req, res, next) {
                   }
                   ioService.enviarMail(mailRespuesta, res);
                });
-            }, function(error) {
-               console.error(error);
+            }, function() {
+               console.error('No pude agregar el mensaje a la conversacion del owner ' + ownerMail + ' y guest ' + guestMail);
                res.status(501);
                res.send();
             });
@@ -108,14 +106,14 @@ router.post('/', function (req, res, next) {
 });
 
 function solicitaReunion(significado) {
-   return chequearContieneIntencion("solicitar_reunion");
+   return chequearContieneIntencion(significado, "solicitar_reunion");
 }
 
 function aceptaReunion(significado) {
-   return chequearContieneIntencion("aceptar_reunion");
+   return chequearContieneIntencion(significado, "aceptar_reunion");
 }
 
-function chequearContieneIntencion (nombreIntencion) {
+function chequearContieneIntencion (significado, nombreIntencion) {
    if(significado && significado.intents){
       return significado.intents.indexOf(nombreIntencion) >= 0;
    } else {

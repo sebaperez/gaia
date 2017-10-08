@@ -14,7 +14,7 @@ function interpretarMensaje(contenido, callback) {
       if(body.ok){
          callback(body);
       } else {
-         console.log("El modulo de IA no pudo procesar el mensaje: " + contenido);
+         console.error("El modulo de IA no pudo procesar el mensaje: " + contenido);
       }
 
    });

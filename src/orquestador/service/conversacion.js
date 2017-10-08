@@ -3,7 +3,7 @@ var config = require('../config/config').config;
 
 var conversacionesUrl = config.conversacionApiUrls.conversaciones;
 
-function crearConversacion(ownerMail, guestMail, contenidoMailActual, significado, callback) {
+function crearConversacion(ownerMail, guestMail, contenidoMailActual, significado, hueco, callback) {
 
 
    // ej significado: {
@@ -24,11 +24,12 @@ function crearConversacion(ownerMail, guestMail, contenidoMailActual, significad
 
    var nuevaConversacion = {
       owner: ownerMail,
-      guests: guestMail,
+      guest: guestMail,
       mensajes: [
          {
             contenido: contenidoMailActual, //solo el ultimo mensaje de la cadena
-            significado: significado
+            significado: significado,
+            hueco: hueco
          }
       ]
    };
@@ -44,17 +45,33 @@ function crearConversacion(ownerMail, guestMail, contenidoMailActual, significad
    });
 }
 
-function obtenerConversacion(idMensaje, callback, err) {
-   request.get(conversacionesUrl + '/' + idMensaje, function (error, response, body) {
-      if(callback){
+function agregarMensajeAConversacion(ownerMail, guestMail, mensaje, callback, err) {
+      request.put({
+         url: conversacionesUrl + '/' + ownerMail + '/' + guestMail,
+         json: true,
+         body: {"mensajes": mensaje}
+      }, function (error, response, body) {
          if(error){
-            err('No pude obtener la conversacion del mensaje con ID ' + idMensaje);
-         } else {
-            callback(JSON.parse(body));
+            err();
          }
-      }
-   });
+         if(callback){
+            callback(body);
+         }
+      });
+}
+
+function armarMensajeProponerHorario(respuesta, desde){
+   return {
+      "contenido": respuesta,
+      "intents": [
+         "proponer_horario"
+      ],
+      "intervalos": [{
+          "desde": desde
+      }]
+   }
 }
 
 module.exports.crearConversacion = crearConversacion;
-module.exports.obtenerConversacion = obtenerConversacion;
+module.exports.agregarMensajeAConversacion = agregarMensajeAConversacion;
+module.exports.armarMensajeProponerHorario = armarMensajeProponerHorario;
