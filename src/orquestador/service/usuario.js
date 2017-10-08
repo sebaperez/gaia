@@ -5,7 +5,7 @@ function obtenerUsuario(emailRemitente, emailDestinatario, callback, err) {
 
    var usuarioRemitenteUrl = config.userApiUrls.clientes + '?filter[where][email]=' + emailRemitente + '&filter[limit]=1';
    request.get(usuarioRemitenteUrl, function (error, response, body) {
-      console.log("Buscando owner entre mails " + emailRemitente " y " + emailDestinatario);
+      console.log("Buscando owner entre mails " + emailRemitente  + " y " + emailDestinatario);
       if(body){
          var usuarioRemitente = JSON.parse(body)[0];
          if(usuarioRemitente) {
