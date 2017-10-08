@@ -104,7 +104,7 @@ function obtenerUltimoMensajeConSignificado(conversacion, significado){
    var mensajesConSignificado = conversacion.mensajes.filter(function(m){
       return m.intents.indexOf(significado) > -1;
    })
-   return mensajesConSignificado[0].;
+   return mensajesConSignificado[0];
 }
 
 module.exports.obtenerConversacion = obtenerConversacion;
