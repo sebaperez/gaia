@@ -1,6 +1,7 @@
 
 var exports = module.exports = {};
 const request = require('request');
+const moment = require('moment');
 
 var fs = require('fs');
 var readline = require('readline');
@@ -31,17 +32,20 @@ fs.readFile('client_secret.json', function processClientSecrets(err, content) {
 //Listar eventos
 exports.listar_eventos = function(auth, desde, hasta, callback) {
   var calendar = google.calendar('v3');
-  //console.log(auth)
+  var D = moment(desde)
+  var H = moment(hasta)
+  D.subtract(3,'hours')
+  H.subtract(3,'hours')
+  console.log('A GOOGLE: desde: '+D.toISOString().replace(".000Z","-03:00")+ " - hasta: "+H.toISOString().replace(".000Z","-03:00"))
   calendar.events.list({
     auth: auth,
     calendarId: 'primary',
-    timeMin: desde,
-    timeMax: hasta,
+    timeMin: D.toISOString().replace(".000Z","-03:00"),
+    timeMax: H.toISOString().replace(".000Z","-03:00"),
     maxResults: 10,
     singleEvents: true,
     orderBy: 'startTime'
   }, function(err, response) {
-
     if (err) {
       console.log('The API returned an error: ' + err);
       callback(null);
@@ -50,7 +54,6 @@ exports.listar_eventos = function(auth, desde, hasta, callback) {
 
     var events = response.items;
     callback(events)
-
   });
 }
 //Agregar un evento
@@ -85,7 +88,7 @@ exports.load_credential = function(user_id, callback) {
 
   var auth = new googleAuth();
   var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
-
+ /*
   var http = require('http');
   var options = {
   host: 'http://gaiameet.com:3000',
@@ -94,18 +97,22 @@ exports.load_credential = function(user_id, callback) {
   var req = http.get(options, function(res) {
     console.log('STATUS: ' + res.statusCode);
     console.log('HEADERS: ' + JSON.stringify(res.headers));
-  });
+  });*/
   //En Archivo
-  /*token_path = "../credentials/" + user_id + ".json"
+  token_path = "../credentials/" + 300 + ".json"
   fs.readFile(token_path, function(err, token) {
     if (err) {
       console.log(err)
     }
-      oauth2Client.credentials = JSON.parse(token);
-      oauth2Client.refreshAccessToken(function(err, tokens){
-        if(err){
-      //do something with the error
-      console.log(err);
-      return reject('error in authenticating calendar oAuth client.');  }*/
+    oauth2Client.credentials = JSON.parse(token);
+    oauth2Client.refreshAccessToken(function(err, tokens){
+      if(err){
+        //do something with the error
+        console.log(err);
+        return reject('error in authenticating calendar oAuth client.');
+      }
+      console.log(oauth2Client)
       callback(oauth2Client);
-    };
+    });
+  });
+}
