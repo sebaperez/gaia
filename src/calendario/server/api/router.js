@@ -2,13 +2,14 @@ const calendar_helper = require('../google/calendar_helper.js');
 const request = require('request');
 const moment = require('moment');
 
-function buscarhueco(auth, fecha_desde, fecha_hasta){
+function buscarhueco(auth, fecha_desde, fecha_hasta, callback){
     // parsear desde y hasta y asignar a variable
     //sacar horas de diferencia entre desde y hasta -> horas
     var desde = moment(fecha_desde)
     var hasta = moment(fecha_hasta)
     Newhasta = moment(fecha_desde)
     Newhasta = Newhasta.add(1,'hours')
+    var retorno
     //console.log(hasta.toISOString())
     //console.log(Newhasta.toISOString())
 
@@ -32,14 +33,14 @@ function buscarhueco(auth, fecha_desde, fecha_hasta){
            {
 
             console.log("HAY HUECO - Desde: " + desde.toISOString() )
-            //armar respuesta
-            //break
+            retorno = desde.toISOString()
+            callback(retorno)
            }
           else
             {
               if(diferenciaHoras<=1){
                 console.log("NO HAY HUECO")
-
+                callback(null)
               }
               else{
             console.log("HAY EVENTO - " + eventos[0].summary);
@@ -61,7 +62,7 @@ module.exports = function(app) {
   //        -- Fecha hora desde (2011-06-03T10:00:00-07:00) verificar
   //        -- Fecha hora hasta
   app.post('/proximodisponible', (req, res) => {
-
+    var respuesta = null
     //ID de usuario
     usuario = req.query.usuario
     //req de preferencias de usuario (token y horario)
@@ -70,26 +71,45 @@ module.exports = function(app) {
     fechas = req.body
     console.log(fechas);
     if (fechas != null){
-      for (var i= 0 ; i < fechas.length; i++) {
+      //for (var i= 0 ; i < fechas.length; i++) {
+        var i = 0
         var intervaloFecha = fechas[i]
         var desde = intervaloFecha.desde;
         var hasta = intervaloFecha.hasta;
-        if (true) //dentro de preferencias)
+        // TODO: Acotar intervalo segun preferencias del user
+
+        buscarhueco(auth,desde,hasta,function(hueco)
         {
-          buscarhueco(auth,desde,hasta)
-        }
-      }
+          var logicaBuscarHueco =  function(hueco){
+            if (hueco)
+              res.status(200).json(hueco);
+            else {
+              var i = i + 1
+
+              if (fechas.lenght > i)
+              {
+
+              var intervaloFecha = fechas[i]
+              var desde = intervaloFecha.desde;
+              var hasta = intervaloFecha.hasta;
+
+              buscarhueco(auth,desde,hasta, function(e) { logicaBuscarHueco(e) } )
+
+              }
+              else {
+                  res.status(200).json(null);
+              }
+            }
+          }
+
+            logicaBuscarHueco(hueco)
+        })
+
+      //}
     }
   })
-    // Buscar en el calendario los eventos entre fecha desde y fecha hasta
+     //respuesta = {haydisponible: true, fecha_desde: "", fecha_hasta: ""}
 
-    // Buscar hueco, un loop que cuando encuentra uno corta.
-    // Arranca desde fecha hora desde y termina en fecha hora hasta.
 
-     // Armar respuesta
-
-     respuesta = {haydisponible: true, fecha_desde: "", fecha_hasta: ""}
-
-     res.status(200).json(respuesta);
   });
 }
