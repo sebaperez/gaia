@@ -110,10 +110,14 @@ function storeToken(token) {
 function listEvents(auth) {
   var calendar = google.calendar('v3');
   /*console.log(auth)*/
+  var desde = "2017-10-08T16:00:00-03:00"
+  var hasta = "2017-10-08T17:00:00-03:00"
+
   calendar.events.list({
     auth: auth,
     calendarId: 'primary',
-    timeMin: (new Date()).toISOString(),
+    timeMin: desde,
+    timeMax: hasta,
     maxResults: 10,
     singleEvents: true,
     orderBy: 'startTime'
