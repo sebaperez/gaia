@@ -1,12 +1,29 @@
 var request = require('request');
 var config = require('../config/config').config;
 
-function obtenerUsuario(email, callback) {
+function obtenerUsuario(emailRemitente, emailDestinatario, callback, err) {
 
-   var usuarioUrl = config.userApiUrls.clientes + '?filter[where][email]=' + email + '&filter[limit]=1';
-
-   request.get(usuarioUrl, function (error, response, body) {
-      callback(JSON.parse(body)[0]);
+   var usuarioRemitenteUrl = config.userApiUrls.clientes + '?filter[where][email]=' + emailRemitente + '&filter[limit]=1';
+   request.get(usuarioRemitenteUrl, function (error, response, body) {
+      if(body){
+         var usuarioRemitente = JSON.parse(body)[0];
+         if(usuarioRemitente) {
+            callback(usuarioRemitente);
+         } else {
+            console.log("Buscando owner entre mails " + emailDestinatario);
+            var usuarioDestinatarioUrl = config.userApiUrls.clientes + '?filter[where][email]=' + emailDestinatario + '&filter[limit]=1';
+            request.get(usuarioDestinatarioUrl, function (error, response, body) {
+               var usuarioDestinatario = JSON.parse(body)[0];
+               if(usuarioDestinatario) {
+                  callback(usuarioDestinatario);
+               } else {
+                  err("No existe un owner con el email " + emailRemitente + " ni " + emailDestinatario);
+               }
+            });
+         }
+      } else {
+         err("Error en el modulo de clientes")
+      }
    });
 
 }

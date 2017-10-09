@@ -1,6 +1,5 @@
-var urlBaseProd = "http://" + process.env.IP;
-
-var prod = process.env.ENTORNO == 'prod'
+var urlBaseProd = 'http://45.55.187.250'
+var prod = process.env.ENTORNO == 'prod';
 
 module.exports.config = {
    userApiUrls: {
@@ -13,9 +12,13 @@ module.exports.config = {
       conversaciones: prod ? urlBaseProd + ":9001/conversacion" : "http://localhost:5555/test/conversacion"
    },
    respuestaApiUrls: {
-      solicitarReunionAlGuest: prod ? urlBaseProd + ":9000/respuesta/solicitarReunionAlGuest/parser" : "http://localhost:5555/test/respuesta/solicitarReunionAlGuest/parser"
+      solicitarReunionAlGuest: prod ? urlBaseProd + ":9000/respuesta/solicitarReunionAlGuest/parser" : "http://localhost:5555/test/respuesta/solicitarReunionAlGuest/parser",
+      confirmarReunion: prod ? urlBaseProd + ":9000/respuesta/confirmarReunion/parser" : "http://localhost:5555/test/respuesta/confirmarReunion/parser"
    },
    calendarioApiUrls: {
       huecos: "http://localhost:5555/test/calendario/huecos"
+   },
+   ioApiUrls: {
+      enviar: prod ? urlBaseProd + ":4444/send" : "http://localhost:5555/test/io/send"
    }
 };
