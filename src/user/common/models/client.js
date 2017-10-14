@@ -11,4 +11,10 @@ module.exports = function(Client) {
 
   Client.validatesFormatOf('botEmail', {with: validEmail, message: 'Must provide a valid email'});
 
+  Client.settings.acls = [
+	 { principalType: 'ROLE',
+        principalId: '$everyone',
+        permission: 'ALLOW' },
+  ];
+
 };

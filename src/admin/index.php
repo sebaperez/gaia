@@ -12,6 +12,7 @@
 
         <!-- CSS -->
         <link href="css/app_1.min.css" rel="stylesheet">
+	<link href="css/app_2.min.css" rel="stylesheet">
     </head>
 
     <body>
@@ -76,11 +77,11 @@
 
             <section id="content">
                 <div class="container">
-                    <div class="card">
-                        <div class="card-body card-padding text-center">
-                            <h4></h4>
-                        </div>
-                    </div>
+			<div class="block-header">
+				<h2></h2>
+			</div>
+			<div id="content-body">
+			</div>
                 </div>
             </section>
         </section>

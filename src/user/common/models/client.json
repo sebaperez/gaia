@@ -28,6 +28,14 @@
       "type": "string",
       "required": true
     },
+    "googleAccessToken": {
+      "type": "string",
+      "required": false
+    },
+    "googleRefreshToken": {
+      "type": "string",
+      "required": false
+    },
     "creationDate": {
       "type": "date",
       "required": false,
@@ -53,6 +61,12 @@
   },
   "validations": [],
   "relations": {},
-  "acls": [],
+  "acls": [
+	{
+		"principalType": "ROLE",
+		"principalId": "$everyone",
+		"permission": "ALLOW"
+	}
+  ],
   "methods": {}
 }
