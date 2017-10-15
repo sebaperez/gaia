@@ -66,20 +66,16 @@ router.post('/', function (req, res, next) {
       iaService.interpretarMensaje(contenidoMailActual, function (significado) {
          console.log(contenidoMailActual);
          console.log("El significado es: " + significado.intents);
+
          if(solicitaReunion(significado)){
             calendarioService.obtenerHueco(significado.intervalos, function(hueco) {
                conversacionService.crearConversacion(mailRemitente, mailDestinatario, contenidoMailActual, significado, hueco);
-               //TODO necesito guardar el hueco en el mensaje para obtenerlo despues
                respuestaService.obtenerMensajeCoordinacionAGuest(owner, hueco, function(respuesta){
-                  var mailRespuesta = {
-                     from: owner.botEmail, //validar cómo sale de usuarioApi
-                     to: mailDestinatario,
-                     cc: mailRemitente,
-                     subject: 'Re: ' + asuntoMail,
-                     inReplyTo: idMensaje,
-                     text: respuesta + "\n\n" + contenidoMail
-                  }
-                  ioService.enviarMail(mailRespuesta, res);
+                  ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
+                     res.status(200).send();
+                  }, function(){
+                     res.status(500).send();
+                  });
                   var mensajeDeGaia = conversacionService.armarMensajeProponerHorario(respuesta, hueco);
                   conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia)
                });
@@ -90,15 +86,11 @@ router.post('/', function (req, res, next) {
             conversacionService.agregarMensajeAConversacion(ownerMail, guestMail, contenidoMailActual, function(conversacion){
                var huecoAceptado = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario").intervalos[0].desde;
                respuestaService.obtenerMensajeConfirmacionReunion(owner, huecoAceptado, function(respuesta){
-                  var mailRespuesta = {
-                     from: owner.botEmail, //validar cómo sale de usuarioApi
-                     to: mailDestinatario,
-                     cc: mailRemitente,
-                     subject: 'Re: ' + asuntoMail,
-                     inReplyTo: idMensaje,
-                     text: respuesta + "\n\n" + contenidoMail
-                  }
-                  ioService.enviarMail(mailRespuesta, res);
+                  ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
+                     res.status(200).send();
+                  }, function(){
+                     res.status(500).send();
+                  });
                   var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, huecoAceptado);
                   conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia);
                });

@@ -1,12 +1,21 @@
 var request = require('request');
 var config = require('../config/config').config;
 
-function enviarMail(mail, res, callback) {
+function enviarMail(mailBot, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, callback) {
 
    var enviarMailUrl = config.ioApiUrls.enviar;
 
    console.log(JSON.stringify(mail));
-   
+
+   var mail = {
+      from: mailBot,
+      to: mailDestinatario,
+      cc: mailRemitente,
+      subject: 'Re: ' + asuntoMail,
+      inReplyTo: idMensaje,
+      text: respuesta + "\n\n" + contenidoMail
+   }
+
    request.post({
       url: enviarMailUrl,
       json: true,
@@ -14,9 +23,9 @@ function enviarMail(mail, res, callback) {
    }, function (error, response, body) {
       if (error || response.statusCode != 200) {
          console.error('Fallo en el envio de la respuesta por mail. ', error);
-         res.status(500).send();
+         err();
       } else{
-         res.status(200).send();
+         callback();
       }
    });
 
