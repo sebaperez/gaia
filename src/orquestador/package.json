@@ -26,6 +26,7 @@
     "body-parser": "^1.17.2",
     "date-and-time": "^0.5.0",
     "express": "^4.15.4",
+    "moment": "^2.19.1",
     "morgan-body": "^0.10.9",
     "request": "^2.81.0"
   }

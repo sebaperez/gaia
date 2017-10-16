@@ -39,6 +39,11 @@ npm install
 forever start . dev
 cd ..
 
+cd calendario
+npm install
+forever start ./server/index.js
+cd ..
+
 echo ============== Desplegado ==============
 
 cd ..
