@@ -90,14 +90,15 @@ router.post('/', function (req, res, next) {
                conversacionService.agregarMensajeAConversacion(ownerMail, guestMail, contenidoMailActual, function(conversacion){
                   var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario");
                   if(mensajeDePropuesta){
-                     var huecoAceptado = mensajeDePropuesta.intervalos[0].desde
-                     respuestaService.obtenerMensajeConfirmacionReunion(owner, huecoAceptado, function(respuesta){
+                     var iniciohuecoAceptado = mensajeDePropuesta.intervalos[0].desde;
+                     calendarioService.agregarEvento(iniciohuecoAceptado, guestMail);
+                     respuestaService.obtenerMensajeConfirmacionReunion(owner, iniciohuecoAceptado, function(respuesta){
                         ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
                            res.status(200).send();
                         }, function(){
                            res.status(500).send();
                         });
-                        var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, huecoAceptado);
+                        var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, iniciohuecoAceptado);
                         conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia);
                      });
                   } else {

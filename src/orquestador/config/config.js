@@ -16,7 +16,8 @@ module.exports.config = {
       confirmarReunion: prod ? urlBaseProd + ":9000/respuesta/confirmarReunion/parser" : "http://localhost:5555/test/respuesta/confirmarReunion/parser"
    },
    calendarioApiUrls: {
-      huecos: prod ? urlBaseProd + ":3009/proximodisponible" : "http://localhost:5555/test/calendario/proximodisponible"
+      huecos: prod ? urlBaseProd + ":3009/proximodisponible" : "http://localhost:5555/test/calendario/proximodisponible",
+      agendar: prod ? urlBaseProd + ":3009/agregarEvento" : "http://localhost:5555/test/calendario/agregarEvento"
    },
    ioApiUrls: {
       enviar: prod ? "http://104.131.40.146:4444/send" : "http://localhost:5555/test/io/send"
