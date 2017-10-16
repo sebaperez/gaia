@@ -1,16 +1,23 @@
 var request = require('request');
 var config = require('../config/config').config;
 
-function obtenerHueco(intervalos, callback) {
+function obtenerHueco(intervalos, ownerId, callback, err) {
 
    var huecosUrl = config.calendarioApiUrls.huecos;
 
    request.post({
       url: huecosUrl,
       json: true,
-      body: intervalos
+      body: intervalos,
+      qs: {
+         usuario: ownerId
+      }
    }, function (error, response, body) {
-      callback(body);
+      if(response.status != 200){
+         err();
+      } else {
+         callback(body);
+      }
    });
 
 }

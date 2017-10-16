@@ -2,6 +2,28 @@ const calendar_helper = require('../google/calendar_helper.js');
 const request = require('request');
 const moment = require('moment');
 
+function acotarFecha(intervalo,fechas){
+  var inicio_Limite = intervalo.hora_inicio
+  var fin_Limite = intervalo.hora_fin
+  var cantidadFechas = fechas.length
+  var retorno = []
+  for (var i = 0; i < cantidadFechas;i++){
+    var moment_desde = moment(fechas[i].desde)
+    var moment_hasta = moment(fechas[i].hasta)
+    var desde = moment_desde.get('hour')
+    var hasta = moment_hasta.get('hour')
+    if(inicio_Limite > desde){
+      moment_desde.set('hour',inicio_Limite)
+    }
+    if(fin_Limite < hasta){
+      moment_hasta.set('hour',fin_Limite)
+    }
+    retorno.push({desde: moment_desde.toISOString(),hasta:moment_hasta.toISOString()})
+  }
+  return retorno
+}
+
+
 function buscarhueco(auth, fecha_desde, fecha_hasta, callback){
     // parsear desde y hasta y asignar a variable
     //sacar horas de diferencia entre desde y hasta -> horas
@@ -22,13 +44,13 @@ function buscarhueco(auth, fecha_desde, fecha_hasta, callback){
         if (eventos != null)
         {
           var cantidadEventos = eventos.length;
-          console.log(eventos)
-          console.log("cantidad eventos: " + cantidadEventos)
-          console.log("desde: "+desde.toISOString())
-          console.log("newhasta: "+Newhasta.toISOString())
-          console.log("hasta: "+hasta.toISOString())
+          //console.log(eventos)
+          //console.log("cantidad eventos: " + cantidadEventos)
+          //console.log("desde: "+desde.toISOString())
+          //console.log("newhasta: "+Newhasta.toISOString())
+          //console.log("hasta: "+hasta.toISOString())
           var diferenciaHoras = hasta.diff(desde,'hours')
-          console.log("diferenciaHoras: "+diferenciaHoras)
+          //console.log("diferenciaHoras: "+diferenciaHoras)
           if (cantidadEventos == 0)
            {
 
@@ -64,12 +86,21 @@ module.exports = function(app) {
   app.post('/proximodisponible', (req, res) => {
     var respuesta = null
     //ID de usuario
-    usuario = req.query.usuario
-    //req de preferencias de usuario (token y horario)
-    calendar_helper.load_credential(usuario, function(auth){
+    var usuario = req.query.usuario
+    if(!usuario){
+      res.status(400).send("Falta el parametro usuario");
+      return
+    }
+
+    calendar_helper.load_credential(usuario, function(auth, intervalo){
     //coleccion de fechas
-    fechas = req.body
-    console.log(fechas);
+    var fechas = req.body
+    var cantidadFechas = fechas.length
+    //console.log(cantidadFechas)
+    //console.log("fecha original: "+JSON.stringify(fechas));
+    var FechaAcotada = acotarFecha(intervalo,fechas)
+    //console.log("fecha acotada: "+JSON.stringify(FechaAcotada))
+    fechas = FechaAcotada
     if (fechas != null){
       //for (var i= 0 ; i < fechas.length; i++) {
         var i = 0
@@ -84,9 +115,9 @@ module.exports = function(app) {
             if (hueco)
               res.status(200).json(hueco);
             else {
-              var i = i + 1
-
-              if (fechas.lenght > i)
+              i++
+              //console.log("cantidad fechas: "+cantidadFechas)
+              if (cantidadFechas > i)
               {
 
               var intervaloFecha = fechas[i]
@@ -108,8 +139,36 @@ module.exports = function(app) {
       //}
     }
   })
-     //respuesta = {haydisponible: true, fecha_desde: "", fecha_hasta: ""}
-
-
   });
+
+  // Dado una fecha se la agrega al calendario
+  // Input: -- Id usuario
+  //        -- Fecha hora desde (2011-06-03T10:00:00-07:00) verificar
+  //        -- Fecha hora hasta
+  app.post('/agregarEvento', (req, res) => {
+    var respuesta = null
+    //ID de usuario
+    var usuario = req.query.usuario
+    var description = req.body.description
+    var desde = req.body.fecha_desde
+    var hasta = req.body.fecha_hasta
+    //console.log ("desde :"+desde)
+    //console.log ("hasta :"+hasta)
+    //console.log ("description :"+description)
+
+    calendar_helper.load_credential(usuario, function(auth, intervalo){
+
+      calendar_helper.agregar_evento(auth,description,desde,hasta,function(e){
+        if(e){
+          res.status(200).json(e)
+        }
+        else{
+          res.status(400).json(e)
+        }
+      })
+
+    })
+
+
+})
 }
