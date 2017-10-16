@@ -44,13 +44,13 @@ function buscarhueco(auth, fecha_desde, fecha_hasta, callback){
         if (eventos != null)
         {
           var cantidadEventos = eventos.length;
-          console.log(eventos)
-          console.log("cantidad eventos: " + cantidadEventos)
-          console.log("desde: "+desde.toISOString())
-          console.log("newhasta: "+Newhasta.toISOString())
-          console.log("hasta: "+hasta.toISOString())
+          //console.log(eventos)
+          //console.log("cantidad eventos: " + cantidadEventos)
+          //console.log("desde: "+desde.toISOString())
+          //console.log("newhasta: "+Newhasta.toISOString())
+          //console.log("hasta: "+hasta.toISOString())
           var diferenciaHoras = hasta.diff(desde,'hours')
-          console.log("diferenciaHoras: "+diferenciaHoras)
+          //console.log("diferenciaHoras: "+diferenciaHoras)
           if (cantidadEventos == 0)
            {
 
@@ -92,10 +92,10 @@ module.exports = function(app) {
     //coleccion de fechas
     fechas = req.body
     cantidadFechas = fechas.length
-    console.log(cantidadFechas)
-    console.log("fecha original: "+JSON.stringify(fechas));
+    //console.log(cantidadFechas)
+    //console.log("fecha original: "+JSON.stringify(fechas));
     var FechaAcotada = acotarFecha(intervalo,fechas)
-    console.log("fecha acotada: "+JSON.stringify(FechaAcotada))
+    //console.log("fecha acotada: "+JSON.stringify(FechaAcotada))
     fechas = FechaAcotada
     if (fechas != null){
       //for (var i= 0 ; i < fechas.length; i++) {
@@ -112,7 +112,7 @@ module.exports = function(app) {
               res.status(200).json(hueco);
             else {
               i++
-              console.log("cantidad fechas: "+cantidadFechas)
+              //console.log("cantidad fechas: "+cantidadFechas)
               if (cantidadFechas > i)
               {
 
@@ -148,6 +148,9 @@ module.exports = function(app) {
     description = req.body.description
     desde = req.body.fecha_desde
     hasta = req.body.fecha_hasta
+    //console.log ("desde :"+desde)
+    //console.log ("hasta :"+hasta)
+    //console.log ("description :"+description)
 
     calendar_helper.load_credential(usuario, function(auth, intervalo){
 
