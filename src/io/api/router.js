@@ -5,6 +5,7 @@ module.exports = function(app) {
 	app.post('/send', (req, res) => {
 
 		console.log("--> to " + req.body.to);
+		console.log("--> cc " + req.body.cc);
 		console.log("--> from " + req.body.from);
 		console.log("--> text " + req.body.text);
 		console.log("--> subject " + req.body.subject);
@@ -21,6 +22,7 @@ module.exports = function(app) {
 		smtp.sendMail({
 					from: req.body.from,
 					to: req.body.to,
+					cc: req.body.cc,
 					subject: req.body.subject,
 					text: req.body.text,
 					inReplyTo: req.body.inReplyTo
