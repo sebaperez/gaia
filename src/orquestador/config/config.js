@@ -19,6 +19,6 @@ module.exports.config = {
       huecos: "http://localhost:5555/test/calendario/huecos"
    },
    ioApiUrls: {
-      enviar: prod ? "104.131.40.146:4444/send" : "http://localhost:5555/test/io/send"
+      enviar: prod ? "http://104.131.40.146:4444/send" : "http://localhost:5555/test/io/send"
    }
 };

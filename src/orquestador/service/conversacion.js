@@ -101,10 +101,12 @@ function armarMensajeConfirmarReunion (respuesta, desde) {
 }
 
 function obtenerUltimoMensajeConSignificado(conversacion, significado){
-   var mensajesConSignificado = conversacion.mensajes.filter(function(m){
-      return m.intents.indexOf(significado) > -1;
+   var mensajesConSignificado = conversacion.mensajes.filter(function(m) {
+      return m.intents && m.intents.indexOf(significado) > -1;
    })
-   return mensajesConSignificado[0];
+   if(mensajesConSignificado.length > 0){
+      return mensajesConSignificado[0];
+   }
 }
 
 module.exports.obtenerConversacion = obtenerConversacion;

@@ -86,16 +86,26 @@ router.post('/', function (req, res, next) {
 
             case 'aceptar_reunion':
                conversacionService.agregarMensajeAConversacion(ownerMail, guestMail, contenidoMailActual, function(conversacion){
-                  var huecoAceptado = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario").intervalos[0].desde;
-                  respuestaService.obtenerMensajeConfirmacionReunion(owner, huecoAceptado, function(respuesta){
+                  var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario");
+                  if(mensajeDePropuesta){
+                     var huecoAceptado = mensajeDePropuesta.intervalos[0].desde
+                     respuestaService.obtenerMensajeConfirmacionReunion(owner, huecoAceptado, function(respuesta){
+                        ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
+                           res.status(200).send();
+                        }, function(){
+                           res.status(500).send();
+                        });
+                        var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, huecoAceptado);
+                        conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia);
+                     });
+                  } else {
+                     var respuesta = "Disculpe, no sé a qué reunión se refiere."
                      ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
                         res.status(200).send();
                      }, function(){
                         res.status(500).send();
                      });
-                     var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, huecoAceptado);
-                     conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia);
-                  });
+                  }
                }, function() {
                   console.error('No pude agregar el mensaje a la conversacion del owner ' + ownerMail + ' y guest ' + guestMail);
                   res.status(501);
@@ -117,12 +127,12 @@ router.post('/', function (req, res, next) {
 
             default:
                console.error('Intencion(es) ' + significado.intents + 'no soportadas.');
-               res.status(501);
+               res.status(400);
                res.send();
          }
       }, function(mensajeError) {
          console.error(mensajeError);
-         res.status(501);
+         res.status(400);
          res.send(mensajeError);
       });
    }, function(mensajeError) {
