@@ -10,7 +10,7 @@ const appConfig = require('./config/config.js');
 const app = express();
 const server = http.createServer(app);
 //const port = process.env.PORT || 3000
-const port = process.argv[2] || 3001;
+const port = process.argv[2] || 3003;
 
 // Middlewares
 app.use(bodyParser.json());
