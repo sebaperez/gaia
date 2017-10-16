@@ -22,7 +22,7 @@ function obtenerUsuario(emailRemitente, emailDestinatario, callback, err) {
             });
          }
       } else {
-         err("Error en el modulo de clientes")
+         err("Error en el modulo de usuarios")
       }
    });
 

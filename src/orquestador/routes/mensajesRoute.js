@@ -64,70 +64,79 @@ router.post('/', function (req, res, next) {
          })
       }
       iaService.interpretarMensaje(contenidoMailActual, function (significado) {
-         console.log(contenidoMailActual);
+         console.log('Mensaje interpretado: [' + contenidoMailActual + ']');
          console.log("El significado es: " + significado.intents);
 
-         if(solicitaReunion(significado)){
-            calendarioService.obtenerHueco(significado.intervalos, function(hueco) {
-               conversacionService.crearConversacion(mailRemitente, mailDestinatario, contenidoMailActual, significado, hueco);
-               respuestaService.obtenerMensajeCoordinacionAGuest(owner, hueco, function(respuesta){
-                  ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
-                     res.status(200).send();
-                  }, function(){
-                     res.status(500).send();
-                  });
-                  var mensajeDeGaia = conversacionService.armarMensajeProponerHorario(respuesta, hueco);
-                  conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia)
-               });
-            });
+         switch(obtenerIntencion(significado)) {
 
-         } else if (aceptaReunion(significado)) {
-
-            conversacionService.agregarMensajeAConversacion(ownerMail, guestMail, contenidoMailActual, function(conversacion){
-               var huecoAceptado = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario").intervalos[0].desde;
-               respuestaService.obtenerMensajeConfirmacionReunion(owner, huecoAceptado, function(respuesta){
-                  ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
-                     res.status(200).send();
-                  }, function(){
-                     res.status(500).send();
+            case 'solicita_reunion':
+               calendarioService.obtenerHueco(significado.intervalos, function(hueco) {
+                  conversacionService.crearConversacion(mailRemitente, mailDestinatario, contenidoMailActual, significado, hueco);
+                  respuestaService.obtenerMensajeCoordinacionAGuest(owner, hueco, function(respuesta){
+                     ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
+                        res.status(200).send();
+                     }, function(){
+                        res.status(500).send();
+                     });
+                     var mensajeDeGaia = conversacionService.armarMensajeProponerHorario(respuesta, hueco);
+                     conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia)
                   });
-                  var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, huecoAceptado);
-                  conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia);
                });
-            }, function() {
-               console.error('No pude agregar el mensaje a la conversacion del owner ' + ownerMail + ' y guest ' + guestMail);
+               break;
+
+            case 'aceptar_reunion':
+               conversacionService.agregarMensajeAConversacion(ownerMail, guestMail, contenidoMailActual, function(conversacion){
+                  var huecoAceptado = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario").intervalos[0].desde;
+                  respuestaService.obtenerMensajeConfirmacionReunion(owner, huecoAceptado, function(respuesta){
+                     ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
+                        res.status(200).send();
+                     }, function(){
+                        res.status(500).send();
+                     });
+                     var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, huecoAceptado);
+                     conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia);
+                  });
+               }, function() {
+                  console.error('No pude agregar el mensaje a la conversacion del owner ' + ownerMail + ' y guest ' + guestMail);
+                  res.status(501);
+                  res.send();
+               });
+               break;
+
+            case 'cancelar_reunion':
+               console.warn('Cancelar reunión todavía no implementado.');
                res.status(501);
                res.send();
-            });
+               break;
 
-         } else {
-               console.error('Intenciones ' + significado.intents + 'no soportadas.');
+            case 'posponer_reunion':
+               console.warn('Posponer reunión todavía no implementado.');
+               res.status(501);
+               res.send();
+               break;
+
+            default:
+               console.error('Intencion(es) ' + significado.intents + 'no soportadas.');
                res.status(501);
                res.send();
          }
+      }, function(mensajeError) {
+         console.error(mensajeError);
+         res.status(501);
+         res.send(mensajeError);
       });
-
-   }, function(mensajeError){
+   }, function(mensajeError) {
+      console.error(mensajeError);
       res.status(400);
       res.send(mensajeError);
    });
-
-
 });
 
-function solicitaReunion(significado) {
-   return chequearContieneIntencion(significado, "solicitar_reunion");
-}
-
-function aceptaReunion(significado) {
-   return chequearContieneIntencion(significado, "aceptar_reunion");
-}
-
-function chequearContieneIntencion (significado, nombreIntencion) {
-   if(significado && significado.intents){
-      return significado.intents.indexOf(nombreIntencion) >= 0;
+function obtenerIntencion (significado) {
+   if(significado && significado.intents) {
+      return significado.intents[0];
    } else {
-      return false;
+      return "desconocida"
    }
 }
 
