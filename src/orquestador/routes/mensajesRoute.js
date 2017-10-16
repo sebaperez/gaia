@@ -69,8 +69,8 @@ router.post('/', function (req, res, next) {
 
          switch(obtenerIntencion(significado)) {
 
-            case 'solicita_reunion':
-               calendarioService.obtenerHueco(significado.intervalos, function(hueco) {
+            case 'solicitar_reunion':
+               calendarioService.obtenerHueco(significado.intervalos, owner.id, function(hueco) {
                   conversacionService.crearConversacion(mailRemitente, mailDestinatario, contenidoMailActual, significado, hueco);
                   respuestaService.obtenerMensajeCoordinacionAGuest(owner, hueco, function(respuesta){
                      ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
@@ -81,6 +81,8 @@ router.post('/', function (req, res, next) {
                      var mensajeDeGaia = conversacionService.armarMensajeProponerHorario(respuesta, hueco);
                      conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia)
                   });
+               }, function(){
+                  res.status(500).send();
                });
                break;
 
@@ -126,7 +128,7 @@ router.post('/', function (req, res, next) {
                break;
 
             default:
-               console.error('Intencion(es) ' + significado.intents + 'no soportadas.');
+               console.error('Intencion(es) ' + significado.intents + ' no soportadas.');
                res.status(400);
                res.send();
          }

@@ -86,12 +86,16 @@ module.exports = function(app) {
   app.post('/proximodisponible', (req, res) => {
     var respuesta = null
     //ID de usuario
-    usuario = req.query.usuario
+    var usuario = req.query.usuario
+    if(!usuario){
+      res.status(400).send("Falta el parametro usuario");
+      return
+    }
 
     calendar_helper.load_credential(usuario, function(auth, intervalo){
     //coleccion de fechas
-    fechas = req.body
-    cantidadFechas = fechas.length
+    var fechas = req.body
+    var cantidadFechas = fechas.length
     //console.log(cantidadFechas)
     //console.log("fecha original: "+JSON.stringify(fechas));
     var FechaAcotada = acotarFecha(intervalo,fechas)
@@ -144,10 +148,10 @@ module.exports = function(app) {
   app.post('/agregarEvento', (req, res) => {
     var respuesta = null
     //ID de usuario
-    usuario = req.query.usuario
-    description = req.body.description
-    desde = req.body.fecha_desde
-    hasta = req.body.fecha_hasta
+    var usuario = req.query.usuario
+    var description = req.body.description
+    var desde = req.body.fecha_desde
+    var hasta = req.body.fecha_hasta
     //console.log ("desde :"+desde)
     //console.log ("hasta :"+hasta)
     //console.log ("description :"+description)

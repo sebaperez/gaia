@@ -5,6 +5,7 @@ function enviarMail(mailBot, mailDestinatario, mailRemitente, asuntoMail, idMens
 
    var enviarMailUrl = config.ioApiUrls.enviar;
 
+   var separador = '\n\n\n---------- Forwarded message ----------\n\n';
 
    var mail = {
       // from: mailBot,
@@ -13,7 +14,7 @@ function enviarMail(mailBot, mailDestinatario, mailRemitente, asuntoMail, idMens
       cc: mailRemitente,
       subject: 'Re: ' + asuntoMail,
       inReplyTo: idMensaje,
-      text: respuesta + "\n\n" + contenidoMail
+      text: respuesta + separador + contenidoMail
    }
 
    request.post({
