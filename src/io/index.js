@@ -5,6 +5,7 @@ const express = require('express');
 const bodyParser = require("body-parser");
 const getStream = require('get-stream');
 const simpleParser = require('mailparser').simpleParser;
+const request = require('request')
 
 // Constant Definition
 const app = express();
@@ -47,27 +48,29 @@ function get_client(mail){
 	});
 
 	client.on("new", function(message){
-
-		console.log(JSON.stringify(message, null, 4))
+		//console.log("mensaje recibido!! ")
+		//console.log(JSON.stringify(message, null, 4))
 		var messageStream = client.createMessageStream(message.UID)
 
 		getStream(messageStream).then(str => {
 				simpleParser(str, (err, mail)=>{
 					// Log por consola del mail recibido
+					console.log("---------- mensaje recibido!! ----------")
 					console.log(JSON.stringify(mail, null, 4))
-
+					console.log(" ---------- ---------- ---------- ---------- ---------- ----------")
 					// Se lo mandamos al orquestador
-					/*
+					// "http://" + process.env.IP + ":5555/mensajes",
 					request.post({
-							url: "http://" + process.env.IP + ":5555/mensajes",
+							url: "http://" + "45.55.187.250" + ":5555/mensajes",
 							json: true,
 							body: mail
 						     },
 						function (error, responde, body){
+							console.log("Respuesta del orquestado: ")
 							console.log(JSON.stringify(body, null, 4))
 						})
-					*/
-
+					
+					/*
 					// Respondemos un dummy
 					var smtp = nodemailer.createTransport({
 						service: "Zoho",
@@ -90,6 +93,7 @@ function get_client(mail){
 									console.log('Message sent: ' + info.response);
 								}
 					});
+					*/
 				})
 			});
 
