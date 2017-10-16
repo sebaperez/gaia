@@ -18,6 +18,17 @@ var admin = {
 		},
 		hasCalendar: function() {
 			return this.data.googleAccessToken;
+		},
+		getTimeStart: function() {
+			var time = admin.user.data.timeStart || "9";
+			return window.parseInt(time, 10);
+		},
+		getTimeEnd: function() {
+			var time = admin.user.data.timeEnd || "18";
+			return window.parseInt(time, 10);
+		},
+		getBlacklist: function() {
+			return this.get("blacklistedContacts");
 		}
 	},
 	logout: function() {
@@ -33,16 +44,10 @@ var admin = {
 			} else {
 				admin.user.set(user);
 				$(document).ready(function() {
-					$("a#dashboard").click(function() {
-						admin.show("dashboard");
-					});
 					$("a#settings").click(function() {
 						admin.show("settings");
 					});
-					$("a#historial").click(function() {
-						admin.show("historial");
-					});
-					admin.show("dashboard");
+					admin.show("settings");
 				});
 			}
 		});
@@ -69,7 +74,71 @@ var admin = {
 		show: function() {
 			var content = "";
 			admin.setTitle("Configuración");
+
+			content += "<div class='row'>";
+
+			content += "<div class='col-sm-4'><div class='card'><div class='card-header bgm-cyan'><h2>Horarios<small>Configure los horarios en los que Gaia concertará reuniones</small></h2></div><div class='card-body card-padding'>";
+			content += "<p class='f-500 c-black m-b-20'>Rango de horarios</p>";
+			content += "<div class=m-b-20 clearfix'><div id='input-slider-value' class='input-slider-range m-b-15'></div><strong class='pull-left text-muted' id='input-slider-value-output'></strong></div>";
+			content += "<div class='m-t-20 text-right'><button id='guardarHorario' class='btn btn-info waves-effect'>Guardar</div></div>";
+			content += "</div></div>";
+
+			content += "<div class='col-sm-8'><div class='card'><div class='card-header bgm-red'><h2>Lista negra<small>Gaia nunca concertará una reunion con los contactos de esta lista</small></div><div class='card-body card-padding'>";
+
+			content += "<select id='blacklist' class='form-control' multiple='multiple'></select>";
+			content += "<div class='m-t-20 text-right'><button id='guardarBlacklist' class='btn btn-info waves-effect'>Guardar</div></div>";
+
+			content += "</div></div></div>";
+
+			content += "</div>";
+
+
 			admin.setContent(content);
+
+			var blacklistContacts = admin.user.getBlacklist(), i;
+			for (i = 0; i < blacklistContacts.length; i++) {
+				$("#blacklist").append($("<option>", { value: blacklistContacts[i], text: blacklistContacts[i], selected: "true" }));
+			}
+
+			$("#blacklist").select2({
+				tags: true
+			});
+
+			var slider = document.getElementById ('input-slider-value');
+			noUiSlider.create (slider, {
+				start: [admin.user.getTimeStart(), admin.user.getTimeEnd()],
+				connect: true,
+				step: 1,
+				range: {
+					'min': 0,
+					'max': 23
+				}
+			});
+			slider.noUiSlider.on("update", function(values, handle) {
+				document.getElementById('input-slider-value-output').innerHTML = "Solo organizar de " + values[0] + "hs a " + values[1] + "hs";
+			});
+			$("#guardarHorario").on("click", function() {
+				var values = slider.noUiSlider.get(), timeStart = window.parseInt(values[0], 10), timeEnd = window.parseInt(values[1], 10);
+				if (timeEnd > timeStart) {
+					base.req("set", { accessToken: admin.user.getAccessToken(), timeStart: timeStart, timeEnd: timeEnd }, function(data) {
+						if (data.error) {
+							$.notify("Ocurrio un error al guardar las preferencias");
+						} else {
+							$.notify("Preferencias guardadas!", "success");
+						}
+					});
+				}
+			});
+			$("#guardarBlacklist").on("click", function() {
+				var values = JSON.stringify($("#blacklist").val());
+				base.req("set", { accessToken: admin.user.getAccessToken(), "blacklistedContacts": values }, function(data) {
+					if (data.error) {
+						$.notify("Ocurrio un error al guardar las preferencias");
+					} else {
+						$.notify("Preferencias guardadas!", "success");
+					}
+				});
+			});
 		}
 	},
 	gcalendar: {

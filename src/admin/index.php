@@ -9,10 +9,18 @@
         <!-- Vendor CSS -->
         <link href="vendors/bower_components/material-design-iconic-font/dist/css/material-design-iconic-font.min.css" rel="stylesheet">
         <link href="vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">
+	<link href="vendors/bower_components/nouislider/nouislider.min.css" rel="stylesheet">
+	<link href="vendors/select2/select2.min.css" rel="stylesheet">
 
         <!-- CSS -->
         <link href="css/app_1.min.css" rel="stylesheet">
 	<link href="css/app_2.min.css" rel="stylesheet">
+
+	<style>
+		#guardarHorario {
+			margin-top: 20px !important;;
+		}
+	</style>
     </head>
 
     <body>
@@ -69,10 +77,8 @@
                 </div>
 
                 <ul class="main-menu">
-                    <li class="active"><a id="dashboard" href="#"><i class="zmdi zmdi-home"></i> Dashboard</a></li>
                     <li><a href="#!" id="settings"><i class="zmdi zmdi-settings"></i> Configuración</a></li>
-                    <li><a href="#!" id="historial"><i class="zmdi zmdi-chart"></i> Historial</a></li>
-                </ul>
+                <ul>
             </aside>
 
             <section id="content">
@@ -93,6 +99,9 @@
         <script src="vendors/bower_components/jquery/dist/jquery.min.js"></script>
         <script src="vendors/bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
         <script src="vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.concat.min.js"></script>
+	<script src="vendors/bower_components/nouislider/nouislider.min.js"></script>
+	<script src="vendors/notify.js"></script>
+	<script src="vendors/select2/select2.min.js"></script>
 
         <script src="js/app.min.js"></script>
 	<script>
