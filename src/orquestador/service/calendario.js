@@ -13,7 +13,7 @@ function obtenerHueco(fechas, intervalos, ownerId, callback, err) {
       });
    }
 
-   console.log('Calendario - Intervalos para buscar hueco: ' + intervalos);
+   console.log('Calendario - Intervalos para buscar hueco: ' + JSON.stringify(intervalos));
 
    request.post({
       url: huecosUrl,

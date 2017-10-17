@@ -6,6 +6,8 @@ cd gaia
 git pull https://jonybuzz:joper951753@github.com/sebaperez/gaia.git
 #git pull -b <branch> https://github.com/sebaperez/gaia.git
 
+#HACER QUE FALLE SI NO PUDO CHECKOUTEAR
+
 echo ============== Instalando ==============
 cd src
 
