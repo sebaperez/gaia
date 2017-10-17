@@ -13,7 +13,7 @@ var clientId = null;
 var redirectUrl = null;
 
 // Load client secrets from a local file.
-fs.readFile('client_secret.json', function processClientSecrets(err, content) {
+fs.readFile('/server/client_secret.json', function processClientSecrets(err, content) {
   if (err) {
     console.log('Error loading client secret file: ' + err);
     return;
@@ -101,7 +101,7 @@ exports.load_credential = function(user_id, callback) {
   });*/
 
   //En Archivo
-  token_path = "../credentials/" + 300 + ".json"
+  token_path = "credentials/" + 300 + ".json"
   fs.readFile(token_path, function(err, token) {
     if (err) {
       console.log(err)
