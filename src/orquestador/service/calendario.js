@@ -13,11 +13,8 @@ function obtenerHueco(intervalos, ownerId, callback, err) {
          usuario: ownerId
       }
    }, function (error, response, body) {
-      if(response.status != 200){
-         err();
-      } else {
-         callback(body);
-      }
+      console.log("responseeee" + body);
+      callback(body);
    });
 
 }

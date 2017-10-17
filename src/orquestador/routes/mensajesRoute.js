@@ -71,16 +71,25 @@ router.post('/', function (req, res, next) {
 
             case 'solicitar_reunion':
                calendarioService.obtenerHueco(significado.intervalos, owner.id, function(hueco) {
-                  conversacionService.crearConversacion(mailRemitente, mailDestinatario, contenidoMailActual, significado, hueco);
-                  respuestaService.obtenerMensajeCoordinacionAGuest(owner, hueco, function(respuesta){
+                  if(hueco){
+                     conversacionService.crearConversacion(mailRemitente, mailDestinatario, contenidoMailActual, significado, hueco);
+                     respuestaService.obtenerMensajeCoordinacionAGuest(owner, hueco, function(respuesta){
+                        ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
+                           res.status(200).send();
+                        }, function(){
+                           res.status(500).send();
+                        });
+                        var mensajeDeGaia = conversacionService.armarMensajeProponerHorario(respuesta, hueco);
+                        conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia)
+                     });
+                  } else {
+                     let respuesta = "Lo siento, no hay horarios disponibles para agendar la reunión.";
                      ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
                         res.status(200).send();
                      }, function(){
                         res.status(500).send();
                      });
-                     var mensajeDeGaia = conversacionService.armarMensajeProponerHorario(respuesta, hueco);
-                     conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia)
-                  });
+                  }
                }, function(){
                   res.status(500).send();
                });
