@@ -10,7 +10,7 @@ function interpretarMensaje(contenido, callback, err) {
       json: true,
       body: {msj: contenido}
    }, function (error, response, body) {
-
+      console.log('IA - respuesta: '+JSON.stringify(body));
       if(body.ok){
          callback(body);
       } else {
