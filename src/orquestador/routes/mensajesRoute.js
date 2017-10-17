@@ -42,8 +42,9 @@ router.post('/', function (req, res, next) {
    // },
    // "messageId": "<CAEfck2BKvKwU57rO1NBDdMic5EOmHBsRy=Y+aW5p3coYsfXtJQ@mail.gmail.com>"
 
-   var mailRemitente = req.body.from.value.address;
-   var mailDestinatario = req.body.to.value.address;
+
+   var mailRemitente = req.body.from.value[0].address;
+   var mailDestinatario = req.body.to.value[0].address;
    var asuntoMail = req.body.subject;
    var contenidoMail = req.body.text;
    var contenidoMailActual = req.body.text.split("----------", 1)[0].trim();

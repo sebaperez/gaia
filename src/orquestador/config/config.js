@@ -1,5 +1,5 @@
 var urlBaseProd = 'http://45.55.187.250'
-var prod = process.env.ENTORNO == 'prod';
+var prod = process.env.ENTORNO != 'prod';
 
 module.exports.config = {
    userApiUrls: {
