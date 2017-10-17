@@ -2,18 +2,27 @@ var request = require('request');
 var config = require('../config/config').config;
 var moment = require('moment');
 
-function obtenerHueco(intervalos, ownerId, callback, err) {
+function obtenerHueco(fechas, intervalos, ownerId, callback, err) {
 
    var huecosUrl = config.calendarioApiUrls.huecos;
+
+   for (var i = 0; i < fechas.length; i++) {
+      intervalos.push({
+         desde: fechas[i].fecha,
+         hasta: calcularFechaHasta(fechas[i].fecha)
+      });
+   }
+
    request.post({
       url: huecosUrl,
       json: true,
       body: intervalos,
       qs: {
-         usuario: ownerId
+         usuario: 300
+         //usuario: ownerId
       }
    }, function (error, response, body) {
-      console.log("responseeee" + body);
+      console.log("hueco encontrado por el calendario: " + body);
       callback(body);
    });
 
@@ -43,6 +52,16 @@ function agregarEvento(inicioHuecoAceptado, guestMail) {
       console.log("Evento agendado: " + evento);
    });
 
+}
+
+function calcularFechaHasta(fechaDesde) {
+   var momentDesde = moment(fechaDesde);
+   if(momentDesde.hour() == 0){
+      momentHasta = momentDesde.add(1,'days').startOf('day');
+   } else {
+      momentHasta = momentDesde.add(1,'hours');
+   }
+   return momentHasta.toISOString().replace(".000Z","-03:00");
 }
 
 module.exports.obtenerHueco = obtenerHueco;

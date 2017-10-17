@@ -70,7 +70,7 @@ router.post('/', function (req, res, next) {
          switch(obtenerIntencion(significado)) {
 
             case 'solicitar_reunion':
-               calendarioService.obtenerHueco(significado.intervalos, owner.id, function(hueco) {
+               calendarioService.obtenerHueco(significado.fechas, significado.intervalos, owner.id, function(hueco) {
                   if(hueco){
                      conversacionService.crearConversacion(mailRemitente, mailDestinatario, contenidoMailActual, significado, hueco);
                      respuestaService.obtenerMensajeCoordinacionAGuest(owner, hueco, function(respuesta){
