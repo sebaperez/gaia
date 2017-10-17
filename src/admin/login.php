@@ -14,6 +14,11 @@
         <!-- CSS -->
         <link href="css/app_1.min.css" rel="stylesheet">
 	<link href="css/css.css" rel="stylesheet">
+	<style>
+		.btn-login {
+			margin-top: 0px !important;
+		}
+	</style>
    </head>
 
     <body>
@@ -31,14 +36,6 @@
                         <div class="fg-line">
                             <input type="password" id="password" class="form-control login" placeholder="Contraseña">
                         </div>
-                    </div>
-
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" value="">
-                            <i class="input-helper"></i>
-                            Mantenerme identicado
-                        </label>
                     </div>
 
                     <a href="#!" id="loginBtn" class="btn btn-login btn-success"><i class="zmdi zmdi-arrow-forward"></i></a>
