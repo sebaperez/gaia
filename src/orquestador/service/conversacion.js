@@ -3,7 +3,7 @@ var config = require('../config/config').config;
 
 var conversacionesUrl = config.conversacionApiUrls.conversaciones;
 
-function crearConversacion(ownerMail, guestMail, contenidoMailActual, significado, hueco, callback) {
+function crearConversacion(ownerMail, guestMail, contenidoMailActual, significado, callback) {
 
 
    // ej significado: {
@@ -28,8 +28,7 @@ function crearConversacion(ownerMail, guestMail, contenidoMailActual, significad
       mensajes: [
          {
             contenido: contenidoMailActual, //solo el ultimo mensaje de la cadena
-            significado: significado,
-            hueco: hueco
+            significado: significado
          }
       ]
    };
@@ -79,30 +78,35 @@ function agregarMensajeAConversacion(ownerMail, guestMail, mensaje, callback, er
 function armarMensajeProponerHorario(respuesta, desde){
    return {
       "contenido": respuesta,
-      "intents": [
-         "proponer_horario"
-      ],
-      "intervalos": [{
-          "desde": desde
-      }]
+      "significado": {
+         "intents": [
+            "proponer_horario"
+         ],
+         "intervalos": [{
+            "desde": desde
+         }]
+      }
    }
 }
 
 function armarMensajeConfirmarReunion (respuesta, desde) {
    return {
       "contenido": respuesta,
-      "intents": [
-         "confirmar_reunion"
-      ],
-      "intervalos": [{
-          "desde": desde
-      }]
+      "significado": {
+         "intents": [
+            "confirmar_reunion"
+         ],
+         "intervalos": [{
+            "desde": desde
+         }]
+      }
    }
 }
 
 function obtenerUltimoMensajeConSignificado(conversacion, significado){
+   console.log("conversacion: " + JSON.stringify(conversacion));
    var mensajesConSignificado = conversacion.mensajes.filter(function(m) {
-      return m.intents && m.intents.indexOf(significado) > -1;
+      return m.significado && m.significado.intents && m.significado.intents.indexOf(significado) > -1;
    })
    if(mensajesConSignificado.length > 0){
       return mensajesConSignificado[0];

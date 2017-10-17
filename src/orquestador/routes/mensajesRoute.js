@@ -70,16 +70,16 @@ router.post('/', function (req, res, next) {
          switch(obtenerIntencion(significado)) {
 
             case 'solicitar_reunion':
-               calendarioService.obtenerHueco(significado.fechas, significado.intervalos, owner.id, function(hueco) {
-                  if(hueco){
-                     conversacionService.crearConversacion(mailRemitente, mailDestinatario, contenidoMailActual, significado, hueco);
-                     respuestaService.obtenerMensajeCoordinacionAGuest(owner, hueco, function(respuesta){
+               calendarioService.obtenerHueco(significado.fechas, significado.intervalos, owner.id, function(horario) {
+                  if(horario){
+                     conversacionService.crearConversacion(mailRemitente, mailDestinatario, contenidoMailActual, significado);
+                     respuestaService.obtenerMensajeCoordinacionAGuest(owner, horario, function(respuesta){
                         ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
                            res.status(200).send();
                         }, function(){
                            res.status(500).send();
                         });
-                        var mensajeDeGaia = conversacionService.armarMensajeProponerHorario(respuesta, hueco);
+                        var mensajeDeGaia = conversacionService.armarMensajeProponerHorario(respuesta, horario);
                         conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia)
                      });
                   } else {
@@ -97,10 +97,12 @@ router.post('/', function (req, res, next) {
 
             case 'aceptar_reunion':
                conversacionService.agregarMensajeAConversacion(ownerMail, guestMail, contenidoMailActual, function(conversacion){
-                  var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario");
+                  // var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario");
+                  var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "solicitar_reunion");
+                  console.log(mensajeDePropuesta);
                   if(mensajeDePropuesta){
-                     var iniciohuecoAceptado = mensajeDePropuesta.intervalos[0].desde;
-                     calendarioService.agregarEvento(iniciohuecoAceptado, guestMail);
+                     var iniciohuecoAceptado = mensajeDePropuesta.significado.intervalos[0].desde;
+                     calendarioService.agregarEvento(owner.id, iniciohuecoAceptado, guestMail);
                      respuestaService.obtenerMensajeConfirmacionReunion(owner, iniciohuecoAceptado, function(respuesta){
                         ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
                            res.status(200).send();
@@ -108,7 +110,7 @@ router.post('/', function (req, res, next) {
                            res.status(500).send();
                         });
                         var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, iniciohuecoAceptado);
-                        conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia);
+                        // conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia);
                      });
                   } else {
                      var respuesta = "Disculpe, no sé a qué reunión se refiere."

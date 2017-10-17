@@ -13,6 +13,8 @@ function obtenerHueco(fechas, intervalos, ownerId, callback, err) {
       });
    }
 
+   console.log('Calendario - Intervalos para buscar hueco: ' + intervalos);
+
    request.post({
       url: huecosUrl,
       json: true,
@@ -28,7 +30,7 @@ function obtenerHueco(fechas, intervalos, ownerId, callback, err) {
 
 }
 
-function agregarEvento(inicioHuecoAceptado, guestMail) {
+function agregarEvento(ownerId, inicioHuecoAceptado, guestMail) {
 
    var agendarUrl = config.calendarioApiUrls.agendar;
 
@@ -44,12 +46,13 @@ function agregarEvento(inicioHuecoAceptado, guestMail) {
    request.post({
       url: agendarUrl,
       json: true,
-      body: body,
+      body: evento,
       qs: {
-         usuario: ownerId
+         usuario: 300
+         // usuario: ownerId
       }
    }, function (error, response, body) {
-      console.log("Evento agendado: " + evento);
+      console.log("Evento agendado: " + JSON.stringify(evento));
    });
 
 }
