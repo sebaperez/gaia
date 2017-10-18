@@ -13,7 +13,7 @@ var clientId = null;
 var redirectUrl = null;
 
 // Load client secrets from a local file.
-fs.readFile('/server/client_secret.json', function processClientSecrets(err, content) {
+fs.readFile('server/client_secret.json', function processClientSecrets(err, content) {
   if (err) {
     console.log('Error loading client secret file: ' + err);
     return;
