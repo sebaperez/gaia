@@ -7,7 +7,7 @@ var USER_PORT = 3000;
 
 var CONVERSACION_HOST = "localhost";
 var CONVERSACION_PORT = 9001;
-
+var CONVERSACIONES_MAX = 15;
 
 function cors(res) {
 	res.header("Access-Control-Allow-Origin", "*");
@@ -104,14 +104,14 @@ var user = (function() {
 })();
 
 app.get("/user/conversaciones", function(req, res) {
-	var data = [], i, email;
+	var data = [], i, email, total;
 	if (req.query.email) {
 		email = req.query.email;;
 		request.get("http://" + CONVERSACION_HOST + ":" + CONVERSACION_PORT + "/conversacion", function(error, response, body) {
 			if (! error && body) {
 				body = JSON.parse(body);
-				for (i = 0; i < body.length; i++) {
-					console.log(body[i].owner + " -- " + email);
+				total = body.length > CONVERSACIONES_MAX ? CONVERSACIONES_MAX : body.length;
+				for (i = 0; i < total; i++) {
 					if (body[i].owner == email) {
 						data.push(body[i]);
 					}
