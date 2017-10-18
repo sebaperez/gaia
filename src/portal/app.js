@@ -5,6 +5,10 @@ var request = require("request");
 var USER_HOST = "localhost";
 var USER_PORT = 3000;
 
+var CONVERSACION_HOST = "localhost";
+var CONVERSACION_PORT = 9001;
+var CONVERSACIONES_MAX = 15;
+
 function cors(res) {
 	res.header("Access-Control-Allow-Origin", "*");
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -98,6 +102,26 @@ var user = (function() {
 		}
 	}
 })();
+
+app.get("/user/conversaciones", function(req, res) {
+	var data = [], i, email, total;
+	if (req.query.email) {
+		email = req.query.email;;
+		request.get("http://" + CONVERSACION_HOST + ":" + CONVERSACION_PORT + "/conversacion", function(error, response, body) {
+			if (! error && body) {
+				body = JSON.parse(body);
+				total = body.length > CONVERSACIONES_MAX ? CONVERSACIONES_MAX : body.length;
+				for (i = 0; i < total; i++) {
+					if (body[i].owner == email) {
+						data.push(body[i]);
+					}
+				}
+				cors(res);
+				res.send(data);
+			}
+		});
+	}
+});
 
 user.register("get", "/user/login", "post", "/api/Clients/login", function(error, response, body, res) {
 	var d = JSON.parse(body);
