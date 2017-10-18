@@ -29,6 +29,15 @@ var admin = {
 		},
 		getBlacklist: function() {
 			return this.get("blacklistedContacts");
+		},
+		getConversaciones: function(cb) {
+			if (this.data.conversaciones) {
+				cb(this.data.conversaciones);
+			} else {
+				base.req("conversaciones", { email: admin.user.get("email") }, function(data) {
+					cb(data);
+				});
+			}
 		}
 	},
 	logout: function() {
@@ -47,7 +56,10 @@ var admin = {
 					$("a#settings").click(function() {
 						admin.show("settings");
 					});
-					admin.show("settings");
+					$("a#profile").click(function() {
+						admin.show("profile");
+					});
+					admin.show("profile");
 				});
 			}
 		});
@@ -69,6 +81,25 @@ var admin = {
 	},
 	setContent: function(content) {
 		$("#content-body").html(content);
+	},
+	profile: {
+		show: function() {
+			var content = "";
+			admin.setTitle("Profile");
+
+			content += '<div class="row"><div class="col-sm-12">';
+			content += '<div class="card"><div class="card-header bgm-green"><h2>Información de la cuenta<small>Aquí se lista la información relacionada a la cuenta</small></h2></div><div class="card-body card-padding"><div class="pmo-contact"><ul>';
+
+			content += '<li class="ng-binding"><i class="zmdi zmdi-account"></i><b>Nombre:</b> ' + admin.user.data.name + ' ' + admin.user.data.lastname + ' </li>';
+			content += '<li class="ng-binding"><i class="zmdi zmdi-email"></i><b>E-mail:</b> ' + admin.user.data.email + ' </li>';
+			content += '<li class="ng-binding"><i class="zmdi zmdi-mood"></i><b>Bot:</b> ' + admin.user.data.botName + ' (' + admin.user.data.botEmail + ') </li>';
+			content += '<li class="ng-binding"><i class="zmdi zmdi-calendar"></i><b>Fecha de alta:</b> ' + (new Date(admin.user.data.creationDate)).toDateString() + ' </li>';
+
+			content += '</ul></div></div></div>';
+			content += '</div></div>';
+
+			admin.setContent(content);
+		}
 	},
 	settings: {
 		show: function() {

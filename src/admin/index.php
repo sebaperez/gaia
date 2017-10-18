@@ -77,6 +77,7 @@
                 </div>
 
                 <ul class="main-menu">
+		    <li><a href="#!" id="profile"><i class="zmdi zmdi-account"></i> Profile</a></li>
                     <li><a href="#!" id="settings"><i class="zmdi zmdi-settings"></i> Configuración</a></li>
                 <ul>
             </aside>
