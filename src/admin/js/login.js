@@ -39,26 +39,48 @@ var admin = {
 		this.initLogin();
 	},
 	initLogin: function() {
-		document.querySelector("#loginBtn").onclick = function() {
+		var doLogin = function() {
 			var emailInput, passwordInput
 			emailInput = document.querySelector("#email");
 			passwordInput = document.querySelector("#password");
 			admin.login(emailInput.value, passwordInput.value);
 		};
+		document.querySelector("#loginBtn").onclick = function() {
+			doLogin();
+		};
+		$(document).keypress(function(e) {
+			if (e.which == 13) {
+				if ($("#l-login.toggled").length) {
+					doLogin();
+				}
+			}
+		});
 	},
 	initRegister: function() {
-		document.querySelector("#registerBtn").onclick = function() {
+		var doRegister = function() {
 			var fields = document.querySelectorAll("input.register"), i, data = {};
 			for (i in fields) {
 				if (fields[i] && fields.hasOwnProperty(i)) {
 					data[fields[i].name] = fields[i].value || "";
 				}
 			}
+			data["botEmail"] += "@gaiameet.com";
 			if (! data.password) {
 				data.password = ".";
 			}
 			admin.register(data);
 		};
+		document.querySelector("#registerBtn").onclick = function() {
+			doRegister();
+		};
+		$(document).keypress(function(e) {
+			if (e.which == 13) {
+				if (! $("#l-login.toggled").length) {
+					doRegister();
+				}
+			}
+		});
+
 	}
 };
 admin.init();

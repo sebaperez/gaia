@@ -18,6 +18,14 @@
 		.btn-login {
 			margin-top: 0px !important;
 		}
+		input[name='botEmail'] {
+			width: 120px;
+			float: left;
+		}
+		#botEmailDomain {
+			float: right;
+			margin: 7px 190px 0 0;
+		}
 	</style>
    </head>
 
@@ -66,6 +74,14 @@
                     <div class="form-group">
                         <div class="fg-line">
                             <input type="<?php echo($field["type"]); ?>" class="form-control register" placeholder="<?php echo($field["title"]); ?>" name="<?php echo($field["name"]); ?>">
+
+			<?php
+				if ($field["name"] == "botEmail") {
+			?>
+						<span id="botEmailDomain">@gaiameet.com</span>
+			<?php
+				}
+			?>
                         </div>
                     </div>
 
