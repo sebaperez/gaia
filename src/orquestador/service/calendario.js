@@ -59,10 +59,10 @@ function calcularFechaHasta(fechaDesde) {
    var fechaHasta;
    if(momentDesde.hour() == 0){
       // todo el dia
-      fechaHasta = momentDesde.add(1,'days').startOf('day').toISOString();
+      fechaHasta = momentDesde.add(1,'days').startOf('day').format('YYYY-MM-DDTHH:mm:ssZ')
    } else {
       // un horario específico
-      fechaHasta = momentDesde.add(1,'hours').toISOString();
+      fechaHasta = momentDesde.add(1,'hours').format('YYYY-MM-DDTHH:mm:ssZ')
    }
    log.debug('[Calendario] Calculo de fechaHasta. Desde: ' + fechaDesde + ', Hasta: ' + fechaHasta);
    return fechaHasta;

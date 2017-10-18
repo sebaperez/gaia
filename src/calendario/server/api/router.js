@@ -18,7 +18,7 @@ function acotarFecha(intervalo,fechas){
     if(fin_Limite < hasta){
       moment_hasta.set('hour',fin_Limite)
     }
-    retorno.push({desde: moment_desde.toISOString(),hasta:moment_hasta.toISOString()})
+    retorno.push({desde: moment_desde.format('YYYY-MM-DDTHH:mm:ssZ'),hasta:moment_hasta.format('YYYY-MM-DDTHH:mm:ssZ')})
   }
   return retorno
 }
@@ -55,7 +55,7 @@ function buscarhueco(auth, fecha_desde, fecha_hasta, callback){
            {
 
             console.log("HAY HUECO - Desde: " + desde.toISOString() )
-            retorno = desde.toISOString()
+            retorno = desde.format('YYYY-MM-DDTHH:mm:ssZ')
             callback(retorno)
            }
           else
