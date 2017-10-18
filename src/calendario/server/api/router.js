@@ -29,53 +29,51 @@ function buscarhueco(auth, fecha_desde, fecha_hasta, callback){
     //sacar horas de diferencia entre desde y hasta -> horas
     var desde = moment(fecha_desde)
     var hasta = moment(fecha_hasta)
-    Newhasta = moment(fecha_desde)
-    Newhasta = Newhasta.add(1,'hours')
+    var newHasta = moment(fecha_desde).add(1,'hours')
     var retorno
     //console.log(hasta.toISOString())
     //console.log(Newhasta.toISOString())
 
-      calendar_helper.listar_eventos(auth,desde,Newhasta, function (eventos)
-      {
+    calendar_helper.listar_eventos(auth, desde, newHasta, function (eventos)
+    {
         var logicaEvento = function(eventos)
         {
-
-        console.log("-------------------------------")
-        if (eventos != null)
-        {
-          var cantidadEventos = eventos.length;
-          //console.log(eventos)
-          //console.log("cantidad eventos: " + cantidadEventos)
-          //console.log("desde: "+desde.toISOString())
-          //console.log("newhasta: "+Newhasta.toISOString())
-          //console.log("hasta: "+hasta.toISOString())
-          var diferenciaHoras = hasta.diff(desde,'hours')
-          //console.log("diferenciaHoras: "+diferenciaHoras)
-          if (cantidadEventos == 0)
+           console.log("-------------------------------")
+           if (eventos != null)
            {
-
-            console.log("HAY HUECO - Desde: " + desde.toISOString() )
-            retorno = desde.format('YYYY-MM-DDTHH:mm:ssZ')
-            callback(retorno)
+             var cantidadEventos = eventos.length;
+             //console.log(eventos)
+             //console.log("cantidad eventos: " + cantidadEventos)
+             //console.log("desde: "+desde.toISOString())
+             //console.log("newhasta: "+Newhasta.toISOString())
+             //console.log("hasta: "+hasta.toISOString())
+             if (cantidadEventos == 0)
+             {
+               console.log("HAY HUECO - Desde: " + desde.format('YYYY-MM-DDTHH:mm:ssZ'))
+               callback(desde.format('YYYY-MM-DDTHH:mm:ssZ'))
+             }
+             else
+             {
+                 var diferenciaHoras = hasta.diff(desde,'hours')
+                 //console.log("diferenciaHoras: " + diferenciaHoras)
+                 if(diferenciaHoras <= 1)
+                 {
+                   console.log("NO HAY HUECO")
+                   callback(null)
+                 }
+                 else
+                 {
+                   console.log("HAY EVENTO - " + eventos[0].summary);
+                   newHasta = newHasta.add( 1, 'hours')
+                   desde = desde.add(1,'hours')
+                   calendar_helper.listar_eventos(auth,desde,newHasta,function(e) { logicaEvento(e) })
+                 }
+             }
            }
-          else
-            {
-              if(diferenciaHoras<=1){
-                console.log("NO HAY HUECO")
-                callback(null)
-              }
-              else{
-            console.log("HAY EVENTO - " + eventos[0].summary);
-             Newhasta = Newhasta.add( 1, 'hours')
-             desde = desde.add(1,'hours')
-             calendar_helper.listar_eventos(auth,desde,Newhasta,function(e) { logicaEvento(e) })
-                }
-            }
-        }
         }
         logicaEvento(eventos)
-      })
-  //  }
+    })
+
 }
 
 module.exports = function(app) {
@@ -146,7 +144,6 @@ module.exports = function(app) {
   //        -- Fecha hora desde (2011-06-03T10:00:00-07:00) verificar
   //        -- Fecha hora hasta
   app.post('/agregarEvento', (req, res) => {
-    var respuesta = null
     //ID de usuario
     var usuario = req.query.usuario
     var description = req.body.description
@@ -158,17 +155,15 @@ module.exports = function(app) {
 
     calendar_helper.load_credential(usuario, function(auth, intervalo){
 
-      calendar_helper.agregar_evento(auth,description,desde,hasta,function(e){
-        if(e){
-          res.status(200).json(e)
-        }
-        else{
-          res.status(400).json(e)
-        }
+      calendar_helper.agregar_evento(auth, description, desde, hasta, function(eventoCreado) {
+          res.status(200).json(eventoCreado).send()
+       }, function(err){
+          res.status(500).send()        
       })
 
-    })
-
+   }, function(mensajeError){
+      res.status(500).send(mensajeError)
+   });
 
 })
 }

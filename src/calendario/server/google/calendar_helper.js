@@ -28,20 +28,17 @@ fs.readFile('server/client_secret.json', function processClientSecrets(err, cont
 
 });
 
-// Funciones utiles para comunicarse con google.
 //Listar eventos
 exports.listar_eventos = function(auth, desde, hasta, callback) {
   var calendar = google.calendar('v3');
-  var D = moment(desde)
-  var H = moment(hasta)
-  D.subtract(3,'hours')
-  H.subtract(3,'hours')
-  console.log('A GOOGLE: desde: '+D.toISOString().replace(".000Z","-03:00")+ " - hasta: "+H.toISOString().replace(".000Z","-03:00"))
+  var momentDesde = moment(desde)
+  var momentHasta = moment(hasta)
+  console.log('A GOOGLE: desde: ' + momentDesde.format('YYYY-MM-DDTHH:mm:ssZ') + " - hasta: " + momentHasta.format('YYYY-MM-DDTHH:mm:ssZ'))
   calendar.events.list({
     auth: auth,
     calendarId: 'primary',
-    timeMin: D.toISOString().replace(".000Z","-03:00"),
-    timeMax: H.toISOString().replace(".000Z","-03:00"),
+    timeMin: momentDesde.format('YYYY-MM-DDTHH:mm:ssZ'),
+    timeMax: momentHasta.format('YYYY-MM-DDTHH:mm:ssZ'),
     maxResults: 10,
     singleEvents: true,
     orderBy: 'startTime'
@@ -56,35 +53,35 @@ exports.listar_eventos = function(auth, desde, hasta, callback) {
     callback(events)
   });
 }
+
 //Agregar un evento
-exports.agregar_evento = function(auth, description,desde,hasta,callback){
+exports.agregar_evento = function(auth, descripcion, desde, hasta, callback, reject) {
   var calendar = google.calendar('v3');
   calendar.events.insert({
     auth: auth,
     calendarId: 'primary',
     resource: {
-      'summary': description,
-      'description': 'Reunion registrada por GAIA',
+      'summary': descripcion,
+      'description': 'Reunión registrada por GAIA',
       'start': {
-        'dateTime': desde,
-        'timeZone': 'GMT',
+        'dateTime': desde
       },
       'end': {
-        'dateTime': hasta,
-        'timeZone': 'GMT',
+        'dateTime': hasta
       },
     },
-  }, function(err, res) {
+}, function(err, eventoCreado) {
     if (err) {
       console.log('Error: ' + err);
-      callback(err)
+      reject(err)
     }
-    console.log(res);
-    callback(res)
+    console.log('Evento creado: ' + eventoCreado);
+    callback(eventoCreado)
   });
 }
+
 // Levantar credenciales
-exports.load_credential = function(user_id, callback) {
+exports.load_credential = function(user_id, callback, reject) {
 
   var auth = new googleAuth();
   var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
@@ -107,14 +104,14 @@ exports.load_credential = function(user_id, callback) {
       console.log(err)
     }
     oauth2Client.credentials = JSON.parse(token);
-    oauth2Client.refreshAccessToken(function(err, tokens){
+    oauth2Client.refreshAccessToken(function(err, tokens) {
       if(err){
         //do something with the error
         console.log(err);
-        return reject('error in authenticating calendar oAuth client.');
+        reject('Error en la autenticacion con oAuth.');
       }
-      intervalo = {hora_inicio: 9, hora_fin: 18}
-      callback(oauth2Client,intervalo);
+      var intervalo = {hora_inicio: 9, hora_fin: 18}
+      callback(oauth2Client, intervalo);
     });
   });
 }

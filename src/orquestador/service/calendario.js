@@ -36,8 +36,8 @@ function agregarEvento(ownerId, inicioHuecoAceptado, guestMail) {
    momentHasta = momentDesde.add(1,'hours');
    var evento = {
    	description: "Reunión con " + guestMail,
-      fecha_desde: inicioHuecoAceptado.replace(".000Z","-03:00"),
-      fecha_hasta: momentHasta.toISOString().replace(".000Z","-03:00")
+      fecha_desde: inicioHuecoAceptado,
+      fecha_hasta: momentHasta.format('YYYY-MM-DDTHH:mm:ssZ')
    }
    condole.debug('[Calendario] Intentando agendar evento: ' +  + JSON.stringify(evento));
    request.post({
