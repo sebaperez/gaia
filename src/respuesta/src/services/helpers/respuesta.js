@@ -21,12 +21,19 @@ module.exports = {
 
     })
     */
-    texto = texto.replace(/@name/g, res.req.body.owner.name);
+    if(body.nombre){
+      texto = texto.replace(/@name/g, body.nombre);
+   } else {
+      texto = texto.replace(/@name/g, 'Hola');
+   }
     console.log("La fecha para agendar es: " + body.hueco)
     var date = new Date(Date.parse(body.hueco))
-    var dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
-    var meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Disciembre"]
-    texto = texto.replace(/@fechas/g, 'el ' + dias[date.getDay()] + ' ' + date.getDate() + ' de ' + meses[date.getMonth()] + ' a las ' + ((date.getHours() < 10) ? "0" + date.getHours() : date.getHours()) + ':'  + ((date.getMinutes() < 10) ? "0" + date.getMinutes() : date.getMinutes()) + ' hs');
+    var dias = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"]
+    var meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+    var fechaInformal = 'el ' + dias[date.getDay()] + ' ' + date.getDate() + ' de ' + meses[date.getMonth()];
+    var minutos = date.getMinutes() == 0? '' : ':' + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes());
+    var horaInformal = ' a las ' + date.getHours() + minutos + ' hs';
+    texto = texto.replace(/@fechas/g, fechaInformal + horaInformal);
     return texto
   }
 }

@@ -43,18 +43,21 @@ router.post('/', function (req, res, next) {
    // },
    // "messageId": "<CAEfck2BKvKwU57rO1NBDdMic5EOmHBsRy=Y+aW5p3coYsfXtJQ@mail.gmail.com>"
 
-   log.info('Mensaje recibido: ' + req.body.subject);
-   log.debug(JSON.stringify(req.body));
-   var mailRemitente = req.body.from.value[0].address;
-   var mailDestinatario = req.body.to.value[0].address;
-   var asuntoMail = req.body.subject;
-   var contenidoMail = req.body.text;
-   var contenidoMailActual = req.body.text.split("----------", 1)[0].trim();
-   var idMensaje = req.body.messageId;
+   var mail = req.body;
+
+   log.info('Mensaje recibido: ' + mail.subject);
+   log.debug(JSON.stringify(mail));
+   var mailRemitente = mail.from.value[0].address;
+   var mailDestinatario = mail.to.value[0].address;
+   var asuntoMail = mail.subject;
+   var contenidoMail = mail.text;
+   var contenidoMailActual = mail.text.split("----------", 1)[0].trim();
+   var idMensaje = mail.messageId;
 
    usuarioService.obtenerUsuario(mailRemitente, mailDestinatario, function (owner) {
       var ownerMail = owner.email;
       var guestMail = owner.email == mailRemitente? mailDestinatario : mailRemitente;
+      var nombreGuest = guestMail == mail.from.value[0].address? mail.from.value[0].name : mail.to.value[0].name;
 
       if(!contenidoMailActual) {
          var mensajeMailVacio = 'Me llegó el mail vacío.'
@@ -73,10 +76,11 @@ router.post('/', function (req, res, next) {
          switch(obtenerIntencion(significado)) {
 
             case 'solicitar_reunion':
+               //cubre sólo el caso en el que el owner pide la reunión al guest copiando a gaia
                calendarioService.obtenerHueco(significado.fechas, significado.intervalos, owner.id, function(horario) {
                   if(horario){
-                     conversacionService.crearConversacion(mailRemitente, mailDestinatario, contenidoMailActual, significado);
-                     respuestaService.obtenerMensajeCoordinacionAGuest(owner, horario, function(respuesta){
+                     conversacionService.crearConversacion(ownerMail, guestMail, contenidoMailActual, significado);
+                     respuestaService.obtenerMensajeCoordinacionAGuest(nombreGuest, horario, function(respuesta){
                         ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
                            res.status(200).send();
                         }, function(){
@@ -100,6 +104,7 @@ router.post('/', function (req, res, next) {
 
             case 'aceptar_reunion':
                conversacionService.agregarMensajeAConversacion(ownerMail, guestMail, contenidoMailActual, function(conversacion){
+                  //TODO una vez que se puedan guardar los mensajes, hacer que busque la ultima propuesta de gaia
                   // var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario");
                   var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "solicitar_reunion");
                   log.info('Mensaje de propuesta de horario: ' + mensajeDePropuesta);

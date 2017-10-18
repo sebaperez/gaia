@@ -17,19 +17,20 @@ log.level = 'debug';
 //    "2017-08-22T00:00:00.000-03:00"
 // ]
 
-function obtenerMensajeCoordinacionAGuest(owner, hueco, callback) {
+function obtenerMensajeCoordinacionAGuest(nombreGuest, hueco, callback) {
    var respuestaUrl = config.respuestaApiUrls.solicitarReunionAlGuest;
    request.post({
       url: respuestaUrl,
       json: true,
       body: {
-         owner: owner,
+         nombre: nombreGuest,
          hueco: hueco
       }
    }, function (error, response, body) {
       callback(body);
    });
 }
+
 function obtenerMensajeConfirmacionReunion(owner, hueco, callback){
    var respuestaUrl = config.respuestaApiUrls.confirmarReunion;
    log.debug('[Respuesta] Armando mensaje de confirmacion de reunion para owner con hueco', hueco);
