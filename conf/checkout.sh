@@ -1,14 +1,19 @@
-forever stopall
-
-echo ========== Checkouteando =========
+echo ============ Pulling ============
 cd gaia
 
 git pull https://jonybuzz:joper951753@github.com/sebaperez/gaia.git
 #git pull -b <branch> https://github.com/sebaperez/gaia.git
 
-#HACER QUE FALLE SI NO PUDO CHECKOUTEAR
+if [ "$?" != "0"]
+then
+   git status
+   cd ..
+   exit 1
+fi
 
-echo ============== Instalando ==============
+forever stopall
+
+echo ============ Instalando =============
 cd src
 
 cd user
@@ -31,10 +36,11 @@ npm install
 forever start . dev
 cd ..
 
-cd io
-npm install
-forever start ./index.js
-cd ..
+#IO está en otro server
+#cd io
+#npm install
+#forever start ./index.js
+#cd ..
 
 cd conversacion
 npm install
