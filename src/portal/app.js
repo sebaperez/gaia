@@ -5,7 +5,7 @@ var request = require("request");
 var USER_HOST = "localhost";
 var USER_PORT = 3000;
 
-var CONVERSACION_HOST = "localhost";
+var CONVERSACION_HOST = "admin.gaiameet.com";
 var CONVERSACION_PORT = 9001;
 var CONVERSACIONES_MAX = 15;
 
