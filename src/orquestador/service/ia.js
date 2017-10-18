@@ -1,5 +1,7 @@
 var request = require('request');
 var config = require('../config/config').config;
+var log = require('log4js').getLogger();
+log.level = 'debug';
 
 function interpretarMensaje(contenido, callback, err) {
 
@@ -10,7 +12,7 @@ function interpretarMensaje(contenido, callback, err) {
       json: true,
       body: {msj: contenido}
    }, function (error, response, body) {
-      console.log('IA - respuesta: '+JSON.stringify(body));
+      log.debug('IA - respuesta: ' + JSON.stringify(body));
       if(body.ok){
          callback(body);
       } else {

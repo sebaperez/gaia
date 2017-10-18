@@ -1,5 +1,7 @@
 var request = require('request');
 var config = require('../config/config').config;
+var log = require('log4js').getLogger();
+log.level = 'debug';
 
 var conversacionesUrl = config.conversacionApiUrls.conversaciones;
 
@@ -32,7 +34,7 @@ function crearConversacion(ownerMail, guestMail, contenidoMailActual, significad
          }
       ]
    };
-
+   log.debug('[Conversacion] Creando conversacion ', nuevaConversacion);
    request.post({
       url: conversacionesUrl,
       json: true,
@@ -51,7 +53,7 @@ function obtenerConversacion (ownerMail, guestMail, callback){
          callback(conversacion);
       }
       if(error){
-         console.error("No se pudo obtener la conversacion de owner " + ownerMail + " y guest " + guestMail);
+         log.error("[Conversacion] No se pudo obtener la conversacion de owner " + ownerMail + " y guest " + guestMail);
       }
    });
 }
@@ -59,6 +61,7 @@ function obtenerConversacion (ownerMail, guestMail, callback){
 function agregarMensajeAConversacion(ownerMail, guestMail, mensaje, callback, err) {
    obtenerConversacion(ownerMail, guestMail, function(conversacion) {
       conversacion.mensajes = conversacion.mensajes? conversacion.mensajes : [];
+      log.debug('[Conversacion] Agregando mensaje',mensaje,"a conversacion con id " + conversacion.id);
       conversacion.mensajes.push(mensaje);
       request.put({
          url: conversacionesUrl + '/' + conversacion.id,
@@ -104,7 +107,7 @@ function armarMensajeConfirmarReunion (respuesta, desde) {
 }
 
 function obtenerUltimoMensajeConSignificado(conversacion, significado){
-   console.log("conversacion: " + JSON.stringify(conversacion));
+   log.debug("[Conversacion] Buscando mensaje con significado: " + significado + ' entre mensajes ' + JSON.stringify(conversacion.mensajes));
    var mensajesConSignificado = conversacion.mensajes.filter(function(m) {
       return m.significado && m.significado.intents && m.significado.intents.indexOf(significado) > -1;
    })

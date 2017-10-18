@@ -8,7 +8,8 @@ var respuestaService = require('../service/respuesta');
 var ioService = require('../service/io');
 var request = require('request');
 var config = require('../config/config').config;
-
+var log = require('log4js').getLogger();
+log.level = 'debug';
 
 router.post('/', function (req, res, next) {
 
@@ -42,7 +43,8 @@ router.post('/', function (req, res, next) {
    // },
    // "messageId": "<CAEfck2BKvKwU57rO1NBDdMic5EOmHBsRy=Y+aW5p3coYsfXtJQ@mail.gmail.com>"
 
-
+   log.info('Mensaje recibido: ' + req.body.subject);
+   log.debug(JSON.stringify(req.body));
    var mailRemitente = req.body.from.value[0].address;
    var mailDestinatario = req.body.to.value[0].address;
    var asuntoMail = req.body.subject;
@@ -56,7 +58,7 @@ router.post('/', function (req, res, next) {
 
       if(!contenidoMailActual) {
          var mensajeMailVacio = 'Me llegó el mail vacío.'
-         console.error(mensajeMailVacio);
+         log.error(mensajeMailVacio);
          res.send({
             de: owner.botEmail,
             para: mailRemitente,
@@ -64,9 +66,9 @@ router.post('/', function (req, res, next) {
             contenido: mensajeMailVacio
          })
       }
+      log.info('Mensaje recibido: [' + contenidoMailActual + ']');
       iaService.interpretarMensaje(contenidoMailActual, function (significado) {
-         console.log('Mensaje interpretado: [' + contenidoMailActual + ']');
-         console.log("El significado es: " + significado.intents);
+         log.info("El significado es: [" + significado.intents + "]");
 
          switch(obtenerIntencion(significado)) {
 
@@ -100,7 +102,7 @@ router.post('/', function (req, res, next) {
                conversacionService.agregarMensajeAConversacion(ownerMail, guestMail, contenidoMailActual, function(conversacion){
                   // var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario");
                   var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "solicitar_reunion");
-                  console.log(mensajeDePropuesta);
+                  log.info('Mensaje de propuesta de horario: ' + mensajeDePropuesta);
                   if(mensajeDePropuesta){
                      var iniciohuecoAceptado = mensajeDePropuesta.significado.intervalos[0].desde;
                      calendarioService.agregarEvento(owner.id, iniciohuecoAceptado, guestMail);
@@ -122,36 +124,36 @@ router.post('/', function (req, res, next) {
                      });
                   }
                }, function() {
-                  console.error('No pude agregar el mensaje a la conversacion del owner ' + ownerMail + ' y guest ' + guestMail);
+                  log.error('No pude agregar el mensaje a la conversacion del owner ' + ownerMail + ' y guest ' + guestMail);
                   res.status(501);
                   res.send();
                });
                break;
 
             case 'cancelar_reunion':
-               console.warn('Cancelar reunión todavía no implementado.');
+               log.warn('Cancelar reunión todavía no implementado.');
                res.status(501);
                res.send();
                break;
 
             case 'posponer_reunion':
-               console.warn('Posponer reunión todavía no implementado.');
+               log.warn('Posponer reunión todavía no implementado.');
                res.status(501);
                res.send();
                break;
 
             default:
-               console.error('Intencion(es) ' + significado.intents + ' no soportadas.');
+               log.error('Intencion(es) ' + significado.intents + ' no soportadas.');
                res.status(400);
                res.send();
          }
       }, function(mensajeError) {
-         console.error(mensajeError);
+         log.error(mensajeError);
          res.status(400);
          res.send(mensajeError);
       });
    }, function(mensajeError) {
-      console.error(mensajeError);
+      log.error(mensajeError);
       res.status(400);
       res.send(mensajeError);
    });

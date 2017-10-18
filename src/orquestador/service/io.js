@@ -1,5 +1,7 @@
 var request = require('request');
 var config = require('../config/config').config;
+var log = require('log4js').getLogger();
+log.level = 'debug';
 
 function enviarMail(mailBot, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, callback, err) {
 
@@ -23,10 +25,10 @@ function enviarMail(mailBot, mailDestinatario, mailRemitente, asuntoMail, idMens
       body: mail
    }, function (error, response, body) {
       if (error || response.statusCode != 200) {
-         console.error('Fallo en el envio de la respuesta por mail. ', error);
+         log.error('Fallo en el envio de mail.', error);
          err();
       } else{
-         console.log("Mail enviado: " + JSON.stringify(mail));
+         log.info("Mail enviado: ", mail);
          callback();
       }
    });

@@ -1,48 +1,45 @@
 var request = require('request');
 var config = require('../config/config').config;
 var moment = require('moment');
+var log = require('log4js').getLogger();
+log.level = 'debug';
 
 function obtenerHueco(fechas, intervalos, ownerId, callback, err) {
 
-   var huecosUrl = config.calendarioApiUrls.huecos;
-
+   var intervalosYFechas = intervalos.slice();
    for (var i = 0; i < fechas.length; i++) {
-      intervalos.push({
+      intervalosYFechas.push({
          desde: fechas[i].fecha,
          hasta: calcularFechaHasta(fechas[i].fecha)
       });
    }
-
-   console.log('Calendario - Intervalos para buscar hueco: ' + JSON.stringify(intervalos));
+   log.debug('[Calendario] Intervalos para buscar hueco: ' + JSON.stringify(intervalosYFechas));
 
    request.post({
-      url: huecosUrl,
+      url: config.calendarioApiUrls.huecos,
       json: true,
-      body: intervalos,
+      body: intervalosYFechas,
       qs: {
          usuario: 300
          //usuario: ownerId
       }
    }, function (error, response, body) {
-      console.log("hueco encontrado por el calendario: " + body);
+      log.debug("[Calendario] Hueco encontrado por el calendario: " + body);
       callback(body);
    });
 
 }
 
 function agregarEvento(ownerId, inicioHuecoAceptado, guestMail) {
-
    var agendarUrl = config.calendarioApiUrls.agendar;
-
    var momentDesde = moment(inicioHuecoAceptado);
    momentHasta = momentDesde.add(1,'hours');
-
    var evento = {
    	description: "Reunión con " + guestMail,
       fecha_desde: inicioHuecoAceptado.replace(".000Z","-03:00"),
       fecha_hasta: momentHasta.toISOString().replace(".000Z","-03:00")
    }
-
+   condole.debug('[Calendario] Intentando agendar evento: ' +  + JSON.stringify(evento));
    request.post({
       url: agendarUrl,
       json: true,
@@ -52,19 +49,23 @@ function agregarEvento(ownerId, inicioHuecoAceptado, guestMail) {
          // usuario: ownerId
       }
    }, function (error, response, body) {
-      console.log("Evento agendado: " + JSON.stringify(evento));
+      log.log("Evento agendado: " + JSON.stringify(evento));
    });
 
 }
 
 function calcularFechaHasta(fechaDesde) {
    var momentDesde = moment(fechaDesde);
+   var fechaHasta;
    if(momentDesde.hour() == 0){
-      momentHasta = momentDesde.add(1,'days').startOf('day');
+      // todo el dia
+      fechaHasta = momentDesde.add(1,'days').startOf('day').toISOString();
    } else {
-      momentHasta = momentDesde.add(1,'hours');
+      // un horario específico
+      fechaHasta = momentDesde.add(1,'hours').toISOString();
    }
-   return momentHasta.toISOString().replace(".000Z","-03:00");
+   log.debug('[Calendario] Calculo de fechaHasta. Desde: ' + fechaDesde + ', Hasta: ' + fechaHasta);
+   return fechaHasta;
 }
 
 module.exports.obtenerHueco = obtenerHueco;

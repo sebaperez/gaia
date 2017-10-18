@@ -1,5 +1,7 @@
 var request = require('request');
 var config = require('../config/config').config;
+var log = require('log4js').getLogger();
+log.level = 'debug';
 
 // ej owner: {
 //     "name": "Sebastian",
@@ -30,7 +32,7 @@ function obtenerMensajeCoordinacionAGuest(owner, hueco, callback) {
 }
 function obtenerMensajeConfirmacionReunion(owner, hueco, callback){
    var respuestaUrl = config.respuestaApiUrls.confirmarReunion;
-   console.log(hueco);
+   log.debug('[Respuesta] Armando mensaje de confirmacion de reunion para owner con hueco', hueco);
    request.post({
       url: respuestaUrl,
       json: true,
