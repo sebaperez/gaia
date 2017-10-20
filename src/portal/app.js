@@ -103,22 +103,37 @@ var user = (function() {
 	}
 })();
 
-app.get("/user/conversaciones", function(req, res) {
-	var data = [], i, email, total;
-	if (req.query.email) {
-		email = req.query.email;;
-		request.get("http://" + CONVERSACION_HOST + ":" + CONVERSACION_PORT + "/conversacion", function(error, response, body) {
-			if (! error && body) {
-				body = JSON.parse(body);
-				total = body.length > CONVERSACIONES_MAX ? CONVERSACIONES_MAX : body.length;
-				for (i = 0; i < total; i++) {
-					if (body[i].owner == email) {
-						data.push(body[i]);
-					}
+function getConversaciones(email, cb) {
+	request.get("http://" + CONVERSACION_HOST + ":" + CONVERSACION_PORT + "/conversacion", function(error, response, body) {
+		var i, total, data = [];
+		if (! error && body) {
+			body = JSON.parse(body);
+			for (i = 0; i < body.length; i++) {
+				if (body[i].owner == email) {
+					data.push(body[i]);
 				}
-				cors(res);
-				res.send(data);
 			}
+			cb(data);
+		}
+	});
+}
+
+app.get("/user/conversaciones", function(req, res) {
+	if (req.query.email) {
+		getConversaciones(req.query.email, function(data) {
+			data = data.slice(0, CONVERSACIONES_MAX);
+			cors(res);
+			res.send(data);
+		});
+	}
+});
+
+app.get("/user/stats", function(req, res) {
+	if (req.query.email) {
+		getConversaciones(req.query.email, function(data) {
+			var r = {};
+			cors(res);
+			res.send(r);
 		});
 	}
 });
