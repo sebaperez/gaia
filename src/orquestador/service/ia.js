@@ -12,8 +12,9 @@ function interpretarMensaje(contenido, callback, err) {
       json: true,
       body: {msj: contenido}
    }, function (error, response, body) {
-      log.debug('IA - respuesta: ' + JSON.stringify(body));
       if(body.ok){
+         delete body.original_response;
+         log.debug('[IA] Respuesta:', body);
          callback(body);
       } else {
          err("El modulo de IA no pudo procesar el mensaje: " + contenido);
