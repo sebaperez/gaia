@@ -1,7 +1,8 @@
-
 var exports = module.exports = {};
-const request = require('request');
+var usuariosHelper = require('../usuarios/usuarios_helper')
 const moment = require('moment');
+var log = require('log4js').getLogger();
+log.level = 'debug';
 
 var fs = require('fs');
 var readline = require('readline');
@@ -85,33 +86,24 @@ exports.load_credential = function(user_id, callback, reject) {
 
   var auth = new googleAuth();
   var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
- /*
-     //req localhost:3000/api/Clients/iduser por get
-  var http = require('http');
-  var options = {
-  host: 'http://gaiameet.com:3000',
-  path: '/api/Clients/'+user_id
-  };
-  var req = http.get(options, function(res) {
-    console.log('STATUS: ' + res.statusCode);
-    console.log('HEADERS: ' + JSON.stringify(res.headers));
-  });*/
 
-  //En Archivo
-  token_path = "credentials/" + 300 + ".json"
-  fs.readFile(token_path, function(err, token) {
-    if (err) {
-      console.log(err)
-    }
-    oauth2Client.credentials = JSON.parse(token);
-    oauth2Client.refreshAccessToken(function(err, tokens) {
-      if(err){
-        //do something with the error
-        console.log(err);
-        reject('Error en la autenticacion con oAuth.');
-      }
-      var intervalo = {hora_inicio: 9, hora_fin: 18}
-      callback(oauth2Client, intervalo);
-    });
+  usuariosHelper.obtenerUsuario(user_id, function(usuario){
+     var token = {
+        access_token: usuario.googleAccessToken,
+        refresh_token: "1/1UGbJVo_GozfnzUvHswp8qP1QkZXH2YgRqNLQb8c2Xg",
+        //TODO: guardar el refresh_token en el user   refresh_token: usuario.googleRefreshToken,
+        token_type: "Bearer"
+     }
+     oauth2Client.credentials = token;
+     oauth2Client.refreshAccessToken(function(err, tokens) {
+        if(err){
+           log.error(err);
+           reject('Error en la autenticacion con oAuth.');
+        }
+        callback(oauth2Client);
+     });
+  }, function(error){
+     log.error(error);
+     reject(error);
   });
 }

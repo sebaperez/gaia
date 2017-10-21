@@ -1,8 +1,10 @@
 const calendar_helper = require('../google/calendar_helper.js');
 const request = require('request');
 const moment = require('moment');
+var log = require('log4js').getLogger();
+log.level = 'debug';
 
-function acotarFecha(intervalo,fechas){
+function acotarFecha(intervalo, fechas){
   var inicio_Limite = intervalo.hora_inicio
   var fin_Limite = intervalo.hora_fin
   var cantidadFechas = fechas.length
@@ -82,24 +84,27 @@ module.exports = function(app) {
   //        -- Fecha hora desde (2011-06-03T10:00:00-07:00) verificar
   //        -- Fecha hora hasta
   app.post('/proximodisponible', (req, res) => {
-    var respuesta = null
     //ID de usuario
-    var usuario = req.query.usuario
-    if(!usuario){
+    log.info("Consulta a /proximodisponible")
+    var usuarioId = req.query.usuario
+    if(!usuarioId){
       res.status(400).send("Falta el parametro usuario");
       return
     }
 
-    calendar_helper.load_credential(usuario, function(auth, intervalo){
+    calendar_helper.load_credential(usuarioId, function(auth) {
     //coleccion de fechas
     var fechas = req.body
+    log.debug("Body:",req.body)
+    if(JSON.stringify(fechas) === "{}"){
+      res.status(400).send("Faltan las fechas en el body");
+      return
+    }
     var cantidadFechas = fechas.length
-    //console.log(cantidadFechas)
-    //console.log("fecha original: "+JSON.stringify(fechas));
-    var FechaAcotada = acotarFecha(intervalo,fechas)
-    //console.log("fecha acotada: "+JSON.stringify(FechaAcotada))
+    var intervalo = {hora_inicio: 9, hora_fin: 18}
+    var FechaAcotada = acotarFecha(intervalo, fechas)
     fechas = FechaAcotada
-    if (fechas != null){
+    if (fechas != null) {
       //for (var i= 0 ; i < fechas.length; i++) {
         var i = 0
         var intervaloFecha = fechas[i]
@@ -107,36 +112,31 @@ module.exports = function(app) {
         var hasta = intervaloFecha.hasta;
         // TODO: Acotar intervalo segun preferencias del user
 
-        buscarhueco(auth,desde,hasta,function(hueco)
-        {
-          var logicaBuscarHueco =  function(hueco){
-            if (hueco)
-              res.status(200).json(hueco);
-            else {
+        buscarhueco(auth, desde, hasta, function(hueco) {
+          var logicaBuscarHueco =  function(hueco) {
+            if (hueco) {
+               res.status(200).json(hueco);
+            } else {
               i++
               //console.log("cantidad fechas: "+cantidadFechas)
-              if (cantidadFechas > i)
-              {
+              if (cantidadFechas > i) {
+                 var intervaloFecha = fechas[i]
+                 var nuevoDesde = intervaloFecha.desde;
+                 var nuevoHasta = intervaloFecha.hasta;
 
-              var intervaloFecha = fechas[i]
-              var desde = intervaloFecha.desde;
-              var hasta = intervaloFecha.hasta;
-
-              buscarhueco(auth,desde,hasta, function(e) { logicaBuscarHueco(e) } )
-
-              }
-              else {
-                  res.status(200).json(null);
+                 buscarhueco(auth, nuevoDesde, nuevoHasta, function(e) { logicaBuscarHueco(e) } )
+              } else {
+                 res.status(200).json(null);
               }
             }
           }
-
-            logicaBuscarHueco(hueco)
+          logicaBuscarHueco(hueco)
         })
 
-      //}
     }
-  })
+   }, function(error){
+      res.status(500).send(error);
+   })
   });
 
   // Dado una fecha se la agrega al calendario
@@ -153,17 +153,17 @@ module.exports = function(app) {
     //console.log ("hasta :"+hasta)
     //console.log ("description :"+description)
 
-    calendar_helper.load_credential(usuario, function(auth, intervalo){
+    calendar_helper.load_credential(usuario, function(auth) {
 
       calendar_helper.agregar_evento(auth, description, desde, hasta, function(eventoCreado) {
           res.status(200).json(eventoCreado).send()
        }, function(err){
-          res.status(500).send()        
+          res.status(500).send()
       })
 
-   }, function(mensajeError){
-      res.status(500).send(mensajeError)
-   });
+    }, function(error){
+      res.status(500).send(error)
+    });
 
 })
 }
