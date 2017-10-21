@@ -82,28 +82,22 @@ exports.agregar_evento = function(auth, descripcion, desde, hasta, callback, rej
 }
 
 // Levantar credenciales
-exports.load_credential = function(user_id, callback, reject) {
+exports.load_credential = function(usuario, callback, reject) {
 
   var auth = new googleAuth();
   var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
 
-  usuariosHelper.obtenerUsuario(user_id, function(usuario){
-     var token = {
-        access_token: usuario.googleAccessToken,
-        refresh_token: "1/1UGbJVo_GozfnzUvHswp8qP1QkZXH2YgRqNLQb8c2Xg",
-        //TODO: guardar el refresh_token en el user   refresh_token: usuario.googleRefreshToken,
-        token_type: "Bearer"
+  var token = {
+     access_token: usuario.googleAccessToken,
+     refresh_token: usuario.googleRefreshToken,
+     token_type: "Bearer"
+  }
+  oauth2Client.credentials = token;
+  oauth2Client.refreshAccessToken(function(err, tokens) {
+     if(err){
+        log.error(err);
+        reject('Error con el refresh token.');
      }
-     oauth2Client.credentials = token;
-     oauth2Client.refreshAccessToken(function(err, tokens) {
-        if(err){
-           log.error(err);
-           reject('Error en la autenticacion con oAuth.');
-        }
-        callback(oauth2Client);
-     });
-  }, function(error){
-     log.error(error);
-     reject(error);
+     callback(oauth2Client);
   });
 }
