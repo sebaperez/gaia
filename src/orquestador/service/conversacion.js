@@ -62,7 +62,7 @@ function agregarMensajeAConversacion(ownerMail, guestMail, mensaje, callback, er
    obtenerConversacion(ownerMail, guestMail, function(conversacion) {
       conversacion.mensajes = conversacion.mensajes? conversacion.mensajes : [];
       log.debug('[Conversacion] Agregando mensaje', mensaje, "a conversacion con id " + conversacion.id);
-      conversacion.mensajes.push(mensaje);
+      conversacion.mensajes.unshift(mensaje);
       request.put({
          url: conversacionesUrl + '/' + conversacion.id,
          json: true,

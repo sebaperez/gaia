@@ -104,9 +104,7 @@ router.post('/', function (req, res, next) {
 
             case 'aceptar_reunion':
                conversacionService.agregarMensajeAConversacion(ownerMail, guestMail, contenidoMailActual, function(conversacion){
-                  //TODO una vez que se puedan guardar los mensajes, hacer que busque la ultima propuesta de gaia
-                  // var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario");
-                  var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "solicitar_reunion");
+                  var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario");
                   log.info('Mensaje de propuesta de horario: ' + mensajeDePropuesta);
                   if(mensajeDePropuesta){
                      var iniciohuecoAceptado = mensajeDePropuesta.significado.intervalos[0].desde;
@@ -114,11 +112,11 @@ router.post('/', function (req, res, next) {
                      respuestaService.obtenerMensajeConfirmacionReunion(owner, iniciohuecoAceptado, function(respuesta){
                         ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
                            res.status(200).send();
-                        }, function(){
+                        }, function() {
                            res.status(500).send();
                         });
                         var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, iniciohuecoAceptado);
-                        // conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia);
+                        conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia);
                      });
                   } else {
                      var respuesta = "Disculpe, no sé a qué reunión se refiere."
