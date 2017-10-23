@@ -97,8 +97,8 @@ router.post('/', function (req, res, next) {
                         res.status(500).send();
                      });
                   }
-               }, function(){
-                  res.status(500).send();
+               }, function(error){
+                  res.status(500).send(error);
                });
                break;
 
@@ -108,7 +108,7 @@ router.post('/', function (req, res, next) {
                   log.info('Mensaje de propuesta de horario: ' + mensajeDePropuesta);
                   if(mensajeDePropuesta){
                      var iniciohuecoAceptado = mensajeDePropuesta.significado.intervalos[0].desde;
-                     calendarioService.agregarEvento(owner.id, iniciohuecoAceptado, guestMail);
+                     calendarioService.agregarEvento(owner.id, iniciohuecoAceptado, nombreGuest || guestMail);
                      respuestaService.obtenerMensajeConfirmacionReunion(owner, iniciohuecoAceptado, function(respuesta){
                         ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
                            res.status(200).send();

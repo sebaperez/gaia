@@ -50,20 +50,19 @@ function buscarhueco(auth, fecha_desde, fecha_hasta, callback){
             if (cantidadEventos == 0)
             {
                console.log("HAY HUECO - Desde: " + desde.format('YYYY-MM-DDTHH:mm:ssZ'))
-               callback(desde.format('YYYY-MM-DDTHH:mm:ssZ'))
+               return callback(desde.format('YYYY-MM-DDTHH:mm:ssZ'))
             }
             else
             {
                var diferenciaHoras = hasta.diff(desde, 'hours')
-               //console.log("diferenciaHoras: " + diferenciaHoras)
                if(diferenciaHoras <= 1)
                {
-                  console.log("NO HAY HUECO")
-                  callback(null)
+                  log.info("NO HAY HUECO")
+                  return callback(null)
                }
                else
                {
-                  console.log("HAY EVENTO - " + eventos[0].summary);
+                  log.info("HAY EVENTO - " + eventos[0].summary);
                   newHasta = newHasta.add( 1, 'hours')
                   desde = desde.add(1,'hours')
                   calendar_helper.listar_eventos(auth, desde, newHasta, function(e) { logicaEvento(e) })
@@ -168,6 +167,7 @@ module.exports = function(app) {
       calendar_helper.load_credential(usuarioId, function(auth) {
 
          calendar_helper.agregar_evento(auth, description, desde, hasta, function(eventoCreado) {
+            log.info("Evento creado:", eventoCreado)
             res.status(200).json(eventoCreado).send()
          }, function(err){
             res.status(500).send()

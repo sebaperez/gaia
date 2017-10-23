@@ -20,12 +20,18 @@ function obtenerHueco(fechas, intervalos, ownerId, callback, err) {
       json: true,
       body: intervalosYFechas,
       qs: {
-         usuario: 300
-         //usuario: ownerId
+         usuario: ownerId
       }
    }, function (error, response, body) {
-      log.debug("[Calendario] Hueco encontrado por el calendario: " + body);
-      callback(body);
+      if(error || response.statusCode != 200){
+         log.error("[Calendario] Hubo un error en el módulo Calendario.");
+         err(error);
+      } else if (response.statusCode != 200){
+         err("[Calendario] Hubo un error en la respuesta del módulo Calendario.");
+      } else {
+         log.info("[Calendario] Hueco encontrado por el calendario: " + body);
+         callback(body);
+      }
    });
 
 }
@@ -35,7 +41,7 @@ function agregarEvento(ownerId, inicioHuecoAceptado, guestMail) {
    var momentDesde = moment(inicioHuecoAceptado);
    momentHasta = momentDesde.add(1,'hours');
    var evento = {
-   	description: "Reunión con " + guestMail,
+      description: "Reunión con " + guestMail,
       fecha_desde: inicioHuecoAceptado,
       fecha_hasta: momentHasta.format('YYYY-MM-DDTHH:mm:ssZ')
    }

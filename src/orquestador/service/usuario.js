@@ -6,7 +6,6 @@ log.level = 'debug';
 function obtenerUsuario(emailRemitente, emailDestinatario, callback, err) {
 
    var usuarioRemitenteUrl = config.userApiUrls.clientes + '?filter[where][email]=' + emailRemitente + '&filter[limit]=1';
-   log.debug(usuarioRemitenteUrl)
    log.debug("[Usuario] Buscando owner entre mails " + emailRemitente + " y " + emailDestinatario);
    request.get(usuarioRemitenteUrl, function (error, response, body) {
       if(body){
