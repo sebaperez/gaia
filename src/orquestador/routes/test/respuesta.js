@@ -10,4 +10,8 @@ router.post('/confirmarReunion/parser', function (req, res, next) {
    res.send("La reunion queda agendada para el " + req.body.hueco + ". Gracias");
 });
 
+router.post('/error/parser', function (req, res, next) {
+   res.send("Lo siento, en este momento no estoy disponible. Gracias");
+});
+
 module.exports = router;

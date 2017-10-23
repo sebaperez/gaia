@@ -11,6 +11,8 @@ var config = require('../config/config').config;
 var log = require('log4js').getLogger();
 log.level = 'debug';
 
+var respuestaDeError = "Lo siento, no estoy disponible en este momento."
+
 router.post('/', function (req, res, next) {
 
    //ej mailParseado:
@@ -98,7 +100,12 @@ router.post('/', function (req, res, next) {
                      });
                   }
                }, function(error){
-                  res.status(500).send(error);
+                  log.error(error);
+                  ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuestaDeError, contenidoMail, function(){
+                     res.status(200).send();
+                  }, function(){
+                     res.status(500).send();
+                  });
                });
                break;
 
@@ -112,9 +119,7 @@ router.post('/', function (req, res, next) {
                      respuestaService.obtenerMensajeConfirmacionReunion(owner, iniciohuecoAceptado, function(respuesta){
                         ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
                            res.status(200).send();
-                        }, function() {
-                           res.status(500).send();
-                        });
+                        }, function() {res.status(500).send()});
                         var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, iniciohuecoAceptado);
                         conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia);
                      });
@@ -122,14 +127,11 @@ router.post('/', function (req, res, next) {
                      var respuesta = "Disculpe, no sé a qué reunión se refiere."
                      ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
                         res.status(200).send();
-                     }, function(){
-                        res.status(500).send();
-                     });
+                     }, function(){res.status(500).send()});
                   }
                }, function() {
                   log.error('No pude agregar el mensaje a la conversacion del owner ' + ownerMail + ' y guest ' + guestMail);
-                  res.status(501);
-                  res.send();
+                  res.status(500).send();
                });
                break;
 
@@ -152,13 +154,15 @@ router.post('/', function (req, res, next) {
          }
       }, function(mensajeError) {
          log.error(mensajeError);
-         res.status(400);
-         res.send(mensajeError);
+         ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuestaDeError, contenidoMail, function(){
+            res.status(200).send();
+         }, function(){res.status(500).send()});
       });
    }, function(mensajeError) {
       log.error(mensajeError);
-      res.status(400);
-      res.send(mensajeError);
+      ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuestaDeError, contenidoMail, function(){
+         res.status(200).send();
+      }, function(){res.status(500).send()});
    });
 });
 
