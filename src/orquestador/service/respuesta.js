@@ -17,7 +17,7 @@ log.level = 'debug';
 //    "2017-08-22T00:00:00.000-03:00"
 // ]
 
-function obtenerMensajeCoordinacionAGuest(nombreGuest, hueco, callback) {
+module.exports.obtenerMensajeCoordinacionAGuest = function (nombreGuest, hueco, callback) {
    var respuestaUrl = config.respuestaApiUrls.solicitarReunionAlGuest;
    request.post({
       url: respuestaUrl,
@@ -31,7 +31,7 @@ function obtenerMensajeCoordinacionAGuest(nombreGuest, hueco, callback) {
    });
 }
 
-function obtenerMensajeConfirmacionReunion(owner, hueco, callback){
+module.exports.obtenerMensajeConfirmacionReunion = function (owner, hueco, callback){
    var respuestaUrl = config.respuestaApiUrls.confirmarReunion;
    log.debug('[Respuesta] Armando mensaje de confirmacion de reunion para owner con hueco', hueco);
    request.post({
@@ -45,6 +45,3 @@ function obtenerMensajeConfirmacionReunion(owner, hueco, callback){
       callback(body);
    });
 }
-
-module.exports.obtenerMensajeCoordinacionAGuest = obtenerMensajeCoordinacionAGuest;
-module.exports.obtenerMensajeConfirmacionReunion = obtenerMensajeConfirmacionReunion;

@@ -78,7 +78,7 @@ function agregarMensajeAConversacion(ownerMail, guestMail, mensaje, callback, er
    });
 }
 
-function armarMensajeProponerHorario(respuesta, desde){
+module.exports.armarMensajeProponerHorario = function (respuesta, desde){
    return {
       "contenido": respuesta,
       "significado": {
@@ -92,7 +92,7 @@ function armarMensajeProponerHorario(respuesta, desde){
    }
 }
 
-function armarMensajeConfirmarReunion (respuesta, desde) {
+module.exports.armarMensajeConfirmarReunion = function (respuesta, desde) {
    return {
       "contenido": respuesta,
       "significado": {
@@ -119,6 +119,4 @@ function obtenerUltimoMensajeConSignificado(conversacion, significado){
 module.exports.obtenerConversacion = obtenerConversacion;
 module.exports.crearConversacion = crearConversacion;
 module.exports.agregarMensajeAConversacion = agregarMensajeAConversacion;
-module.exports.armarMensajeProponerHorario = armarMensajeProponerHorario;
-module.exports.armarMensajeConfirmarReunion = armarMensajeConfirmarReunion;
 module.exports.obtenerUltimoMensajeConSignificado = obtenerUltimoMensajeConSignificado;
