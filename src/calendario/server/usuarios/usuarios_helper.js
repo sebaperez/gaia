@@ -14,7 +14,8 @@ exports.obtenerUsuario = function(id, callback, err){
             log.debug("[Usuario] Usuario encontrado:", JSON.parse(body));
             callback(JSON.parse(body));
          } else {
-            err(JSON.parse(body))
+            if(err)
+               err("[Usuario] Hubo un problema con el módulo de usuarios", body);
          }
       }
    });
