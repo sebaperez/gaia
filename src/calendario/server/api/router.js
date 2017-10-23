@@ -6,9 +6,8 @@ var log = require('log4js').getLogger();
 log.level = 'debug';
 
 function acotarFechas(horaInicioLimite, horaFinLimite, fechas){
-   var cantidadFechas = fechas.length
    var retorno = []
-   for (var i = 0; i < cantidadFechas; i++){
+   for (var i = 0; i < fechas.length; i++){
       var moment_desde = moment(fechas[i].desde)
       var moment_hasta = moment(fechas[i].hasta)
       var horaDesde = moment_desde.get('hour')
@@ -101,31 +100,38 @@ module.exports = function(app) {
             }
             var cantidadFechas = fechas.length
             var fechasAcotadas = acotarFechas(usuario.timeStart, usuario.timeEnd, fechas)
-            if (fechasAcotadas != null) {
-               //for (var i= 0 ; i < fechas.length; i++) {
-               var i = 0
-               var intervaloFecha = fechasAcotadas[i]
-               var desde = intervaloFecha.desde;
-               var hasta = intervaloFecha.hasta;
+            log.debug("Fechas acotadas:", fechasAcotadas)
+            var cantidadFechas = fechasAcotadas.length;
+            if (fechasAcotadas != null && cantidadFechas > 0) {
+               for (var i = 0; i < cantidadFechas; i++){
+                  var intervaloFecha = fechasAcotadas[i]
+                  var desde = intervaloFecha.desde;
+                  var hasta = intervaloFecha.hasta;
 
-               buscarhueco(auth, desde, hasta, function(hueco) {
-                  var logicaBuscarHueco =  function(hueco) {
-                     if (hueco) {
-                        res.status(200).json(hueco);
-                     } else {
-                        i++
-                        if (cantidadFechas > i) {
-                           var intervaloFecha = fechasAcotadas[i]
-                           var nuevoDesde = intervaloFecha.desde;
-                           var nuevoHasta = intervaloFecha.hasta;
-                           buscarhueco(auth, nuevoDesde, nuevoHasta, function(proxHueco) { logicaBuscarHueco(proxHueco) } )
+                  buscarhueco(auth, desde, hasta, function(hueco) {
+                     var logicaBuscarHueco =  function(hueco) {
+                        if (hueco) {
+                           log.info("Devolviendo hueco", hueco)
+                           res.status(200).json(hueco);
                         } else {
-                           res.status(200).json(null);
+                           i++
+                           if (cantidadFechas > i) {
+                              var intervaloFecha = fechasAcotadas[i]
+                              var nuevoDesde = intervaloFecha.desde;
+                              var nuevoHasta = intervaloFecha.hasta;
+                              buscarhueco(auth, nuevoDesde, nuevoHasta, function(proxHueco) { logicaBuscarHueco(proxHueco) } )
+                           } else {
+                              log.info("Devolviendo null")
+                              res.status(200).json(null);
+                           }
                         }
                      }
-                  }
-                  logicaBuscarHueco(hueco)
-               })
+                     logicaBuscarHueco(hueco)
+                  })
+               }
+            } else {
+               log.info("Devolviendo null")
+               res.status(200).json(null);
             }
 
          }, function(error){
