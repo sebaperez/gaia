@@ -14,8 +14,20 @@ app.use(bodyParser.urlencoded({ extended: false }));
 var mensajesRoute = require('./routes/mensajesRoute');
 app.use('/mensajes', mensajesRoute);
 
-var testRouter = require('./routes/test');
-app.use('/test', testRouter);
+/////TEST ROUTERS//////
+var usuarioTestRouter = require('./routes/test/usuario');
+app.use('/test/user', usuarioTestRouter);
+var iaTestRouter = require('./routes/test/ia');
+app.use('/test/ia', iaTestRouter);
+var conversacionTestRouter = require('./routes/test/conversacion');
+app.use('/test/conversacion', conversacionTestRouter);
+var calendarioTestRouter = require('./routes/test/calendario');
+app.use('/test/calendario', calendarioTestRouter);
+var respuestaTestRouter = require('./routes/test/respuesta');
+app.use('/test/respuesta', respuestaTestRouter);
+var ioTestRouter = require('./routes/test/io');
+app.use('/test/io', ioTestRouter);
+/////TEST ROUTERS//////
 
 
 // catch 404 and forward to error handler
@@ -29,7 +41,8 @@ app.use(function(req, res, next) {
 app.use(function(err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
+  // res.locals.error = req.app.get('env') === 'development' ? err : {};
+  res.locals.error = err;
 
   // render the error page
   res.status(err.status || 500);

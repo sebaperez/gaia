@@ -6,7 +6,7 @@ import { schema } from './model'
 export Respuesta, { schema } from './model'
 
 const router = new Router()
-const { motivo, contenido, owner, fechas } = schema.tree
+const { motivo, contenido, nombre, hueco } = schema.tree
 
 /**
  * @api {post} /respuesta Create respuesta
@@ -78,7 +78,7 @@ router.delete('/:motivo',
  * @apiError 404 Respuesta not found.
  */
 router.post('/:motivo/parser',
-  body({ owner, fechas }),
+  body({ nombre, hueco }),
   parser)
 
 export default router

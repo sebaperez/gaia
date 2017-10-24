@@ -5,6 +5,10 @@ var request = require("request");
 var USER_HOST = "localhost";
 var USER_PORT = 3000;
 
+var CONVERSACION_HOST = "admin.gaiameet.com";
+var CONVERSACION_PORT = 9001;
+var CONVERSACIONES_MAX = 15;
+
 function cors(res) {
 	res.header("Access-Control-Allow-Origin", "*");
 	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -25,6 +29,9 @@ var user = (function() {
 		post: function(path, data, cb) {
 			return this.request("post", path, data, cb);
 		},
+		patch: function(path, data, cb) {
+			return this.request("patch", path, data, cb);
+		},
 		request: function(method, path, data, cb) {
 			var url = "http://" + this.cons.HOST + ":" + this.cons.PORT + path;
 			if (method === "get") {
@@ -33,8 +40,11 @@ var user = (function() {
 						cb(error, response, body);
 					}
 				});
-			} else if (method === "post") {
-				return request.post({
+			} else if (method === "post" || method === "patch") {
+				if ("patch") {
+					delete data.accessToken;
+				}
+				return request[method]({
 					url: url,
 					form: data
 				}, function(error, response, body) {
@@ -69,8 +79,8 @@ var user = (function() {
 		register: function(method, local, endMethod, _endpoint, cb) {
 			app[method](local, function(req, res) {
 				var endpoint = user.replaceMacros(_endpoint, req.query);
-				if (endMethod === "post") {
-					user.post(endpoint, req.query, function(error, response, body) {
+				if (endMethod === "post" || endMethod === "patch") {
+					user[endMethod](endpoint, req.query, function(error, response, body) {
 						cors(res);
 						if (cb) {
 							cb(error, response, body, res);
@@ -93,6 +103,41 @@ var user = (function() {
 	}
 })();
 
+function getConversaciones(email, cb) {
+	request.get("http://" + CONVERSACION_HOST + ":" + CONVERSACION_PORT + "/conversacion", function(error, response, body) {
+		var i, total, data = [];
+		if (! error && body) {
+			body = JSON.parse(body);
+			for (i = 0; i < body.length; i++) {
+				if (body[i].owner == email) {
+					data.push(body[i]);
+				}
+			}
+			cb(data);
+		}
+	});
+}
+
+app.get("/user/conversaciones", function(req, res) {
+	if (req.query.email) {
+		getConversaciones(req.query.email, function(data) {
+			data = data.slice(0, CONVERSACIONES_MAX);
+			cors(res);
+			res.send(data);
+		});
+	}
+});
+
+app.get("/user/stats", function(req, res) {
+	if (req.query.email) {
+		getConversaciones(req.query.email, function(data) {
+			var r = {};
+			cors(res);
+			res.send(r);
+		});
+	}
+});
+
 user.register("get", "/user/login", "post", "/api/Clients/login", function(error, response, body, res) {
 	var d = JSON.parse(body);
 	if (d && !d.error && d.id && d.userId) {
@@ -110,6 +155,7 @@ user.register("get", "/user/login", "post", "/api/Clients/login");
 user.register("get", "/user/logout", "post", "/api/Clients/logout");
 user.register("get", "/user/info", "get", "/api/Clients/{userId}");
 user.register("get", "/user/logout", "get", "/api/Clients/{userId}");
+user.register("get", "/user/set", "patch", "/api/Clients/{userId}");
 
 app.get('/', function (req, res) {
 	res.send('');

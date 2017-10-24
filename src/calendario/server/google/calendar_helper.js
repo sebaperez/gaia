@@ -1,8 +1,13 @@
-
 var exports = module.exports = {};
-const request = require('request');
+var usuariosHelper = require('../usuarios/usuarios_helper')
 const moment = require('moment');
+
 moment.tz.setDefault("America/Buenos_Aires")
+
+var utcArgentina = "-0300"
+var log = require('log4js').getLogger();
+log.level = 'debug';
+
 
 var fs = require('fs');
 var readline = require('readline');
@@ -14,7 +19,7 @@ var clientId = null;
 var redirectUrl = null;
 
 // Load client secrets from a local file.
-fs.readFile('client_secret.json', function processClientSecrets(err, content) {
+fs.readFile('server/client_secret.json', function processClientSecrets(err, content) {
   if (err) {
     console.log('Error loading client secret file: ' + err);
     return;
@@ -29,20 +34,17 @@ fs.readFile('client_secret.json', function processClientSecrets(err, content) {
 
 });
 
-// Funciones utiles para comunicarse con google.
 //Listar eventos
 exports.listar_eventos = function(auth, desde, hasta, callback) {
   var calendar = google.calendar('v3');
-  var D = moment(desde)
-  var H = moment(hasta)
-  D.subtract(3,'hours')
-  H.subtract(3,'hours')
-  console.log('A GOOGLE: desde: '+D.toISOString().replace(".000Z","-03:00")+ " - hasta: "+H.toISOString().replace(".000Z","-03:00"))
+  var momentDesde = moment(desde)
+  var momentHasta = moment(hasta)
+  console.log('A GOOGLE: desde: ' + momentDesde.utcOffset(utcArgentina).format('YYYY-MM-DDTHH:mm:ssZ') + " - hasta: " + momentHasta.format('YYYY-MM-DDTHH:mm:ssZ'))
   calendar.events.list({
     auth: auth,
     calendarId: 'primary',
-    timeMin: D.toISOString().replace(".000Z","-03:00"),
-    timeMax: H.toISOString().replace(".000Z","-03:00"),
+    timeMin: momentDesde.utcOffset(utcArgentina).format('YYYY-MM-DDTHH:mm:ssZ'),
+    timeMax: momentHasta.utcOffset(utcArgentina).format('YYYY-MM-DDTHH:mm:ssZ'),
     maxResults: 10,
     singleEvents: true,
     orderBy: 'startTime'
@@ -57,65 +59,48 @@ exports.listar_eventos = function(auth, desde, hasta, callback) {
     callback(events)
   });
 }
+
 //Agregar un evento
-exports.agregar_evento = function(auth, description,desde,hasta,callback){
+exports.agregar_evento = function(auth, descripcion, desde, hasta, callback, reject) {
   var calendar = google.calendar('v3');
   calendar.events.insert({
     auth: auth,
     calendarId: 'primary',
     resource: {
-      'summary': description,
-      'description': 'Reunion registrada por GAIA',
+      'summary': descripcion,
+      'description': 'Reunión registrada por GAIA',
       'start': {
-        'dateTime': desde,
-        'timeZone': 'GMT',
+        'dateTime': desde
       },
       'end': {
-        'dateTime': hasta,
-        'timeZone': 'GMT',
+        'dateTime': hasta
       },
     },
-  }, function(err, res) {
+}, function(err, eventoCreado) {
     if (err) {
       console.log('Error: ' + err);
-      callback(err)
+      return reject(err)
     }
-    console.log(res);
-    callback(res)
+    console.log('Evento creado: ' + eventoCreado);
+    return callback(eventoCreado)
   });
 }
+
 // Levantar credenciales
-exports.load_credential = function(user_id, callback) {
+exports.load_credential = function(usuario, callback, reject) {
 
   var auth = new googleAuth();
   var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
- /*
-     //req localhost:3000/api/Clients/iduser por get
-  var http = require('http');
-  var options = {
-  host: 'http://gaiameet.com:3000',
-  path: '/api/Clients/'+user_id
-  };
-  var req = http.get(options, function(res) {
-    console.log('STATUS: ' + res.statusCode);
-    console.log('HEADERS: ' + JSON.stringify(res.headers));
-  });*/
 
-  //En Archivo
-  token_path = "../credentials/" + 300 + ".json"
-  fs.readFile(token_path, function(err, token) {
-    if (err) {
-      console.log(err)
-    }
-    oauth2Client.credentials = JSON.parse(token);
-    oauth2Client.refreshAccessToken(function(err, tokens){
-      if(err){
-        //do something with the error
-        console.log(err);
-        return reject('error in authenticating calendar oAuth client.');
-      }
-      intervalo = {hora_inicio: 9, hora_fin: 18}
-      callback(oauth2Client,intervalo);
-    });
+  oauth2Client.credentials.access_token = usuario.googleAccessToken;
+  oauth2Client.credentials.refresh_token = usuario.googleRefreshToken;
+  oauth2Client.credentials.token_type = "Bearer";
+
+  oauth2Client.refreshAccessToken(function(err, tokens) {
+     if(err){
+        log.error(err);
+        return reject('Error con el refresh token.');
+     }
   });
+  return callback(oauth2Client);
 }

@@ -43,7 +43,7 @@ router.get('/',
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 Conversacion not found.
  */
-router.get('/:id',
+router.get('/:owner/:guest',
   show)
 
 /**
