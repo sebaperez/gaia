@@ -36,12 +36,12 @@ function obtenerHueco(fechas, intervalos, ownerId, callback, err) {
 
 }
 
-function agregarEvento(ownerId, inicioHuecoAceptado, guestMail) {
+function agregarEvento(ownerId, inicioHuecoAceptado, guestNombre) {
    var agendarUrl = config.calendarioApiUrls.agendar;
    var momentDesde = moment(inicioHuecoAceptado);
    momentHasta = momentDesde.add(1,'hours');
    var evento = {
-      description: "Reunión con " + guestMail,
+      description: "Reunión con " + guestNombre,
       fecha_desde: inicioHuecoAceptado,
       fecha_hasta: momentHasta.format('YYYY-MM-DDTHH:mm:ssZ')
    }

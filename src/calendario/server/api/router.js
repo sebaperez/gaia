@@ -162,18 +162,21 @@ module.exports = function(app) {
       var desde = req.body.fecha_desde
       var hasta = req.body.fecha_hasta
 
-      calendar_helper.load_credential(usuarioId, function(auth) {
+      usuariosHelper.obtenerUsuario(usuarioId, function(usuario){
 
-         calendar_helper.agregar_evento(auth, description, desde, hasta, function(eventoCreado) {
-            log.info("Evento creado:", eventoCreado)
-            return res.status(200).json(eventoCreado).send()
-         }, function(err){
-            return res.status(500).send()
-         })
+         calendar_helper.load_credential(usuario, function(auth) {
 
-      }, function(error){
-         res.status(500).send(error)
+            calendar_helper.agregar_evento(auth, description, desde, hasta, function(eventoCreado) {
+               log.info("Evento creado:", eventoCreado)
+               return res.status(200).json(eventoCreado).send()
+            }, function(err){
+               return res.status(500).send(err)
+            })
+
+         }, function(error){
+            res.status(500).send(error)
+         });
+
       });
-
    })
 }
