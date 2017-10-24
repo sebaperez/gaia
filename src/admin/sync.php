@@ -70,7 +70,7 @@
 	function saveData($userId, $gaiaToken, $access_token, $refresh_token) {
 		$c = curl_init();
 		$data = [ "googleAccessToken" => $access_token ];
-		if ($refreshToken) {
+		if ($refresh_token) {
 			$data["googleRefreshToken"] = $refresh_token;
 		}
 		$opt = array(
