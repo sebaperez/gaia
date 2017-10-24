@@ -1,6 +1,7 @@
 const calendar_helper = require('../google/calendar_helper.js');
 const request = require('request');
 const moment = require('moment');
+moment.tz.setDefault("America/Buenos_Aires")
 
 function acotarFecha(intervalo,fechas){
   var inicio_Limite = intervalo.hora_inicio

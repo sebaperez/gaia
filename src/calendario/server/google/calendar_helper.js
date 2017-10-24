@@ -2,6 +2,7 @@
 var exports = module.exports = {};
 const request = require('request');
 const moment = require('moment');
+moment.tz.setDefault("America/Buenos_Aires")
 
 var fs = require('fs');
 var readline = require('readline');
