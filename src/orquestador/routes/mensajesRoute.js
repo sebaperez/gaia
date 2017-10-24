@@ -8,6 +8,7 @@ var respuestaService = require('../service/respuesta');
 var ioService = require('../service/io');
 var request = require('request');
 var config = require('../config/config').config;
+var mailHelper = require('../helpers/mailHelper')
 var log = require('log4js').getLogger();
 log.level = 'debug';
 
@@ -15,55 +16,29 @@ var respuestaDeError = "Lo siento, no estoy disponible en este momento."
 
 router.post('/', function (req, res, next) {
 
-   //ej mailParseado:
-   // "attachments": [],
-   // "headers": {},
-   // "html": "<div dir=\"ltr\">teaaegafa ag aeg </div>\n",
-   // "text": "teaaegafa ag aeg\n",
-   // "textAsHtml": "<p>teaaegafa ag aeg</p>",
-   // "subject": "test",
-   // "date": "2017-10-08T16:20:00.000Z",
-   // "to": {
-   //    "value": [
-   //         {
-   //             "address": "clara@gaiameet.com",
-   //             "name": ""
-   //         }
-   //    ],
-   //    "html": "<span class=\"mp_address_group\"><a href=\"mailto:clara@gaiameet.com\" class=\"mp_address_email\">clara@gaiameet.com</a></span>",
-   //    "text": "clara@gaiameet.com"
-   // },
-   // "from": {
-   //    "value": [
-   //         {
-   //             "address": "nicolas.presta@mercadolibre.com",
-   //             "name": "Nicolas Rodriguez Presta"
-   //         }
-   //    ],
-   //    "html": "<span class=\"mp_address_group\"><span class=\"mp_address_name\">Nicolas Rodriguez Presta</span> &lt;<a href=\"mailto:nicolas.presta@mercadolibre.com\" class=\"mp_address_email\">nicolas.presta@mercadolibre.com</a>&gt;</span>",
-   //    "text": "Nicolas Rodriguez Presta <nicolas.presta@mercadolibre.com>"
-   // },
-   // "messageId": "<CAEfck2BKvKwU57rO1NBDdMic5EOmHBsRy=Y+aW5p3coYsfXtJQ@mail.gmail.com>"
-
    var mail = req.body;
 
    log.info('Mensaje recibido: ' + mail.subject);
    log.debug(JSON.stringify(mail));
    var mailRemitente = mail.from.value[0].address;
    var mailDestinatario = mail.to.value[0].address;
+   if(mail.cc.value[0]){
+      var mailCC = mail.cc.value[0].address;
+   }
+   var mails = [mailRemitente, mailDestinatario, mailCC]
    var asuntoMail = mail.subject;
    var contenidoMail = mail.text;
    var contenidoMailActual = mail.text.split("----------", 1)[0].trim();
    var idMensaje = mail.messageId;
 
-   usuarioService.obtenerUsuario(mailRemitente, mailDestinatario, function (owner) {
+   usuarioService.obtenerUsuario(mails, function (owner) {
       var ownerMail = owner.email;
-      var guestMail = owner.email == mailRemitente? mailDestinatario : mailRemitente;
-      var nombreGuest = guestMail == mail.from.value[0].address? mail.from.value[0].name : mail.to.value[0].name;
+      var guestMail = mailHelper.obtenerGuestMail(mails, owner);
+      var guestNombre = mailHelper.obtenerGuestNombre(mail, guestMail);
 
       if(!contenidoMailActual) {
          var mensajeMailVacio = 'Me llegó el mail vacío.'
-         log.error(mensajeMailVacio);
+         log.info(mensajeMailVacio);
          res.send({
             de: owner.botEmail,
             para: mailRemitente,
@@ -75,103 +50,89 @@ router.post('/', function (req, res, next) {
       iaService.interpretarMensaje(contenidoMailActual, function (significado) {
          log.info("El significado es: [" + significado.intents + "]");
 
-         switch(obtenerIntencion(significado)) {
+         switch(mailHelper.obtenerIntencion(significado)) {
 
             case 'solicitar_reunion':
                //cubre sólo el caso en el que el owner pide la reunión al guest copiando a gaia
                calendarioService.obtenerHueco(significado.fechas, significado.intervalos, owner.id, function(horario) {
                   if(horario){
                      conversacionService.crearConversacion(ownerMail, guestMail, contenidoMailActual, significado);
-                     respuestaService.obtenerMensajeCoordinacionAGuest(nombreGuest, horario, function(respuesta){
-                        ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
-                           res.status(200).send();
-                        }, function(){
-                           res.status(500).send();
-                        });
+                     respuestaService.obtenerMensajeCoordinacionAGuest(guestNombre, horario, function(respuesta){
+                        ioService.enviarMail(owner.botEmail, guestMail, ownerMail, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
+                           return res.status(200).send();
+                        }, function(){ return res.status(500).send() });
                         var mensajeDeGaia = conversacionService.armarMensajeProponerHorario(respuesta, horario);
-                        conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia)
+                        conversacionService.agregarMensajeAConversacion(ownerMail, guestMail, mensajeDeGaia)
                      });
                   } else {
                      let respuesta = "Lo siento, no hay horarios disponibles para agendar la reunión.";
-                     ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
-                        res.status(200).send();
-                     }, function(){
-                        res.status(500).send();
-                     });
+                     ioService.enviarMail(owner.botEmail, guestMail, ownerMail, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
+                        return res.status(200).send();
+                     }, function(){ return res.status(500).send() });
                   }
                }, function(error){
                   log.error(error);
-                  ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuestaDeError, contenidoMail, function(){
-                     res.status(200).send();
-                  }, function(){
-                     res.status(500).send();
-                  });
+                  ioService.enviarMail(owner.botEmail, guestMail, ownerMail, asuntoMail, idMensaje, respuestaDeError, contenidoMail, function(){
+                     return res.status(200).send();
+                  }, function(){ return res.status(500).send() });
                });
                break;
 
             case 'aceptar_reunion':
                conversacionService.agregarMensajeAConversacion(ownerMail, guestMail, contenidoMailActual, function(conversacion){
                   var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario");
-                  log.info('Mensaje de propuesta de horario: ' + mensajeDePropuesta);
+                  log.info('Mensaje de propuesta de horario: ', mensajeDePropuesta);
                   if(mensajeDePropuesta){
                      var iniciohuecoAceptado = mensajeDePropuesta.significado.intervalos[0].desde;
-                     calendarioService.agregarEvento(owner.id, iniciohuecoAceptado, nombreGuest || guestMail);
+                     calendarioService.agregarEvento(owner.id, iniciohuecoAceptado, guestNombre || guestMail);
                      respuestaService.obtenerMensajeConfirmacionReunion(owner, iniciohuecoAceptado, function(respuesta){
-                        ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
-                           res.status(200).send();
-                        }, function() {res.status(500).send()});
+                        ioService.enviarMail(owner.botEmail, guestMail, ownerMail, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
+                           return res.status(200).send();
+                        }, function() {return res.status(500).send()});
                         var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, iniciohuecoAceptado);
-                        conversacionService.agregarMensajeAConversacion(mailRemitente, mailDestinatario, mensajeDeGaia);
+                        conversacionService.agregarMensajeAConversacion(ownerMail, guestMail, mensajeDeGaia);
                      });
                   } else {
                      var respuesta = "Disculpe, no sé a qué reunión se refiere."
-                     ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
-                        res.status(200).send();
-                     }, function(){res.status(500).send()});
+                     ioService.enviarMail(owner.botEmail, guestMail, ownerMail, asuntoMail, idMensaje, respuesta, contenidoMail, function(){
+                        return res.status(200).send();
+                     }, function(){return res.status(500).send()});
                   }
                }, function() {
                   log.error('No pude agregar el mensaje a la conversacion del owner ' + ownerMail + ' y guest ' + guestMail);
-                  res.status(500).send();
+                  return res.status(500).send();
                });
                break;
 
             case 'cancelar_reunion':
                log.warn('Cancelar reunión todavía no implementado.');
-               res.status(501);
-               res.send();
+               return res.status(501).send();
                break;
 
             case 'posponer_reunion':
                log.warn('Posponer reunión todavía no implementado.');
-               res.status(501);
-               res.send();
+               return res.status(501).send();
                break;
 
             default:
                log.error('Intencion(es) ' + significado.intents + ' no soportadas.');
-               res.status(400);
-               res.send();
+               return res.status(400).send();
          }
+
       }, function(mensajeError) {
          log.error(mensajeError);
-         ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuestaDeError, contenidoMail, function(){
-            res.status(200).send();
-         }, function(){res.status(500).send()});
+         ioService.enviarMail(owner.botEmail, ownerMail, guestMail, asuntoMail, idMensaje, respuestaDeError, contenidoMail, function(){
+            return res.status(200).send();
+         }, function(){return res.status(500).send()});
       });
+
    }, function(mensajeError) {
       log.error(mensajeError);
-      ioService.enviarMail(owner.botEmail, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuestaDeError, contenidoMail, function(){
-         res.status(200).send();
-      }, function(){res.status(500).send()});
+      ioService.enviarMail(owner.botEmail, ownerMail, guestMail, asuntoMail, idMensaje, respuestaDeError, contenidoMail, function(){
+         return res.status(200).send();
+      }, function(){return res.status(500).send()});
    });
 });
 
-function obtenerIntencion (significado) {
-   if(significado && significado.intents) {
-      return significado.intents[0];
-   } else {
-      return "desconocida"
-   }
-}
 
 module.exports = router;

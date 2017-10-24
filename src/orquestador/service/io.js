@@ -3,17 +3,16 @@ var config = require('../config/config').config;
 var log = require('log4js').getLogger();
 log.level = 'debug';
 
-function enviarMail(mailBot, mailDestinatario, mailRemitente, asuntoMail, idMensaje, respuesta, contenidoMail, callback, err) {
+function enviarMail(mailBot, mailDestinatario, mailCC, asuntoMail, idMensaje, respuesta, contenidoMail, callback, err) {
 
    var enviarMailUrl = config.ioApiUrls.enviar;
 
    var separador = '\n\n\n---------- Forwarded message ----------\n\n';
 
    var mail = {
-      // from: mailBot,
-      from: 'esteban@gaiameet.com',
+      from: mailBot,
       to: mailDestinatario,
-      cc: mailRemitente,
+      cc: mailCC,
       subject: 'Re: ' + asuntoMail,
       inReplyTo: idMensaje,
       text: respuesta + separador + contenidoMail

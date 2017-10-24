@@ -153,12 +153,10 @@ module.exports = function(app) {
 
       var usuarioId = req.query.usuario
       if(!usuarioId){
-         res.status(400).send("Falta el parametro usuario");
-         return
+         return res.status(400).send("Falta el parametro usuario");
       }
       if(JSON.stringify(req.body) === "{}"){
-         res.status(400).send("Falta el body");
-         return
+         return res.status(400).send("Falta el body");
       }
       var description = req.body.description
       var desde = req.body.fecha_desde
@@ -168,9 +166,9 @@ module.exports = function(app) {
 
          calendar_helper.agregar_evento(auth, description, desde, hasta, function(eventoCreado) {
             log.info("Evento creado:", eventoCreado)
-            res.status(200).json(eventoCreado).send()
+            return res.status(200).json(eventoCreado).send()
          }, function(err){
-            res.status(500).send()
+            return res.status(500).send()
          })
 
       }, function(error){

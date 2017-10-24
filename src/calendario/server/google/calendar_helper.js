@@ -74,10 +74,10 @@ exports.agregar_evento = function(auth, descripcion, desde, hasta, callback, rej
 }, function(err, eventoCreado) {
     if (err) {
       console.log('Error: ' + err);
-      reject(err)
+      return reject(err)
     }
     console.log('Evento creado: ' + eventoCreado);
-    callback(eventoCreado)
+    return callback(eventoCreado)
   });
 }
 
@@ -96,8 +96,9 @@ exports.load_credential = function(usuario, callback, reject) {
   oauth2Client.refreshAccessToken(function(err, tokens) {
      if(err){
         log.error(err);
-        reject('Error con el refresh token.');
+        return reject('Error con el refresh token.');
+     } else {
+        return callback(oauth2Client);
      }
-     callback(oauth2Client);
   });
 }
