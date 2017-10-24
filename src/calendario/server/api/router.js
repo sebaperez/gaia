@@ -20,8 +20,8 @@ function acotarFechas(horaInicioLimite, horaFinLimite, fechas){
          moment_hasta.set('hour', horaFinLimite)
       }
       retorno.push({
-         desde: moment_desde.format('YYYY-MM-DDTHH:mm:ssZ'),
-         hasta: moment_hasta.format('YYYY-MM-DDTHH:mm:ssZ')
+         desde: moment_desde.utcOffset(utcArgentina).format('YYYY-MM-DDTHH:mm:ssZ'),
+         hasta: moment_hasta.utcOffset(utcArgentina).format('YYYY-MM-DDTHH:mm:ssZ')
       })
    }
    return retorno
