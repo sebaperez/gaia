@@ -4,6 +4,7 @@ const request = require('request');
 const moment = require('moment');
 var log = require('log4js').getLogger();
 log.level = 'debug';
+var utcArgentina = "-0300"
 
 function acotarFechas(horaInicioLimite, horaFinLimite, fechas){
    var retorno = []
@@ -49,8 +50,8 @@ function buscarhueco(auth, fecha_desde, fecha_hasta, callback){
             //console.log("hasta: "+hasta.toISOString())
             if (cantidadEventos == 0)
             {
-               console.log("HAY HUECO - Desde: " + desde.format('YYYY-MM-DDTHH:mm:ssZ'))
-               return callback(desde.format('YYYY-MM-DDTHH:mm:ssZ'))
+               console.log("HAY HUECO - Desde: " + desde.utcOffset("-0300").format('YYYY-MM-DDTHH:mm:ssZ'))
+               return callback(desde.utcOffset(utcArgentina).format('YYYY-MM-DDTHH:mm:ssZ'))
             }
             else
             {

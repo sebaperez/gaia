@@ -1,6 +1,7 @@
 var exports = module.exports = {};
 var usuariosHelper = require('../usuarios/usuarios_helper')
 const moment = require('moment');
+var utcArgentina = "-0300"
 var log = require('log4js').getLogger();
 log.level = 'debug';
 
@@ -34,12 +35,12 @@ exports.listar_eventos = function(auth, desde, hasta, callback) {
   var calendar = google.calendar('v3');
   var momentDesde = moment(desde)
   var momentHasta = moment(hasta)
-  console.log('A GOOGLE: desde: ' + momentDesde.format('YYYY-MM-DDTHH:mm:ssZ') + " - hasta: " + momentHasta.format('YYYY-MM-DDTHH:mm:ssZ'))
+  console.log('A GOOGLE: desde: ' + momentDesde.utcOffset(utcArgentina).format('YYYY-MM-DDTHH:mm:ssZ') + " - hasta: " + momentHasta.format('YYYY-MM-DDTHH:mm:ssZ'))
   calendar.events.list({
     auth: auth,
     calendarId: 'primary',
-    timeMin: momentDesde.format('YYYY-MM-DDTHH:mm:ssZ'),
-    timeMax: momentHasta.format('YYYY-MM-DDTHH:mm:ssZ'),
+    timeMin: momentDesde.utcOffset(utcArgentina).format('YYYY-MM-DDTHH:mm:ssZ'),
+    timeMax: momentHasta.utcOffset(utcArgentina).format('YYYY-MM-DDTHH:mm:ssZ'),
     maxResults: 10,
     singleEvents: true,
     orderBy: 'startTime'
