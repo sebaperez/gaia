@@ -45,7 +45,7 @@ function agregarEvento(ownerId, inicioHuecoAceptado, guestMail) {
       fecha_desde: inicioHuecoAceptado,
       fecha_hasta: momentHasta.format('YYYY-MM-DDTHH:mm:ssZ')
    }
-   log.debug('[Calendario] Intentando agendar evento: ' +  + JSON.stringify(evento));
+   log.debug('[Calendario] Intentando agendar evento: ' + JSON.stringify(evento));
    request.post({
       url: agendarUrl,
       json: true,

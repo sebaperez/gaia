@@ -87,18 +87,15 @@ exports.load_credential = function(usuario, callback, reject) {
   var auth = new googleAuth();
   var oauth2Client = new auth.OAuth2(clientId, clientSecret, redirectUrl);
 
-  var token = {
-     access_token: usuario.googleAccessToken,
-     refresh_token: usuario.googleRefreshToken,
-     token_type: "Bearer"
-  }
-  oauth2Client.credentials = token;
+  oauth2Client.credentials.access_token = usuario.googleAccessToken;
+  oauth2Client.credentials.refresh_token = usuario.googleRefreshToken;
+  oauth2Client.credentials.token_type = "Bearer";
+
   oauth2Client.refreshAccessToken(function(err, tokens) {
      if(err){
         log.error(err);
         return reject('Error con el refresh token.');
-     } else {
-        return callback(oauth2Client);
      }
   });
+  return callback(oauth2Client);
 }
