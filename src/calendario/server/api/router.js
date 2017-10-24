@@ -2,6 +2,7 @@ var usuariosHelper = require('../usuarios/usuarios_helper')
 const calendar_helper = require('../google/calendar_helper.js');
 const request = require('request');
 const moment = require('moment');
+moment.tz.setDefault("America/Buenos_Aires")
 var log = require('log4js').getLogger();
 log.level = 'debug';
 var utcArgentina = "-0300"
