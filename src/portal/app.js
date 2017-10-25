@@ -131,7 +131,16 @@ app.get("/user/conversaciones", function(req, res) {
 app.get("/user/stats", function(req, res) {
 	if (req.query.email) {
 		getConversaciones(req.query.email, function(data) {
-			var r = {};
+			var r = {}, i, _fecha, fecha;
+			for (i = 0; i < data.length; i++) {
+				_fecha = new Date(data[i].createdAt);
+				fecha = _fecha.getDate().toString() + "/" + (_fecha.getDate() + 1).toString() + "/" + _fecha.getFullYear().toString();
+				if (r[fecha]) {
+					r[fecha] = r[fecha] + 1;
+				} else {
+					r[fecha] = 1;
+				}	
+			}
 			cors(res);
 			res.send(r);
 		});
