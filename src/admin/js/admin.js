@@ -68,7 +68,7 @@ var admin = {
 					$("a#dashboard").click(function() {
 						admin.show("dashboard");
 					});
-					admin.show("profile");
+					admin.show("dashboard");
 				});
 			}
 		});
