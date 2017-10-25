@@ -11,6 +11,8 @@ module.exports = function(Client) {
 
   Client.validatesFormatOf('botEmail', {with: validEmail, message: 'Must provide a valid email'});
 
+  Client.validatesUniquenessOf('botEmail', {message: 'Ya existe un bot con ese correo'});
+
   Client.settings.acls = [
 	 { principalType: 'ROLE',
         principalId: '$everyone',

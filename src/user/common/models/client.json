@@ -26,7 +26,8 @@
     },
     "botEmail": {
       "type": "string",
-      "required": true
+      "required": true,
+      "index": { "unique": true }
     },
     "googleAccessToken": {
       "type": "string",
