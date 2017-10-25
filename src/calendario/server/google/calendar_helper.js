@@ -1,8 +1,7 @@
 var exports = module.exports = {};
 var usuariosHelper = require('../usuarios/usuarios_helper')
 const moment = require('moment');
-
-moment.tz.setDefault("America/Buenos_Aires")
+process.env.TZ = 'America/Buenos_Aires'
 
 var utcArgentina = "-0300"
 var log = require('log4js').getLogger();
