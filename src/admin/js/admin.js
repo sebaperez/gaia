@@ -35,6 +35,12 @@ var admin = {
 				data = JSON.parse(data);
 				cb(data);
 			});
+		},
+		getStats: function(cb) {
+			base.req("stats", { email: admin.user.get("email") }, function(data) {
+				data = JSON.parse(data);
+				cb(data);
+			});
 		}
 	},
 	logout: function() {
@@ -58,6 +64,9 @@ var admin = {
 					});
 					$("a#conversaciones").click(function() {
 						admin.show("conversaciones");
+					});
+					$("a#dashboard").click(function() {
+						admin.show("dashboard");
 					});
 					admin.show("profile");
 				});
@@ -99,6 +108,93 @@ var admin = {
 			content += '</div></div>';
 
 			admin.setContent(content);
+		}
+	},
+	dashboard: {
+		show: function() {
+			admin.setTitle("Dashboard");
+			admin.setContent("Cargando...");
+
+			admin.user.getStats(function(data) {
+				var content = "", hasConv = data.convperday && data.convperday.length, d, raw = [];
+				content += '<div class="card">';
+				content += '<div class="card-header"><h2>Conversaciones mantenidas por día <small>Este gráfico muestra como se distribuyen por día la cantidad de conversaciones mantenidas por el bot</small></h2></div>';
+				content += '<div class="card-body">'
+				if (hasConv) {
+					content += '<div class="chart-edge"><div id="curved-line-chart" class="flot-chart "></div></div>';
+				} else {
+					content += '<div class="card-body card-padding text-center">No se realizó ninguna conversación aún.</div>';
+				}
+
+				content += '</div>';
+				content += '</div>';
+
+				content += '<div class="mini-charts"><div class="row">';
+
+				content += '<div class="col-sm-6 col-md-3"><div class="mini-charts-item bgm-lightgreen"><div class="clearfix"><div class="chart stats-bar"></div><div class="count"><small>Total conversaciones</small><h2>' + data.totalconv + '</h2></div></div></div></div>';
+
+				content += '<div class="col-sm-6 col-md-3"><div class="mini-charts-item bgm-bluegray"><div class="clearfix"><div class="chart stats-bar"></div><div class="count"><small>Promedio diario</small><h2>' + data.avg.toFixed(2) + '</h2></div></div></div></div>';
+
+				content += '<div class="col-sm-6 col-md-3"><div class="mini-charts-item bgm-orange"><div class="clearfix"><div class="chart stats-bar"></div><div class="count"><small>Total días con conversaciones</small><h2>' + data.convperday.length + '</h2></div></div></div></div>';
+
+				content += '</div></div>';
+
+
+
+				admin.setContent(content);
+
+				if (hasConv) {
+					    var options = {
+						series: {
+            						shadowSize: 0,
+           						lines: {
+               							show: false,
+                						lineWidth: 0,
+                						fill: 1
+            						},
+        					},
+        					grid: {
+            						borderWidth: 0,
+            						labelMargin:10,
+            						hoverable: true,
+            						clickable: true,
+            						mouseActiveRadius:6,
+        					},
+        					xaxis: {
+            						tickDecimals: 1,
+            						ticks: false
+        					},
+       						yaxis: {
+            						tickDecimals: 0,
+           						ticks: false
+        					},
+        					legend: {
+            						show: false
+        					}
+    					};
+
+					d = ([[null, 0]]).concat(data.convperday);
+					d.push([null, 0]);
+
+					for (i = 0; i < d.length; i++) {
+						raw.push([i, d[i][1]]);
+					}
+
+					$.plot($("#curved-line-chart"), [
+            					{ data: raw, lines: { show: true, fill: 0.98 }, label: '', stack: true, color: '#f1dd2c' },
+        				], options);
+					$(".flot-chart").bind("plothover", function (event, pos, item) {
+            					if (item && raw[item.datapoint[0]]) {
+                    					var y = item.datapoint[1];
+                					$(".flot-tooltip").html(d[item.datapoint[0]][0] + ": " + y + " conversaciones").css({top: item.pageY + 5, left: item.pageX + 5}).show();
+            					} else {
+                					$(".flot-tooltip").hide();
+            					}
+        				});
+        				$("<div class='flot-tooltip' class='chart-tooltip'></div>").appendTo("body");
+				}
+
+			});
 		}
 	},
 	conversaciones: {

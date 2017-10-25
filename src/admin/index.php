@@ -77,6 +77,7 @@
                 </div>
 
                 <ul class="main-menu">
+		    <li><a href="#!" id="dashboard"><i class="zmdi zmdi-chart"></i> Dashboard</a></li>
 		    <li><a href="#!" id="profile"><i class="zmdi zmdi-account"></i> Profile</a></li>
                     <li><a href="#!" id="settings"><i class="zmdi zmdi-settings"></i> Configuración</a></li>
 		    <li><a href="#!" id="conversaciones"><i class="zmdi zmdi-email-open"></i> Conversaciones</a></li>
@@ -104,6 +105,10 @@
 	<script src="vendors/bower_components/nouislider/nouislider.min.js"></script>
 	<script src="vendors/notify.js"></script>
 	<script src="vendors/select2/select2.min.js"></script>
+	<script src="vendors/plot/jquery.flot.js"></script>
+	<script src="vendors/plot/jquery.flot.resize.js"></script>
+	<script src="vendors/plot/curvedLines.js"></script>
+	<script src="vendors/plot/jquery.sparkline.min.js"></script>
 
         <script src="js/app.min.js"></script>
 	<script>

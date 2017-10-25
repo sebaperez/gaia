@@ -131,18 +131,24 @@ app.get("/user/conversaciones", function(req, res) {
 app.get("/user/stats", function(req, res) {
 	if (req.query.email) {
 		getConversaciones(req.query.email, function(data) {
-			var r = {}, i, _fecha, fecha;
+			var r = {}, i, _fecha, fecha, _r = [], total = 0, fechas = 0;
 			for (i = 0; i < data.length; i++) {
 				_fecha = new Date(data[i].createdAt);
-				fecha = _fecha.getDate().toString() + "/" + (_fecha.getDate() + 1).toString() + "/" + _fecha.getFullYear().toString();
+				fecha = _fecha.getDate().toString() + "/" + (_fecha.getMonth() + 1).toString() + "/" + _fecha.getFullYear().toString();
 				if (r[fecha]) {
 					r[fecha] = r[fecha] + 1;
+					total++;
 				} else {
 					r[fecha] = 1;
+					total++;
+					fechas++;
 				}	
 			}
+			for (i in r) {
+				_r.push([i, r[i]]);
+			}
 			cors(res);
-			res.send(r);
+			res.send({ convperday: _r, totalconv: total, avg: total  / (fechas > 0 ? fechas : 1) });
 		});
 	}
 });
