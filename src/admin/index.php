@@ -11,6 +11,7 @@
         <link href="vendors/bower_components/malihu-custom-scrollbar-plugin/jquery.mCustomScrollbar.min.css" rel="stylesheet">
 	<link href="vendors/bower_components/nouislider/nouislider.min.css" rel="stylesheet">
 	<link href="vendors/select2/select2.min.css" rel="stylesheet">
+	<link href="vendors/sweetalert2/sweetalert2.min.css" rel="stylesheet">
 
         <!-- CSS -->
         <link href="css/app_1.min.css" rel="stylesheet">
@@ -109,6 +110,7 @@
 	<script src="vendors/plot/jquery.flot.resize.js"></script>
 	<script src="vendors/plot/curvedLines.js"></script>
 	<script src="vendors/plot/jquery.sparkline.min.js"></script>
+	<script src="vendors/sweetalert2/sweetalert2.js"></script>
 
         <script src="js/app.min.js"></script>
 	<script>

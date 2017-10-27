@@ -49,6 +49,12 @@ var admin = {
 			document.location.href = "/login.php";
 		});
 	},
+	delete: function() {
+		base.req("delete", { "accessToken": admin.user.getAccessToken() }, function() {
+			localStorage.setItem("gaiaid", "");
+			document.location.href = "/login.php";
+		});
+	},
 	init: function() {
 		var user = base.checkSesion(function(user) {
 			if (! user) {
@@ -96,7 +102,8 @@ var admin = {
 			var content = "";
 			admin.setTitle("Profile");
 
-			content += '<div class="row"><div class="col-sm-12">';
+			content += '<div class="row">';
+			content += '<div class="col-sm-8">';
 			content += '<div class="card"><div class="card-header bgm-green"><h2>Información de la cuenta<small>Aquí se lista la información relacionada a la cuenta</small></h2></div><div class="card-body card-padding"><div class="pmo-contact"><ul>';
 
 			content += '<li class="ng-binding"><i class="zmdi zmdi-account"></i><b>Nombre:</b> ' + admin.user.data.name + ' ' + admin.user.data.lastname + ' </li>';
@@ -105,9 +112,27 @@ var admin = {
 			content += '<li class="ng-binding"><i class="zmdi zmdi-calendar"></i><b>Fecha de alta:</b> ' + (new Date(admin.user.data.creationDate)).toDateString() + ' </li>';
 
 			content += '</ul></div></div></div>';
-			content += '</div></div>';
+			content += '</div>';
+
+			content += '<div class="col-sm-4">';
+			content += '<div class="card"><div class="card-header bgm-red"><h2>Eliminar cuenta<small>Elimine su cuenta. Esta acción es permanente.</small></h2></div><div class="card-body card-padding"><div class="text-center"><button id="deleteAccount" class="btn bgm-red waves-effect">Eliminar cuenta</button></div></div></div>';
+			content += '</div>';
+
+			content += '</div>';
 
 			admin.setContent(content);
+			$("#deleteAccount").click(function() {
+				swal({
+					title: "Esta seguro?",
+					text: "Su cuenta sera eliminada, junto con toda su información. Esta acción no podra ser revertida.",
+					type: "warning",
+					showCancelButton: true,
+					confirmButtonText: "Si, eliminar mi cuenta",
+					cancelButtonText: "Cancelar"
+				}).then(function(){
+					admin.delete();
+				});
+			});
 		}
 	},
 	dashboard: {

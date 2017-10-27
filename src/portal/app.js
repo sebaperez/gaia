@@ -32,6 +32,9 @@ var user = (function() {
 		patch: function(path, data, cb) {
 			return this.request("patch", path, data, cb);
 		},
+		delete: function(path, data, cb) {
+			return this.request("delete", path, data, cb);
+		},
 		request: function(method, path, data, cb) {
 			var url = "http://" + this.cons.HOST + ":" + this.cons.PORT + path;
 			if (method === "get") {
@@ -40,9 +43,12 @@ var user = (function() {
 						cb(error, response, body);
 					}
 				});
-			} else if (method === "post" || method === "patch") {
+			} else if (method === "post" || method === "patch" || method === "delete") {
 				if ("patch") {
 					delete data.accessToken;
+				}
+				if (method === "delete" && path === "/api/Clients/") {
+					return null;
 				}
 				return request[method]({
 					url: url,
@@ -79,7 +85,7 @@ var user = (function() {
 		register: function(method, local, endMethod, _endpoint, cb) {
 			app[method](local, function(req, res) {
 				var endpoint = user.replaceMacros(_endpoint, req.query);
-				if (endMethod === "post" || endMethod === "patch") {
+				if (endMethod === "post" || endMethod === "patch" || endMethod === "delete") {
 					user[endMethod](endpoint, req.query, function(error, response, body) {
 						cors(res);
 						if (cb) {
@@ -171,6 +177,7 @@ user.register("get", "/user/logout", "post", "/api/Clients/logout");
 user.register("get", "/user/info", "get", "/api/Clients/{userId}");
 user.register("get", "/user/logout", "get", "/api/Clients/{userId}");
 user.register("get", "/user/set", "patch", "/api/Clients/{userId}");
+user.register("get", "/user/delete", "delete", "/api/Clients/{userId}");
 
 app.get('/', function (req, res) {
 	res.send('');
