@@ -43,11 +43,14 @@ module.exports.aceptarReunion = function(owner, guest, mail, significado, callba
       log.info('Mensaje de propuesta de horario: ', mensajeDePropuesta);
       if(mensajeDePropuesta){
          var iniciohuecoAceptado = mensajeDePropuesta.significado.intervalos[0].desde;
-         calendarioService.agregarEvento(owner.id, iniciohuecoAceptado, guest.name || guest.email);
-         respuestaService.obtenerMensajeConfirmacionReunion(owner, iniciohuecoAceptado, function(respuesta){
-            ioService.enviarMail(owner.botEmail, guest.email, owner.email, mail.subject, mail.messageId, respuesta, mail.text, callback, error);
-            var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, iniciohuecoAceptado);
-            conversacionService.agregarMensajeAConversacion(owner.email, guest.email, mensajeDeGaia);
+         calendarioService.agregarEvento(owner.id, iniciohuecoAceptado, guest.name || guest.email, function(evento){
+
+            respuestaService.obtenerMensajeConfirmacionReunion(owner, evento.start.dateTime, function(respuesta){
+               ioService.enviarMail(owner.botEmail, guest.email, owner.email, mail.subject, mail.messageId, respuesta, mail.text, callback, error);
+               var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, evento);
+               conversacionService.agregarMensajeAConversacion(owner.email, guest.email, mensajeDeGaia);
+            });
+
          });
       } else {
          var respuesta = "Disculpe, no sé a qué reunión se refiere."

@@ -92,15 +92,16 @@ module.exports.armarMensajeProponerHorario = function (respuesta, desde){
    }
 }
 
-module.exports.armarMensajeConfirmarReunion = function (respuesta, desde) {
+module.exports.armarMensajeConfirmarReunion = function (respuesta, evento) {
    return {
       "contenido": respuesta,
+      "evento": evento,
       "significado": {
          "intents": [
             "confirmar_reunion"
          ],
          "intervalos": [{
-            "desde": desde
+            "desde": evento.start.dateTime
          }]
       }
    }

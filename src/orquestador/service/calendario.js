@@ -36,7 +36,7 @@ function obtenerHueco(fechas, intervalos, ownerId, callback, err) {
 
 }
 
-function agregarEvento(ownerId, inicioHuecoAceptado, guestNombre) {
+function agregarEvento(ownerId, inicioHuecoAceptado, guestNombre, callback) {
    var agendarUrl = config.calendarioApiUrls.agendar;
    var momentDesde = moment(inicioHuecoAceptado);
    momentHasta = momentDesde.add(1,'hours');
@@ -54,7 +54,8 @@ function agregarEvento(ownerId, inicioHuecoAceptado, guestNombre) {
          usuario: ownerId
       }
    }, function (error, response, body) {
-      log.info("Evento agendado: " + JSON.stringify(evento));
+      callback(body);
+      log.info("Evento agendado:", body);
    });
 
 }

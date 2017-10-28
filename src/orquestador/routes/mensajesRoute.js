@@ -27,7 +27,7 @@ router.post('/', function (req, res, next) {
             return res.status(500).send()
          })
       }
-      log.info('Mensaje recibido: [' + contenidoMailActual + ']');
+      log.info('Contenido recibido: [' + contenidoMailActual + ']');
       iaService.interpretarMensaje(contenidoMailActual, function (significado) {
          log.info("El significado es: [" + significado.intents + "]");
 

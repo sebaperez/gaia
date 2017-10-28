@@ -51,3 +51,35 @@ body:
   "fecha_desde": "2017-10-16T17:00:00-03:00",
   "fecha_hasta": "2017-10-16T19:00:00-03:00"
 }
+
+respuesta:
+{
+ "kind": "calendar#event",
+ "etag": "\"3018409072886000\"",
+ "id": "g2buuvfkliogvk6i80hr92m04c",
+ "status": "confirmed",
+ "htmlLink": "https://www.google.com/calendar/event?eid=ZzJidXV2ZmtsaW9ndms2aTgwaHI5Mm0wNGMgYnV6emV0dGkuanBAbQ",
+ "created": "2017-10-28T15:28:56.000Z",
+ "updated": "2017-10-28T15:28:56.443Z",
+ "creator": {
+  "email": "buzzetti.jp@gmail.com",
+  "displayName": "Jonathan Buzzetti",
+  "self": true
+ },
+ "organizer": {
+  "email": "buzzetti.jp@gmail.com",
+  "displayName": "Jonathan Buzzetti",
+  "self": true
+ },
+ "start": {
+  "dateTime": "2017-10-28T17:00:00-03:00"
+ },
+ "end": {
+  "dateTime": "2017-10-28T18:00:00-03:00"
+ },
+ "iCalUID": "g2buuvfkliogvk6i80hr92m04c@google.com",
+ "sequence": 0,
+ "reminders": {
+  "useDefault": true
+ }
+}
