@@ -16,6 +16,7 @@ export const index = ({ querymen: { query, select, cursor } }, res, next) =>
 
 export const show = ({ params }, res, next) =>
   Conversacion.findOne({ owner: params.owner,  guest: params.guest })
+    .sort({createdAt: -1})
     .then(notFound(res))
     .then((conversacion) => conversacion ? conversacion.view() : null)
     .then(success(res))
