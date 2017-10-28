@@ -85,6 +85,22 @@ exports.agregar_evento = function(auth, descripcion, desde, hasta, callback, rej
   });
 }
 
+exports.quitar_evento = function(auth,event_id,callback,reject) {
+  var calendar = google.calendar('v3');
+  calendar.events.delete({
+    auth: auth,
+    calendarId: 'primary',
+    eventId: event_id,
+  }, function(err, eventoBorrado) {
+      if (err) {
+        console.log('Error: ' + err);
+        return reject(err)
+      }
+      console.log('Evento borrado: ' + eventoBorrado);
+      return callback(eventoBorrado)
+    });
+}
+
 // Levantar credenciales
 exports.load_credential = function(usuario, callback, reject) {
 

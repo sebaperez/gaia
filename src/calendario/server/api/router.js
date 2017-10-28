@@ -181,4 +181,36 @@ module.exports = function(app) {
 
       });
    })
+
+   //Quitar Evento
+   app.post('/quitarEvento', (req, res) => {
+      log.info("Consulta a /quitarEvento")
+      log.debug("Body:",req.body)
+
+      var usuarioId = req.query.usuario
+      if(!usuarioId){
+         return res.status(400).send("Falta el parametro usuario");
+      }
+      if(JSON.stringify(req.body) === "{}"){
+         return res.status(400).send("Falta el body");
+      }
+      var event_id = req.body.event_id
+
+      usuariosHelper.obtenerUsuario(usuarioId, function(usuario){
+
+         calendar_helper.load_credential(usuario, function(auth) {
+
+            calendar_helper.quitar_evento(auth, event_id, function(eventoBorrado) {
+               log.info("Evento Borrado:", eventoBorrado)
+               return res.status(200).json(eventoBorrado).send()
+            }, function(err){
+               return res.status(500).send(err)
+            })
+
+         }, function(error){
+            res.status(500).send(error)
+         });
+
+      });
+   })
 }
