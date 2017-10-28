@@ -38,5 +38,6 @@ export const destroy = ({ params }, res, next) =>
 
 function actualizarMensajes(conversacion, nuevaConversacion) {
    conversacion.mensajes = nuevaConversacion.mensajes
+   conversacion.abierto = nuevaConversacion.abierto
    return conversacion
 }

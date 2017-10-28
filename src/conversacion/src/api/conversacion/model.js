@@ -9,6 +9,9 @@ const conversacionSchema = new Schema({
   },
   mensajes: {
     type: Object
+  },
+  abierto: {
+    type: Boolean
   }
 }, {
   timestamps: true
@@ -22,6 +25,7 @@ conversacionSchema.methods = {
       owner: this.owner,
       guest: this.guest,
       mensajes: this.mensajes,
+      abierto: this.abierto,
       createdAt: this.createdAt,
       updatedAt: this.updatedAt
     }
