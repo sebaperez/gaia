@@ -5,7 +5,7 @@ log.level = 'debug';
 
 var conversacionesUrl = config.conversacionApiUrls.conversaciones;
 
-function crearConversacion(owner, guest, contenidoMailActual, significado, callback) {
+module.exports.crearConversacion = function (owner, guest, contenidoMailActual, significado, callback) {
    // ej significado: {
    //   "original_response": "PARA DEBUG",
    //   "ok": true,
@@ -104,7 +104,7 @@ module.exports.armarMensajeConfirmarReunion = function (respuesta, evento) {
    }
 }
 
-function obtenerUltimoMensajeConSignificado(conversacion, significado){
+module.exports.obtenerUltimoMensajeConSignificado = function (conversacion, significado){
    log.debug("[Conversacion] Buscando mensaje con significado: " + significado + ' entre mensajes ' + JSON.stringify(conversacion.mensajes));
    var mensajesConSignificado = conversacion.mensajes.filter(function(m) {
       return m.significado && m.significado.intents && m.significado.intents.indexOf(significado) > -1;
@@ -112,7 +112,5 @@ function obtenerUltimoMensajeConSignificado(conversacion, significado){
    if(mensajesConSignificado.length > 0){
       return mensajesConSignificado[0];
    }
+   log.info('[Conversacion] Mensaje de propuesta de horario: ', mensajeDePropuesta);
 }
-
-module.exports.crearConversacion = crearConversacion;
-module.exports.obtenerUltimoMensajeConSignificado = obtenerUltimoMensajeConSignificado;

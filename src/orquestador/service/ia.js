@@ -3,7 +3,7 @@ var config = require('../config/config').config;
 var log = require('log4js').getLogger();
 log.level = 'debug';
 
-function interpretarMensaje(contenido, callback, err) {
+module.exports.interpretarMensaje = function (contenido, callback, err) {
 
    var iaProcessUrl = config.iaApiUrls.procesar;
 
@@ -23,5 +23,3 @@ function interpretarMensaje(contenido, callback, err) {
    });
 
 }
-
-module.exports.interpretarMensaje = interpretarMensaje;

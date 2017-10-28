@@ -4,7 +4,7 @@ var moment = require('moment');
 var log = require('log4js').getLogger();
 log.level = 'debug';
 
-function obtenerHueco(fechas, intervalos, ownerId, callback, err) {
+module.exports.obtenerHueco = function (fechas, intervalos, ownerId, callback, err) {
 
    var intervalosYFechas = intervalos.slice();
    for (var i = 0; i < fechas.length; i++) {
@@ -36,7 +36,7 @@ function obtenerHueco(fechas, intervalos, ownerId, callback, err) {
 
 }
 
-function agregarEvento(ownerId, inicioHuecoAceptado, guestNombre, callback) {
+module.exports.agregarEvento = function (ownerId, inicioHuecoAceptado, guestNombre, callback) {
    var agendarUrl = config.calendarioApiUrls.agendar;
    var momentDesde = moment(inicioHuecoAceptado);
    momentHasta = momentDesde.add(1,'hours');
@@ -73,6 +73,3 @@ function calcularFechaHasta(fechaDesde) {
    log.debug('[Calendario] Calculo de fechaHasta. Desde: ' + fechaDesde + ', Hasta: ' + fechaHasta);
    return fechaHasta;
 }
-
-module.exports.obtenerHueco = obtenerHueco;
-module.exports.agregarEvento = agregarEvento;

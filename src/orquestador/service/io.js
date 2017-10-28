@@ -3,7 +3,7 @@ var config = require('../config/config').config;
 var log = require('log4js').getLogger();
 log.level = 'debug';
 
-function enviarMail(mailRemitente, mailDestinatario, mailCC, asuntoMail, idMensaje, respuesta, contenidoMail, callback, err) {
+module.exports.enviarMail = function (mailRemitente, mailDestinatario, mailCC, asuntoMail, idMensaje, respuesta, contenidoMail, callback, err) {
 
    var enviarMailUrl = config.ioApiUrls.enviar;
 
@@ -33,5 +33,3 @@ function enviarMail(mailRemitente, mailDestinatario, mailCC, asuntoMail, idMensa
    });
 
 }
-
-module.exports.enviarMail = enviarMail;

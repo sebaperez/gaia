@@ -53,7 +53,6 @@ module.exports.cancelarReunionAgendada = function(owner, conversacion, callback,
 module.exports.confirmarReunion = function(owner, guest, mail, significado, conversacion, callback, error){
    conversacionService.agregarMensajeAConversacion(owner.email, guest.email, mail.text, conversacion, null, error);
    var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario");
-   log.info('Mensaje de propuesta de horario: ', mensajeDePropuesta);
    if(mensajeDePropuesta){
       var iniciohuecoAceptado = mensajeDePropuesta.significado.intervalos[0].desde;
       calendarioService.agregarEvento(owner.id, iniciohuecoAceptado, guest.name || guest.email, function(evento){
