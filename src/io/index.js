@@ -107,4 +107,9 @@ get_client("paula@gaiameet.com").connect();
 get_client("belen@gaiameet.com").connect();
 get_client("maria@gaiameet.com").connect();
 get_client("esteban@gaiameet.com").connect();
-
+get_client("roberto@gaiameet.com").connect();
+get_client("estefania@gaiameet.com").connect();
+get_client("victoria@gaiameet.com").connect();
+get_client("alfredo@gaiameet.com").connect();
+get_client("romina@gaiameet.com").connect();
+get_client("gabriela@gaiameet.com").connect();
