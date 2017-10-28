@@ -45,3 +45,7 @@ module.exports.obtenerMensajeConfirmacionReunion = function (owner, hueco, callb
       callback(body);
    });
 }
+
+module.exports.obtenerMensajeCancelacionReunion = function(evento){
+    callback("Quedó cancelada la reunión del día " + evento.start.dateTime);
+}

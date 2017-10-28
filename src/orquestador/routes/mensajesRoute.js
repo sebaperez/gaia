@@ -33,7 +33,8 @@ router.post('/', function (req, res, next) {
          log.info("El significado es: [" + significado.intents + "]");
 
          conversacionService.obtenerUltimaConversacion(owner, guest, function(ultimaConversacion){
-
+            log.debug("Ultima conversacion id:", ultimaConversacion.id)
+            log.debug("Ultima conversacion abierta?", ultimaConversacion.abierto)
             switch(mailHelper.obtenerIntencion(significado)) {
 
                case 'solicitar_reunion':
@@ -49,6 +50,7 @@ router.post('/', function (req, res, next) {
                   orquestadorService.confirmarReunion(owner, guest, mail, significado, ultimaConversacion, ok, mal)
                } else {
                   log.info("Se intentó aceptar una reunión en una conversación cerrada o inexistente")
+                  mal()
                }
                break;
 

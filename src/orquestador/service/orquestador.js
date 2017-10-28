@@ -45,7 +45,19 @@ module.exports.proponerNuevoHorarioReunion = function(owner, guest, mail, signif
 
 
 module.exports.cancelarReunionAgendada = function(owner, conversacion, callback, error){
-   log.error('Cancelar reunión todavía no implementado.');
+
+   var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "confirmar_reunion");
+
+   calendarioService.eliminarEvento(owner.id, mensajeDePropuesta.evento.id, function(){
+
+      respuestaService.obtenerMensajeCancelacionReunion(mensajeDePropuesta.evento, function(respuesta){
+         ioService.enviarMail(owner.botEmail, guest.email, owner.email, mail.subject, mail.messageId, respuesta, mail.text, callback, error);
+         var mensajeDeGaia = conversacionService.armarMensajeCancelacionReunion(respuesta, evento);
+         conversacionService.agregarMensajeAConversacion(owner.email, guest.email, mensajeDeGaia, conversacion);
+      });
+
+   });
+   //log.error('Cancelar reunión todavía no implementado.');
    error()
 };
 

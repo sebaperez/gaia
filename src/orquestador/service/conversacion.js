@@ -104,6 +104,20 @@ module.exports.armarMensajeConfirmarReunion = function (respuesta, evento) {
    }
 }
 
+module.exports.armarMensajeCancelacionReunion = function (respuesta, evento) {
+   return {
+      "contenido": respuesta,
+      "evento": evento,
+      "significado": {
+         "intents": [
+            "confirmar_cancelacion"
+         ],
+         "intervalos": [{
+            "desde": evento.start.dateTime
+         }]
+      }
+   }
+}
 module.exports.obtenerUltimoMensajeConSignificado = function (conversacion, significado){
    log.debug("[Conversacion] Buscando mensaje con significado: " + significado + ' entre mensajes ' + JSON.stringify(conversacion.mensajes));
    var mensajesConSignificado = conversacion.mensajes.filter(function(m) {

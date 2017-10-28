@@ -54,10 +54,26 @@ module.exports.agregarEvento = function (ownerId, inicioHuecoAceptado, guestNomb
          usuario: ownerId
       }
    }, function (error, response, body) {
-      callback(body);
       log.info("Evento agendado:", body);
+      callback(body);
    });
 
+}
+
+module.exports.eliminarEvento = function(ownerId, eventoId) {
+   var eliminarUrl = config.calendarioApiUrls.eliminar;
+   log.debug('[Calendario] Intentando eliminar evento: ' + eventoId);
+   request.post({
+      url: eliminarUrl,
+      json: true,
+      body: {event_id: eventoId},
+      qs: {
+         usuario: ownerId
+      }
+   }, function (error, response, body) {
+      log.info("Evento eliminado");
+      callback();
+   });
 }
 
 function calcularFechaHasta(fechaDesde) {

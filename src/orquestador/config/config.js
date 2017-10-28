@@ -23,7 +23,8 @@ module.exports.config = {
    },
    calendarioApiUrls: {
       huecos: urlBase + (prod ? ":3009/proximodisponible" : "/calendario/proximodisponible"),
-      agendar: urlBase + (prod ? ":3009/agregarEvento" : "/calendario/agregarEvento")
+      agendar: urlBase + (prod ? ":3009/agregarEvento" : "/calendario/agregarEvento"),
+      eliminar: urlBase + (prod ? ":3009/quitarEvento" : "/calendario/quitarEvento")
    },
    ioApiUrls: {
       enviar: prod ? "http://104.131.40.146:4444/send" : (urlBase + "/io/send")
