@@ -6,7 +6,7 @@ import { schema } from './model'
 export Conversacion, { schema } from './model'
 
 const router = new Router()
-const { owner, guest, mensajes } = schema.tree
+const { owner, guest, mensajes, abierto } = schema.tree
 
 /**
  * @api {post} /conversacion Create conversacion
@@ -20,7 +20,7 @@ const { owner, guest, mensajes } = schema.tree
  * @apiError 404 Conversacion not found.
  */
 router.post('/',
-  body({ owner, guest, mensajes }),
+  body({ owner, guest, mensajes, abierto }),
   create)
 
 /**
@@ -58,7 +58,7 @@ router.get('/:owner/:guest',
  * @apiError 404 Conversacion not found.
  */
 router.put('/:id',
-  body({ owner, guest, mensajes }),
+  body({ owner, guest, mensajes, abierto }),
   update)
 
 /**
