@@ -46,5 +46,6 @@ module.exports.obtenerGuest = function(owner, mail){
 }
 
 module.exports.obtenerContenidoMailActual = function(mail){
+   //TODO agregar soporte para outlook
    return mail.text.split("----------", 1)[0].trim();
 }
