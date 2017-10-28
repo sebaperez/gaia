@@ -61,23 +61,27 @@ module.exports.obtenerUltimaConversacion = function (owner, guest, callback){
    });
 }
 
-module.exports.agregarMensajeAConversacion = function (owner, guest, mensaje, conversacion, callback, err) {
-      conversacion.mensajes = conversacion.mensajes? conversacion.mensajes : [];
+module.exports.agregarMensajeAConversacion = function (mensaje, conversacion) {
+      conversacion.mensajes = conversacion.mensajes ? conversacion.mensajes : [];
       log.debug('[Conversacion] Agregando mensaje', mensaje, "a conversacion con id " + conversacion.id);
       conversacion.mensajes.unshift(mensaje);
-      request.put({
-         url: conversacionesUrl + '/' + conversacion.id,
-         json: true,
-         body: conversacion
-      }, function (error, response, body) {
-         if(error){
-            log.error('No pude agregar el mensaje a la conversacion del owner ' + owner.email + ' y guest ' + guest.email);
-            err();
-         }
-         if(callback){
-            callback(body);
-         }
-      });
+      return conversacion;
+}
+
+module.exports.actualizarConversacion = function(conversacion, callback, err){
+   request.put({
+      url: conversacionesUrl + '/' + conversacion.id,
+      json: true,
+      body: conversacion
+   }, function (error, response, body) {
+      if(error){
+         log.error('No pude agregar el mensaje a la conversacion del owner ' + owner.email + ' y guest ' + guest.email);
+         err();
+      }
+      if(callback){
+         callback(body);
+      }
+   });
 }
 
 module.exports.armarMensajeProponerHorario = function (respuesta, desde){
@@ -129,7 +133,7 @@ module.exports.obtenerUltimoMensajeConSignificado = function (conversacion, sign
       return m.significado && m.significado.intents && m.significado.intents.indexOf(significado) > -1;
    })
    if(mensajesConSignificado.length > 0){
+      log.info('[Conversacion] Mensaje de propuesta de horario: ', mensajesConSignificado[0].contenido);
       return mensajesConSignificado[0];
    }
-   log.info('[Conversacion] Mensaje de propuesta de horario: ', mensajeDePropuesta);
 }

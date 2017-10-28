@@ -60,7 +60,7 @@ module.exports.agregarEvento = function (ownerId, inicioHuecoAceptado, guestNomb
 
 }
 
-module.exports.eliminarEvento = function(ownerId, eventoId) {
+module.exports.eliminarEvento = function(ownerId, eventoId, callback) {
    var eliminarUrl = config.calendarioApiUrls.eliminar;
    log.debug('[Calendario] Intentando eliminar evento: ' + eventoId);
    request.post({
@@ -72,6 +72,7 @@ module.exports.eliminarEvento = function(ownerId, eventoId) {
       }
    }, function (error, response, body) {
       log.info("Evento eliminado");
+      if(callback)
       callback();
    });
 }

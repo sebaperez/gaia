@@ -43,7 +43,7 @@ router.post('/', function (req, res, next) {
 
                case 'solicitar_reunion':
                if(ultimaConversacion && ultimaConversacion.abierto){
-                  orquestadorService.proponerNuevoHorarioReunion(owner, guest, mail, significado, ultimaConversacion, ok(res), mal(res))
+                  orquestadorService.proponerNuevoHorarioReunion(owner, guest, mail, significado, ultimaConversacion, ok, mal)
                } else {
                   orquestadorService.proponerHorarioReunion(owner, guest, mail, significado, ok, mal)
                }
@@ -63,7 +63,7 @@ router.post('/', function (req, res, next) {
                   if(ultimaConversacion.abierto){
                      orquestadorService.proponerNuevoHorarioReunion(owner, guest, mail, significado, ultimaConversacion, ok, mal)
                   } else {
-                     orquestadorService.cancelarReunionAgendada(owner, ultimaConversacion, ok, mal)
+                     orquestadorService.cancelarReunionAgendada(owner, guest, mail, significado, ultimaConversacion, ok, mal)
                   }
                }
                break;
@@ -90,11 +90,11 @@ router.post('/', function (req, res, next) {
       return mal(mensajeError)
    });
 
-   function ok(body){
-      return res.status(200).send(body)
+   function ok(){
+      return res.status(200).send()
    }
-   function mal(error){
-      return res.status(500).send(error)
+   function mal(){
+      return res.status(500).send()
    }
 });
 
