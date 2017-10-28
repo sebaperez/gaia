@@ -5,7 +5,7 @@ log.level = 'debug';
 
 var conversacionesUrl = config.conversacionApiUrls.conversaciones;
 
-function crearConversacion(ownerMail, guestMail, contenidoMailActual, significado, callback) {
+function crearConversacion(owner, guest, contenidoMailActual, significado, callback) {
 
 
    // ej significado: {
@@ -25,8 +25,8 @@ function crearConversacion(ownerMail, guestMail, contenidoMailActual, significad
    // }
 
    var nuevaConversacion = {
-      owner: ownerMail,
-      guest: guestMail,
+      owner: owner.email,
+      guest: guest.email,
       mensajes: [
          {
             contenido: contenidoMailActual, //solo el ultimo mensaje de la cadena

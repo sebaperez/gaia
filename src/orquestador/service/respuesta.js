@@ -17,13 +17,13 @@ log.level = 'debug';
 //    "2017-08-22T00:00:00.000-03:00"
 // ]
 
-module.exports.obtenerMensajeCoordinacionAGuest = function (nombreGuest, hueco, callback) {
+module.exports.obtenerMensajeCoordinacionAGuest = function (guest, hueco, callback) {
    var respuestaUrl = config.respuestaApiUrls.solicitarReunionAlGuest;
    request.post({
       url: respuestaUrl,
       json: true,
       body: {
-         nombre: nombreGuest,
+         nombre: guest.name,
          hueco: hueco
       }
    }, function (error, response, body) {

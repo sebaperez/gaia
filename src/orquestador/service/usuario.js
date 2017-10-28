@@ -3,8 +3,11 @@ var config = require('../config/config').config;
 var log = require('log4js').getLogger();
 log.level = 'debug';
 
-module.exports.obtenerUsuario = function(mails, callback, err) {
-
+module.exports.obtenerUsuario = function(mail, callback, err) {
+   if(mail.cc.value[0]){
+      var mailCC = mail.cc.value[0].address
+   }
+   var mails = [mail.from.value[0].address, mail.to.value[0].address, mailCC]
    log.debug("[Usuario] Buscando owner entre mails", mails);
 
    for (var i = 0; i < mails.length; i++) {
