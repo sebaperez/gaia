@@ -15,16 +15,17 @@ module.exports.responderAMailVacio = function(owner, mail, callback, error){
    ioService.enviarMail(owner.botEmail, mailRemitente, null, mail.subject, mail.messageId, mensajeMailVacio, mail.text, callback, error);
 }
 
-module.exports.solicitarReunion = function(owner, guest, mail, significado, callback, error){
-   //cubre sólo el caso en el que el owner pide la reunión al guest copiando a gaia
+
+module.exports.proponerHorarioReunion = function(owner, guest, mail, significado, callback, error){
    calendarioService.obtenerHueco(significado.fechas, significado.intervalos, owner.id, function(horario) {
       if(horario){
          var contenidoMailActual = mailHelper.obtenerContenidoMailActual(mail);
-         conversacionService.crearConversacion(owner, guest, contenidoMailActual, significado);
-         respuestaService.obtenerMensajeCoordinacionAGuest(guest, horario, function(respuesta){
-            ioService.enviarMail(owner.botEmail, guest.email, owner.email, mail.subject, mail.messageId, respuesta, mail.text, callback, error);
-            var mensajeDeGaia = conversacionService.armarMensajeProponerHorario(respuesta, horario);
-            conversacionService.agregarMensajeAConversacion(owner.email, guest.email, mensajeDeGaia)
+         conversacionService.crearConversacion(owner, guest, contenidoMailActual, significado, function(nuevaConversacion){
+            respuestaService.obtenerMensajeCoordinacionAGuest(guest, horario, function(respuesta){
+               ioService.enviarMail(owner.botEmail, guest.email, owner.email, mail.subject, mail.messageId, respuesta, mail.text, callback, error);
+               var mensajeDeGaia = conversacionService.armarMensajeProponerHorario(respuesta, horario);
+               conversacionService.agregarMensajeAConversacion(owner.email, guest.email, mensajeDeGaia, nuevaConversacion)
+            });
          });
       } else {
          let respuesta = "Lo siento, no hay horarios disponibles para agendar la reunión.";
@@ -37,27 +38,35 @@ module.exports.solicitarReunion = function(owner, guest, mail, significado, call
 }
 
 
-module.exports.aceptarReunion = function(owner, guest, mail, significado, callback, error){
-   conversacionService.agregarMensajeAConversacion(owner.email, guest.email, mail.text, function(conversacion){
-      var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario");
-      log.info('Mensaje de propuesta de horario: ', mensajeDePropuesta);
-      if(mensajeDePropuesta){
-         var iniciohuecoAceptado = mensajeDePropuesta.significado.intervalos[0].desde;
-         calendarioService.agregarEvento(owner.id, iniciohuecoAceptado, guest.name || guest.email, function(evento){
+module.exports.proponerNuevoHorarioReunion = function(owner, guest, mail, significado, conversacion, callback, error){
+   log.error('Negociar reunión todavía no implementado.');
+   error()
+};
 
-            respuestaService.obtenerMensajeConfirmacionReunion(owner, evento.start.dateTime, function(respuesta){
-               ioService.enviarMail(owner.botEmail, guest.email, owner.email, mail.subject, mail.messageId, respuesta, mail.text, callback, error);
-               var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, evento);
-               conversacionService.agregarMensajeAConversacion(owner.email, guest.email, mensajeDeGaia);
-            });
 
+module.exports.cancelarReunionAgendada = function(owner, conversacion, callback, error){
+   log.error('Cancelar reunión todavía no implementado.');
+   error()
+};
+
+
+module.exports.confirmarReunion = function(owner, guest, mail, significado, conversacion, callback, error){
+   conversacionService.agregarMensajeAConversacion(owner.email, guest.email, mail.text, conversacion, null, error);
+   var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario");
+   log.info('Mensaje de propuesta de horario: ', mensajeDePropuesta);
+   if(mensajeDePropuesta){
+      var iniciohuecoAceptado = mensajeDePropuesta.significado.intervalos[0].desde;
+      calendarioService.agregarEvento(owner.id, iniciohuecoAceptado, guest.name || guest.email, function(evento){
+
+         respuestaService.obtenerMensajeConfirmacionReunion(owner, evento.start.dateTime, function(respuesta){
+            ioService.enviarMail(owner.botEmail, guest.email, owner.email, mail.subject, mail.messageId, respuesta, mail.text, callback, error);
+            var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, evento);
+            conversacionService.agregarMensajeAConversacion(owner.email, guest.email, mensajeDeGaia, conversacion);
          });
-      } else {
-         var respuesta = "Disculpe, no sé a qué reunión se refiere."
-         ioService.enviarMail(owner.botEmail, guest.email, owner.email, mail.subject, mail.messageId, respuesta, mail.text, callback, error);
-      }
-   }, function() {
-      log.error('No pude agregar el mensaje a la conversacion del owner ' + owner.email + ' y guest ' + guest.email);
-      error();
-   });
+
+      });
+   } else {
+      var respuesta = "Disculpe, no sé a qué reunión se refiere."
+      ioService.enviarMail(owner.botEmail, guest.email, owner.email, mail.subject, mail.messageId, respuesta, mail.text, callback, error);
+   }
 }

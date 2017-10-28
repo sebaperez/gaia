@@ -6,8 +6,6 @@ log.level = 'debug';
 var conversacionesUrl = config.conversacionApiUrls.conversaciones;
 
 function crearConversacion(owner, guest, contenidoMailActual, significado, callback) {
-
-
    // ej significado: {
    //   "original_response": "PARA DEBUG",
    //   "ok": true,
@@ -46,20 +44,19 @@ function crearConversacion(owner, guest, contenidoMailActual, significado, callb
    });
 }
 
-function obtenerConversacion (ownerMail, guestMail, callback){
-   request.get(conversacionesUrl + '/' + ownerMail + '/' + guestMail, function (error, response, body) {
-       var conversacion = JSON.parse(body);
+module.exports.obtenerUltimaConversacion = function (owner, guest, callback){
+   request.get(conversacionesUrl + '/' + owner.email + '/' + guest.email, function (error, response, body) {
       if(callback) {
+         var conversacion = JSON.parse(body);
          callback(conversacion);
       }
       if(error){
-         log.error("[Conversacion] No se pudo obtener la conversacion de owner " + ownerMail + " y guest " + guestMail);
+         log.error("[Conversacion] No se pudo obtener la conversacion entre owner " + owner.email + " y guest " + guest.email);
       }
    });
 }
 
-function agregarMensajeAConversacion(ownerMail, guestMail, mensaje, callback, err) {
-   obtenerConversacion(ownerMail, guestMail, function(conversacion) {
+module.exports.agregarMensajeAConversacion = function (owner, guest, mensaje, conversacion, callback, err) {
       conversacion.mensajes = conversacion.mensajes? conversacion.mensajes : [];
       log.debug('[Conversacion] Agregando mensaje', mensaje, "a conversacion con id " + conversacion.id);
       conversacion.mensajes.unshift(mensaje);
@@ -69,13 +66,13 @@ function agregarMensajeAConversacion(ownerMail, guestMail, mensaje, callback, er
          body: conversacion
       }, function (error, response, body) {
          if(error){
+            log.error('No pude agregar el mensaje a la conversacion del owner ' + owner.email + ' y guest ' + guest.email);
             err();
          }
          if(callback){
             callback(body);
          }
       });
-   });
 }
 
 module.exports.armarMensajeProponerHorario = function (respuesta, desde){
@@ -117,7 +114,5 @@ function obtenerUltimoMensajeConSignificado(conversacion, significado){
    }
 }
 
-module.exports.obtenerConversacion = obtenerConversacion;
 module.exports.crearConversacion = crearConversacion;
-module.exports.agregarMensajeAConversacion = agregarMensajeAConversacion;
 module.exports.obtenerUltimoMensajeConSignificado = obtenerUltimoMensajeConSignificado;
