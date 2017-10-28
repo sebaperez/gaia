@@ -25,6 +25,7 @@ module.exports.crearConversacion = function (owner, guest, contenidoMailActual, 
    var nuevaConversacion = {
       owner: owner.email,
       guest: guest.email,
+      abierto: true,
       mensajes: [
          {
             contenido: contenidoMailActual, //solo el ultimo mensaje de la cadena
@@ -47,8 +48,12 @@ module.exports.crearConversacion = function (owner, guest, contenidoMailActual, 
 module.exports.obtenerUltimaConversacion = function (owner, guest, callback){
    request.get(conversacionesUrl + '/' + owner.email + '/' + guest.email, function (error, response, body) {
       if(callback) {
-         var conversacion = JSON.parse(body);
-         callback(conversacion);
+         if(body){
+            var conversacion = JSON.parse(body);
+            callback(conversacion);
+         } else{
+            callback(null)
+         }
       }
       if(error){
          log.error("[Conversacion] No se pudo obtener la conversacion entre owner " + owner.email + " y guest " + guest.email);
