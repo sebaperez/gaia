@@ -7,44 +7,37 @@ module.exports.obtenerIntencion = function(significado) {
 }
 
 
-module.exports.obtenerBotMail = function(mail){
-   var mails = [mail.from.value, mail.to.value]
-   if(mail.cc.value.length > 0){
-      mails.push(mail.cc.value);
+module.exports.extraerBotEmail = function(mail){
+   var personas = [mail.from.value, mail.to.value]
+   if(mail.cc && mail.cc.value && mail.cc.value.length > 0){
+      personas.push(mail.cc.value);
    }
-   for (var i = 0; i < mails.length; i++) {
-      for (var j = 0; j < mails[i].length; j++) {
-         if(mails[i][j].address.indexOf('gaiameet.com') > -1)
-            return mails[i][j].address
+   for (var i = 0; i < personas.length; i++) {
+      for (var j = 0; j < personas[i].length; j++) {
+         if(personas[i][j].address.indexOf('@gaiameet.com') > -1)
+            return personas[i][j].address
       }
    }
 }
 
 
-module.exports.obtenerGuest = function(owner, mail){
-   if(mail.from.value.length > 1 || mail.to.value > 1){
-      log.error("No está soportado recibir más de un guest");
+module.exports.extraerGuest = function(owner, mail){
+   var personas = [mail.from.value, mail.to.value]
+   if(mail.cc && mail.cc.value && mail.cc.value.length > 0){
+      personas.push(mail.cc.value);
    }
-
-   if(mail.from.value[0].address != owner.email && mail.from.value[0].address != owner.botEmail){
-      return {
-         name: mail.from.value[0].name,
-         email: mail.from.value[0].address
-      }
-   } else if (mail.to.value[0].address != owner.email && mail.to.value[0].address != owner.botEmail) {
-      return {
-         name: mail.to.value[0].name,
-         email: mail.to.value[0].address
-      }
-   } else if (mail.cc && mail.cc.value[0] && mail.cc.value[0].address != owner.email && mail.cc.value[0].address != owner.botEmail) {
-      return {
-         name: mail.cc.value[0].name,
-         email: mail.cc.value[0].address
+   for (var i = 0; i < personas.length; i++) {
+      for (var j = 0; j < personas[i].length; j++) {
+         if(personas[i][j].address != owner.email && personas[i][j].address != owner.botEmail)
+            return {
+               name: personas[i][j].name,
+               email: personas[i][j].address
+            }
       }
    }
 }
 
-module.exports.obtenerContenidoMailActual = function(mail){
+module.exports.extraerContenidoMailActual = function(mail){
    //TODO agregar soporte para outlook
    return mail.text.split("----------", 1)[0].trim();
 }

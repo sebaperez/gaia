@@ -13,15 +13,16 @@ router.post('/', function (req, res, next) {
    var mail = req.body;
    log.info('[Route] Mensaje recibido: ' + mail.subject);
    res.status(200).send("Mensaje recibido [" + mail.subject + "]")
+   var botEmail = mailHelper.extraerBotEmail(mail)
 
-   usuarioService.obtenerUsuario(mail, function() {
-      ioService.responderMail(mailHelper.obtenerBotMail(mail), mail.from.value[0].address, null, "Creo que se confundió de mail", mail);
+   usuarioService.obtenerUsuario(botEmail, function() {
+      ioService.responderMail(botEmail, mail.from.value[0].address, null, "Creo que se confundió de mail", mail);
 
    }, function (owner) {
-      var guest = mailHelper.obtenerGuest(owner, mail)
-      var contenidoMailActual = mailHelper.obtenerContenidoMailActual(mail);
+      var guest = mailHelper.extraerGuest(owner, mail)
+      var contenidoMailActual = mailHelper.extraerContenidoMailActual(mail);
       if(!contenidoMailActual) {
-         orquestadorService.responderAMailVacio(owner, mail)
+         return orquestadorService.responderTexto(owner, mail, 'Me llegó el mail vacío.')
       }
       log.debug('[Route] Contenido recibido: [' + contenidoMailActual + ']');
 

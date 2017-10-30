@@ -15,8 +15,7 @@ module.exports.responderAMailVacio = function(owner, mail, reject, callback) {
    ioService.responderMail(owner.botEmail, mail.from.value[0].address, null, respuestaMailVacio, mail, reject, callback);
 }
 
-function responderTexto (owner, mail, texto, reject, callback) {
-
+function responderTexto(owner, mail, texto, reject, callback) {
    ioService.responderMail(owner.botEmail, mail.from.value[0].address, null, texto, mail, reject, callback);
 };
 module.exports.responderTexto = responderTexto
@@ -26,7 +25,7 @@ module.exports.proponerHorarioReunion = function(owner, guest, mail, significado
 
    calendarioService.obtenerHueco(significado.fechas, significado.intervalos, owner.id, errorResponse, function(horario) {
       if(horario){
-         var contenidoMailActual = mailHelper.obtenerContenidoMailActual(mail);
+         var contenidoMailActual = mailHelper.extraerContenidoMailActual(mail);
          conversacionService.crearConversacion(owner, guest, contenidoMailActual, significado, errorResponse, function(nuevaConversacion){
             respuestaService.obtenerMensajeCoordinacionAGuest(guest, horario, errorResponse, function(respuesta) {
                var mensajeDeGaia = conversacionService.armarMensajeProponerHorario(respuesta, horario);
@@ -51,7 +50,7 @@ module.exports.proponerNuevoHorarioReunion = function(owner, guest, mail, signif
 
 module.exports.cancelarReunionAgendada = function(owner, guest, mail, significado, conversacion){
 
-   conversacionService.agregarMensajeAConversacion(mailHelper.obtenerContenidoMailActual(mail), conversacion);
+   conversacionService.agregarMensajeAConversacion(mailHelper.extraerContenidoMailActual(mail), conversacion);
    var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "confirmar_reunion");
    if(mensajeDePropuesta){
       calendarioService.eliminarEvento(owner.id, mensajeDePropuesta.evento.id, errorResponse, function(){
@@ -63,14 +62,14 @@ module.exports.cancelarReunionAgendada = function(owner, guest, mail, significad
          });
       });
    } else {
-      ioService.responderTexto(owner, mail, "Disculpe, no sé a qué reunión se refiere.");
+      responderTexto(owner, mail, "Disculpe, no sé a qué reunión se refiere.");
    }
 };
 
 
 module.exports.confirmarReunion = function(owner, guest, mail, significado, conversacion){
 
-   conversacionService.agregarMensajeAConversacion(mailHelper.obtenerContenidoMailActual(mail), conversacion);
+   conversacionService.agregarMensajeAConversacion(mailHelper.extraerContenidoMailActual(mail), conversacion);
    var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario");
    if(mensajeDePropuesta){
       var iniciohuecoAceptado = mensajeDePropuesta.significado.intervalos[0].desde;
@@ -85,7 +84,7 @@ module.exports.confirmarReunion = function(owner, guest, mail, significado, conv
 
       });
    } else {
-      ioService.responderTexto(owner, mail, "Disculpe, no sé a qué reunión se refiere.");
+      responderTexto(owner, mail, "Disculpe, no sé a qué reunión se refiere.");
    }
 }
 
