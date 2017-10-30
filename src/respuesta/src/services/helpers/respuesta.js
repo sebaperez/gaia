@@ -1,3 +1,7 @@
+var moment = require('moment');
+moment.locale('es')
+process.env.TZ = 'America/Buenos_Aires'
+
 module.exports = {
   parseText:function(respuesta, body, res) {
     var texto = respuesta.contenido
@@ -27,13 +31,20 @@ module.exports = {
       texto = texto.replace(/@name/g, 'Hola');
    }
     console.log("La fecha para agendar es: " + body.hueco)
-    var date = new Date(Date.parse(body.hueco))
-    var dias = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"]
-    var meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
-    var fechaInformal = 'el ' + dias[date.getDay()] + ' ' + date.getDate() + ' de ' + meses[date.getMonth()];
-    var minutos = date.getMinutes() == 0? '' : ':' + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes());
-    var horaInformal = ' a las ' + date.getHours() + minutos + ' hs';
-    texto = texto.replace(/@fechas/g, fechaInformal + horaInformal);
+   //  var date = new Date(Date.parse(body.hueco))
+   //  var dias = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"]
+   //  var meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"]
+   //  var fechaInformal = 'el ' + dias[date.getDay()] + ' ' + date.getDate() + ' de ' + meses[date.getMonth()];
+   //  var minutos = date.getMinutes() == 0? '' : ':' + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes());
+   //  var horaInformal = ' a las ' + date.getHours() + minutos + ' hs';
+
+   var fecha = moment(body.hueco)
+
+    texto = texto.replace(/@fechas/g, (hoyManiana(fecha)? "" : "el ") + moment(evento.start.dateTime).calendar());
     return texto
   }
+}
+
+function hoyManiana(fechaString) {
+   return fechaString.indexOf("hoy") > -1 || fechaString.indexOf("mañana") > -1
 }
