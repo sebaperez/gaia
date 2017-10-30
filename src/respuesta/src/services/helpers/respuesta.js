@@ -38,7 +38,7 @@ module.exports = {
    //  var minutos = date.getMinutes() == 0? '' : ':' + (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes());
    //  var horaInformal = ' a las ' + date.getHours() + minutos + ' hs';
 
-   var fecha = body.hueco
+   var fecha = body.hueco;
 
     texto = texto.replace(/@fechas/g, (hoyManiana(fecha)? "" : "el ") + moment(fecha).calendar());
     return texto
