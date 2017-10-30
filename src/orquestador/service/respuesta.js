@@ -2,6 +2,9 @@ var request = require('request');
 var config = require('../config/config').config;
 var log = require('log4js').getLogger();
 log.level = 'debug';
+var moment = require('moment');
+moment.locale('es')
+process.env.TZ = 'America/Buenos_Aires'
 
 // ej owner: {
 //     "name": "Sebastian",
@@ -59,7 +62,12 @@ module.exports.obtenerMensajeConfirmacionReunion = function (owner, hueco, rejec
 }
 
 module.exports.obtenerRespuestaCancelacionReunion = function(evento, reject, callback){
+   var fecha = evento.start.dateTime
    if(callback){
-      callback("Quedó cancelada la reunión del día " + evento.start.dateTime);
+      callback("Quedó cancelada la reunión " + (hoyManiana(fecha)? "de " : "del ") + moment(fecha).calendar());
    }
+}
+
+function hoyManiana(fechaString) {
+   return fechaString.indexOf("hoy") > -1 || fechaString.indexOf("mañana") > -1
 }

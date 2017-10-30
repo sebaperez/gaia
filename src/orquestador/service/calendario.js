@@ -1,6 +1,8 @@
 var request = require('request');
 var config = require('../config/config').config;
 var moment = require('moment');
+moment.locale('es')
+process.env.TZ = 'America/Buenos_Aires'
 var log = require('log4js').getLogger();
 log.level = 'debug';
 
@@ -27,7 +29,7 @@ module.exports.obtenerHueco = function (fechas, intervalos, ownerId, reject, cal
          log.error("[Calendario] Hubo un error en la respuesta del módulo Calendario.");
          reject(error || response.statusMessage)
       } else {
-         log.info("[Calendario] Hueco encontrado por el calendario: " + body);
+         log.info("[Calendario] Hueco encontrado por el calendario: " + moment(body).calendar());
          if(callback){
             callback(body)
          }

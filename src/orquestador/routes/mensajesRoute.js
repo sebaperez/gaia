@@ -57,7 +57,7 @@ router.post('/', function (req, res, next) {
                case 'cancelar_reunion':
                if(ultimaConversacion){
                   if(ultimaConversacion.abierto){
-                     orquestadorService.proponerNuevoHorarioReunion(owner, guest, mail, significado, ultimaConversacion)
+                     orquestadorService.rechazarHorarioReunion(owner, guest, mail, significado, ultimaConversacion)
                   } else {
                      orquestadorService.cancelarReunionAgendada(owner, guest, mail, significado, ultimaConversacion)
                   }

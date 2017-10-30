@@ -6,7 +6,6 @@ var ioService = require('../service/io');
 var log = require('log4js').getLogger();
 log.level = 'debug';
 
-var respuestaDeError = "Lo siento, no estoy disponible en este momento."
 
 module.exports.responderAMailVacio = function(owner, mail, reject, callback) {
 
@@ -14,6 +13,7 @@ module.exports.responderAMailVacio = function(owner, mail, reject, callback) {
    log.info(respuestaMailVacio);
    ioService.responderMail(owner.botEmail, mail.from.value[0].address, null, respuestaMailVacio, mail, reject, callback);
 }
+
 
 function responderTexto(owner, mail, texto, reject, callback) {
    ioService.responderMail(owner.botEmail, mail.from.value[0].address, null, texto, mail, reject, callback);
@@ -31,7 +31,7 @@ module.exports.proponerHorarioReunion = function(owner, guest, mail, significado
                var mensajeDeGaia = conversacionService.armarMensajeProponerHorario(respuesta, horario);
                conversacionService.agregarMensajeAConversacion(mensajeDeGaia, nuevaConversacion)
                conversacionService.actualizarConversacion(nuevaConversacion)
-               ioService.responderMail(owner.botEmail, guest.email, owner.email, respuesta, mail);
+               ioService.responderMail(owner.botEmail, guest.email, null, respuesta, mail);
             });
          });
       } else {
@@ -43,6 +43,12 @@ module.exports.proponerHorarioReunion = function(owner, guest, mail, significado
 
 
 module.exports.proponerNuevoHorarioReunion = function(owner, guest, mail, significado, conversacion){
+   log.error('Negociar reunión todavía no implementado.');
+   errorResponse()
+};
+
+
+module.exports.rechazarHorarioReunion = function(owner, guest, mail, significado, conversacion){
    log.error('Negociar reunión todavía no implementado.');
    errorResponse()
 };
