@@ -4,7 +4,7 @@ var moment = require('moment');
 var log = require('log4js').getLogger();
 log.level = 'debug';
 
-module.exports.obtenerHueco = function (fechas, intervalos, ownerId, callback, err) {
+module.exports.obtenerHueco = function (fechas, intervalos, ownerId, reject, callback) {
 
    var intervalosYFechas = intervalos.slice();
    for (var i = 0; i < fechas.length; i++) {
@@ -23,20 +23,20 @@ module.exports.obtenerHueco = function (fechas, intervalos, ownerId, callback, e
          usuario: ownerId
       }
    }, function (error, response, body) {
-      if(error || response.statusCode != 200){
-         log.error("[Calendario] Hubo un error en el módulo Calendario.");
-         err(error);
-      } else if (response.statusCode != 200){
-         err("[Calendario] Hubo un error en la respuesta del módulo Calendario.");
+      if (reject && (error || response.statusCode != 200)) {
+         log.error("[Calendario] Hubo un error en la respuesta del módulo Calendario.");
+         reject(error || response.statusMessage)
       } else {
          log.info("[Calendario] Hueco encontrado por el calendario: " + body);
-         callback(body);
+         if(callback){
+            callback(body)
+         }
       }
    });
 
 }
 
-module.exports.agregarEvento = function (ownerId, inicioHuecoAceptado, guestNombre, callback) {
+module.exports.agregarEvento = function (ownerId, inicioHuecoAceptado, guestNombre, reject, callback) {
    var agendarUrl = config.calendarioApiUrls.agendar;
    var momentDesde = moment(inicioHuecoAceptado);
    momentHasta = momentDesde.add(1,'hours');
@@ -54,13 +54,19 @@ module.exports.agregarEvento = function (ownerId, inicioHuecoAceptado, guestNomb
          usuario: ownerId
       }
    }, function (error, response, body) {
-      log.info("Evento agendado:", body);
-      callback(body);
+      if (reject && (error || response.statusCode != 200)) {
+         reject(error || response.statusMessage)
+      } else {
+         log.info("Evento agendado:", body);
+         if(callback){
+            callback(body)
+         }
+      }
    });
 
 }
 
-module.exports.eliminarEvento = function(ownerId, eventoId, callback) {
+module.exports.eliminarEvento = function(ownerId, eventoId, reject, callback) {
    var eliminarUrl = config.calendarioApiUrls.eliminar;
    log.debug('[Calendario] Intentando eliminar evento: ' + eventoId);
    request.post({
@@ -71,9 +77,14 @@ module.exports.eliminarEvento = function(ownerId, eventoId, callback) {
          usuario: ownerId
       }
    }, function (error, response, body) {
-      log.info("Evento eliminado");
-      if(callback)
-      callback();
+      if (reject && (error || response.statusCode != 200)) {
+         reject(error || response.statusMessage)
+      } else {
+         log.info("Evento eliminado");
+         if(callback){
+            callback(body)
+         }
+      }
    });
 }
 

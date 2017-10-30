@@ -17,7 +17,7 @@ log.level = 'debug';
 //    "2017-08-22T00:00:00.000-03:00"
 // ]
 
-module.exports.obtenerMensajeCoordinacionAGuest = function (guest, hueco, callback) {
+module.exports.obtenerMensajeCoordinacionAGuest = function (guest, hueco, reject, callback) {
    var respuestaUrl = config.respuestaApiUrls.solicitarReunionAlGuest;
    request.post({
       url: respuestaUrl,
@@ -27,11 +27,17 @@ module.exports.obtenerMensajeCoordinacionAGuest = function (guest, hueco, callba
          hueco: hueco
       }
    }, function (error, response, body) {
-      callback(body);
+      if (reject && (error || response.statusCode != 200)) {
+         reject(error || response.statusMessage)
+      } else {
+         if(callback){
+            callback(body)
+         }
+      }
    });
 }
 
-module.exports.obtenerMensajeConfirmacionReunion = function (owner, hueco, callback){
+module.exports.obtenerMensajeConfirmacionReunion = function (owner, hueco, reject, callback){
    var respuestaUrl = config.respuestaApiUrls.confirmarReunion;
    log.debug('[Respuesta] Armando mensaje de confirmacion de reunion para owner con hueco', hueco);
    request.post({
@@ -42,10 +48,18 @@ module.exports.obtenerMensajeConfirmacionReunion = function (owner, hueco, callb
          hueco: hueco
       }
    }, function (error, response, body) {
-      callback(body);
+      if (reject && (error || response.statusCode != 200)) {
+         reject(error || response.statusMessage)
+      } else {
+         if(callback){
+            callback(body)
+         }
+      }
    });
 }
 
-module.exports.obtenerMensajeCancelacionReunion = function(evento, callback){
-    callback("Quedó cancelada la reunión del día " + evento.start.dateTime);
+module.exports.obtenerRespuestaCancelacionReunion = function(evento, reject, callback){
+   if(callback){
+      callback("Quedó cancelada la reunión del día " + evento.start.dateTime);
+   }
 }

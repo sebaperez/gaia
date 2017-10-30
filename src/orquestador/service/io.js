@@ -3,32 +3,34 @@ var config = require('../config/config').config;
 var log = require('log4js').getLogger();
 log.level = 'debug';
 
-module.exports.enviarMail = function (mailRemitente, mailDestinatario, mailCC, asuntoMail, idMensaje, respuesta, contenidoMail, callback, err) {
+module.exports.responderMail = function (mailRemitente, mailDestinatario, mailCC, mensaje, mail, reject, callback) {
 
    var enviarMailUrl = config.ioApiUrls.enviar;
 
    var separador = '\n\n\n---------- Forwarded message ----------\n\n';
 
-   var mail = {
+   var nuevoMail = {
       from: mailRemitente,
       to: mailDestinatario,
       cc: mailCC,
-      subject: 'Re: ' + asuntoMail,
-      inReplyTo: idMensaje,
-      text: respuesta + separador + contenidoMail
+      subject: 'Re: ' + mail.subject,
+      inReplyTo: mail.messageId,
+      text: mensaje + separador + mail.text
    }
 
    request.post({
       url: enviarMailUrl,
       json: true,
-      body: mail
+      body: nuevoMail
    }, function (error, response, body) {
-      if (error || response.statusCode != 200) {
+      if (reject && (error || response.statusCode != 200)) {
          log.error('Fallo en el envio de mail.', error);
-         err();
-      } else{
-         log.info("Mail enviado: ", mail);
-         callback();
+         reject(error || response.statusMessage)
+      } else {
+         log.info("Mail enviado: ", nuevoMail);
+         if(callback){
+            callback()
+         }
       }
    });
 

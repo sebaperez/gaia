@@ -3,7 +3,7 @@ var config = require('../config/config').config;
 var log = require('log4js').getLogger();
 log.level = 'debug';
 
-module.exports.obtenerUsuario = function(mail, callback, err) {
+module.exports.obtenerUsuario = function(mail, reject, callback) {
    if(mail.cc && mail.cc.value[0]){
       var mailCC = mail.cc.value[0].address
    }
@@ -19,9 +19,12 @@ module.exports.obtenerUsuario = function(mail, callback, err) {
                if(owner) {
                   return callback(owner);
                }
+            } else {
+               return reject();
             }
             if(error) {
-               return err("[Usuario] Error en el modulo de usuarios")
+               log.error("[Usuario] Error en el modulo de usuarios")
+               return reject()
             }
          });
       }

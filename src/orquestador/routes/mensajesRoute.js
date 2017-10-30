@@ -4,9 +4,6 @@ var orquestadorService = require("../service/orquestador")
 var usuarioService = require('../service/usuario');
 var conversacionService = require('../service/conversacion');
 var iaService = require('../service/ia');
-
-var request = require('request');
-var config = require('../config/config').config;
 var mailHelper = require('../helpers/mailHelper')
 var log = require('log4js').getLogger();
 log.level = 'debug';
@@ -14,89 +11,81 @@ log.level = 'debug';
 router.post('/', function (req, res, next) {
 
    var mail = req.body;
-   log.info('Mensaje recibido: ' + mail.subject);
-   log.debug(JSON.stringify(mail));
+   log.info('[Route] Mensaje recibido: ' + mail.subject);
+   res.status(200).send("Mensaje recibido [" + mail.subject + "]")
 
-   usuarioService.obtenerUsuario(mail, function (owner) {
+   usuarioService.obtenerUsuario(mail, function() {
+      ioService.responderMail(mailHelper.obtenerBotMail(mail), mail.from.value[0].address, null, "Creo que se confundió de mail", mail);
+
+   }, function (owner) {
       var guest = mailHelper.obtenerGuest(owner, mail)
-
       var contenidoMailActual = mailHelper.obtenerContenidoMailActual(mail);
       if(!contenidoMailActual) {
-         orquestadorService.responderAMailVacio(owner, mail, function(){
-            return res.status(200).send()
-         }, function(){
-            return res.status(500).send()
-         })
+         orquestadorService.responderAMailVacio(owner, mail)
       }
-      log.info('Contenido recibido: [' + contenidoMailActual + ']');
-      iaService.interpretarMensaje(contenidoMailActual, function (significado) {
-         log.info("El significado es: [" + significado.intents + "]");
+      log.debug('[Route] Contenido recibido: [' + contenidoMailActual + ']');
 
-         conversacionService.obtenerUltimaConversacion(owner, guest, function(ultimaConversacion){
-            if(ultimaConversacion){
-               log.debug("Ultima conversacion id:", ultimaConversacion.id)
-               log.debug("Ultima conversacion abierta?", ultimaConversacion.abierto)
-            } else{
-               log.debug("No hay conversaciones anteriores")
-            }
+      iaService.interpretarMensaje(contenidoMailActual, function() {
+         orquestadorService.responderTexto(owner, mail, "Disculpe, no entendí lo que quiso decir")
+
+      }, function (significado) {
+         log.info("[Route] La intencion del mensaje: [" + significado.intents + "]");
+         conversacionService.obtenerUltimaConversacion(owner, guest, function() {
+            orquestadorService.responderTexto(owner, mail, "Lo siento, no estoy disponible en este momento.");
+         }, function(ultimaConversacion) {
+            loggearInfoConversacion(ultimaConversacion)
+
             switch(mailHelper.obtenerIntencion(significado)) {
 
                case 'solicitar_reunion':
                if(ultimaConversacion && ultimaConversacion.abierto){
-                  orquestadorService.proponerNuevoHorarioReunion(owner, guest, mail, significado, ultimaConversacion, ok, mal)
+                  orquestadorService.proponerNuevoHorarioReunion(owner, guest, mail, significado, ultimaConversacion)
                } else {
-                  orquestadorService.proponerHorarioReunion(owner, guest, mail, significado, ok, mal)
+                  orquestadorService.proponerHorarioReunion(owner, guest, mail, significado)
                }
                break;
 
                case 'aceptar_reunion':
-               if(ultimaConversacion && ultimaConversacion.abierto){
-                  orquestadorService.confirmarReunion(owner, guest, mail, significado, ultimaConversacion, ok, mal)
+               if(ultimaConversacion && ultimaConversacion.abierto) {
+                  orquestadorService.confirmarReunion(owner, guest, mail, significado, ultimaConversacion)
                } else {
-                  log.info("Se intentó aceptar una reunión en una conversación cerrada o inexistente")
-                  mal()
+                  orquestadorService.responderTexto(owner, mail, "Disculpe, no sé a qué reunión se refiere.");
                }
                break;
 
                case 'cancelar_reunion':
                if(ultimaConversacion){
                   if(ultimaConversacion.abierto){
-                     orquestadorService.proponerNuevoHorarioReunion(owner, guest, mail, significado, ultimaConversacion, ok, mal)
+                     orquestadorService.proponerNuevoHorarioReunion(owner, guest, mail, significado, ultimaConversacion)
                   } else {
-                     orquestadorService.cancelarReunionAgendada(owner, guest, mail, significado, ultimaConversacion, ok, mal)
+                     orquestadorService.cancelarReunionAgendada(owner, guest, mail, significado, ultimaConversacion)
                   }
                }
                break;
 
                case 'posponer_reunion':
-               log.warn('Posponer reunión todavía no implementado.');
-               return res.status(501).send()
+               log.warn('[Route] Posponer reunión todavía no implementado.');
+               errorResponse()
                break;
 
                default:
-               log.error('Intencion(es) ' + significado.intents + ' no soportadas.');
-               return res.status(400).send()
+               log.error('[Route] Intencion(es) ' + significado.intents + ' no soportadas.');
+               orquestadorService.responderTexto(owner, mail, "Disculpe, no entendí lo que quiso decir")
             }
          })
 
-
-      }, function(mensajeError) {
-         log.error(mensajeError);
-         ioService.enviarMail(owner.botEmail, owner.email, guest.email, mail.subject, mail.messageId, respuestaDeError, mail.text, ok, mal);
       });
 
-   }, function(mensajeError) {
-      log.error(mensajeError)
-      return mal(mensajeError)
-   });
-
-   function ok(){
-      return res.status(200).send()
-   }
-   function mal(){
-      return res.status(500).send()
-   }
+   })
 });
 
+function loggearInfoConversacion(conversacion){
+   if(conversacion){
+      log.debug("[Route] Ultima conversacion id:", conversacion.id)
+      log.debug("[Route] Ultima conversacion abierta?", conversacion.abierto)
+   } else {
+      log.debug("[Route] No hay conversaciones anteriores")
+   }
+}
 
 module.exports = router;

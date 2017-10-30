@@ -5,81 +5,69 @@ log.level = 'debug';
 
 var conversacionesUrl = config.conversacionApiUrls.conversaciones;
 
-module.exports.crearConversacion = function (owner, guest, contenidoMailActual, significado, callback) {
-   // ej significado: {
-   //   "original_response": "PARA DEBUG",
-   //   "ok": true,
-   //   "intents": [
-   //      "solicitar_reunion"
-   //   ],
-   //   "fechas": [{
-   //      "fecha": "2017-08-22T00:00:00.000-03:00"
-   //   }],
-   //   "intervalos": [
-   //     {
-   //        "desde": "2017-08-17T00:00:00.000-03:00",
-   //        "hasta": "2017-09-02T00:00:00.000-03:00"
-   //     }],
-   // }
-
+module.exports.crearConversacion = function (owner, guest, contenidoMensaje, significado, reject, callback) {
    var nuevaConversacion = {
       owner: owner.email,
       guest: guest.email,
       abierto: true,
-      mensajes: [
-         {
-            contenido: contenidoMailActual, //solo el ultimo mensaje de la cadena
-            significado: significado
-         }
-      ]
+      mensajes: [{
+         contenido: contenidoMensaje,
+         significado: significado
+      }]
    };
-   log.debug('[Conversacion] Creando conversacion ', nuevaConversacion);
+   log.debug('[Conversacion] Creando conversacion: ', nuevaConversacion);
    request.post({
       url: conversacionesUrl,
       json: true,
       body: nuevaConversacion
    }, function (error, response, body) {
-      if(callback){
-         callback(body);
+      if (reject && (error || response.statusCode != 201)) {
+         reject(error || response.statusMessage)
+      } else {
+         if(callback) {
+            callback(body)
+         }
       }
    });
 }
 
-module.exports.obtenerUltimaConversacion = function (owner, guest, callback){
+module.exports.obtenerUltimaConversacion = function (owner, guest, reject, callback){
    request.get(conversacionesUrl + '/' + owner.email + '/' + guest.email, function (error, response, body) {
-      if(callback) {
+      if (reject && (error || (response.statusCode != 200 && response.statusCode != 404))) {
+         log.error("[Conversacion] No se pudo obtener la conversacion entre owner " + owner.email + " y guest " + guest.email);
+         reject(error || response.statusMessage)
+      } else {
          if(body){
-            var conversacion = JSON.parse(body);
-            callback(conversacion);
-         } else{
+            if(callback){
+               callback(JSON.parse(body))
+            }
+         } else {
             callback(null)
          }
-      }
-      if(error){
-         log.error("[Conversacion] No se pudo obtener la conversacion entre owner " + owner.email + " y guest " + guest.email);
       }
    });
 }
 
 module.exports.agregarMensajeAConversacion = function (mensaje, conversacion) {
-      conversacion.mensajes = conversacion.mensajes ? conversacion.mensajes : [];
-      log.debug('[Conversacion] Agregando mensaje', mensaje, "a conversacion con id " + conversacion.id);
-      conversacion.mensajes.unshift(mensaje);
-      return conversacion;
+   conversacion.mensajes = conversacion.mensajes ? conversacion.mensajes : [];
+   log.debug('[Conversacion] Agregando mensaje', mensaje, "a conversacion con id " + conversacion.id);
+   conversacion.mensajes.unshift(mensaje);
+   return conversacion;
 }
 
-module.exports.actualizarConversacion = function(conversacion, callback, err){
+module.exports.actualizarConversacion = function(conversacion, reject, callback){
    request.put({
       url: conversacionesUrl + '/' + conversacion.id,
       json: true,
       body: conversacion
    }, function (error, response, body) {
-      if(error){
+      if (reject && (error || response.statusCode != 200)) {
          log.error('No pude agregar el mensaje a la conversacion del owner ' + owner.email + ' y guest ' + guest.email);
-         err();
-      }
-      if(callback){
-         callback(body);
+         reject(error || response.statusMessage)
+      } else {
+         if(callback){
+            callback(body)
+         }
       }
    });
 }
@@ -103,9 +91,7 @@ module.exports.armarMensajeConfirmarReunion = function (respuesta, evento) {
       "contenido": respuesta,
       "evento": evento,
       "significado": {
-         "intents": [
-            "confirmar_reunion"
-         ],
+         "intents": ["confirmar_reunion"],
          "intervalos": [{
             "desde": evento.start.dateTime
          }]
@@ -118,9 +104,7 @@ module.exports.armarMensajeCancelacionReunion = function (respuesta, evento) {
       "contenido": respuesta,
       "evento": evento,
       "significado": {
-         "intents": [
-            "confirmar_cancelacion"
-         ],
+         "intents": ["confirmar_cancelacion"],
          "intervalos": [{
             "desde": evento.start.dateTime
          }]
@@ -135,5 +119,7 @@ module.exports.obtenerUltimoMensajeConSignificado = function (conversacion, sign
    if(mensajesConSignificado.length > 0){
       log.info('[Conversacion] Mensaje de propuesta de horario: ', mensajesConSignificado[0].contenido);
       return mensajesConSignificado[0];
+   } else {
+      return null;
    }
 }

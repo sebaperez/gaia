@@ -6,21 +6,20 @@ module.exports.obtenerIntencion = function(significado) {
    }
 }
 
-module.exports.obtenerGuestMail = function(mail, owner){
-   if(mail.cc.value[0]){
-      var mailCC = mail.cc.value[0].address;
-   }
-   var mails = [mail.from.value[0].address, mail.to.value[0].address, mailCC]
 
-   if(mail.from.value.length > 1 || mail.to.value > 1){
-      log.error("No está soportado recibir más de un guest");
+module.exports.obtenerBotMail = function(mail){
+   var mails = [mail.from.value, mail.to.value]
+   if(mail.cc.value.length > 0){
+      mails.push(mail.cc.value);
    }
    for (var i = 0; i < mails.length; i++) {
-      if(mails[i] != owner.email && mails[i] != owner.botEmail){
-         return mails[i];
+      for (var j = 0; j < mails[i].length; j++) {
+         if(mails[i][j].address.indexOf('gaiameet.com') > -1)
+            return mails[i][j].address
       }
    }
 }
+
 
 module.exports.obtenerGuest = function(owner, mail){
    if(mail.from.value.length > 1 || mail.to.value > 1){
