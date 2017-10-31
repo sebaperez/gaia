@@ -55,6 +55,7 @@
     "express": "^4.13.4",
     "lodash": "^4.13.1",
     "moment": "^2.19.1",
+    "moment-timezone": "^0.5.13",
     "mongoose": "^4.11.11",
     "mongoose-create-unique": "^0.4.1",
     "mongoose-keywords": "^0.3.1",
