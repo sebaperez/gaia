@@ -23,7 +23,7 @@ export const show = ({ params }, res, next) =>
     .catch(next)
 
 export const update = ({ bodymen: { body }, params }, res, next) =>
-  Respuesta.findById(params.id)
+  Respuesta.findOne( { motivo: params.motivo } )
     .then(notFound(res))
     .then((respuesta) => respuesta ? _.merge(respuesta, body).save() : null)
     .then((respuesta) => respuesta ? respuesta.view(true) : null)
