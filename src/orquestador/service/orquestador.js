@@ -36,7 +36,7 @@ module.exports.proponerHorarioReunion = function(owner, guest, mail, significado
          });
       } else {
          let respuesta = "Lo siento, no hay horarios disponibles para agendar la reunión.";
-         ioService.responderMail(owner.botEmail, guest.email, owner.email, respuesta, mail);
+         ioService.responderMail(owner.botEmail, guest.email, null, respuesta, mail);
       }
    });
 }
@@ -49,8 +49,14 @@ module.exports.proponerNuevoHorarioReunion = function(owner, guest, mail, signif
 
 
 module.exports.rechazarHorarioReunion = function(owner, guest, mail, significado, conversacion){
-   log.error('Negociar reunión todavía no implementado.');
-   errorResponse()
+
+   conversacionService.agregarMensajeAConversacion(mailHelper.extraerContenidoMailActual(mail), conversacion);
+   respuestaService.obtenerRespuestaPreguntarHorarios(function(respuesta){
+      var mensajeDeGaia = conversacionService.armarMensajePreguntarHorarios(respuesta);
+      conversacionService.agregarMensajeAConversacion(mensajeDeGaia, conversacion);
+      conversacionService.actualizarConversacion(conversacion)
+      ioService.responderMail(owner.botEmail, mail.from.value[0].address, null, respuesta, mail);
+   });
 };
 
 

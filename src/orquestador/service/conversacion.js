@@ -111,6 +111,16 @@ module.exports.armarMensajeCancelacionReunion = function (respuesta, evento) {
       }
    }
 }
+
+module.exports.armarMensajePreguntarHorarios = function (contenido) {
+   return {
+      "contenido": respuesta,
+      "significado": {
+         "intents": ["preguntar_horario"]
+      }
+   }
+};
+
 module.exports.obtenerUltimoMensajeConSignificado = function (conversacion, significado){
    log.debug("[Conversacion] Buscando mensaje con significado: " + significado + ' entre mensajes ' + JSON.stringify(conversacion.mensajes));
    var mensajesConSignificado = conversacion.mensajes.filter(function(m) {

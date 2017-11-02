@@ -60,6 +60,11 @@ module.exports.obtenerMensajeConfirmacionReunion = function (owner, hueco, rejec
       }
    });
 }
+module.exports.obtenerRespuestaPreguntarHorarios = function(callback){
+   if(callback){
+      callback("En qué horario está disponible?");
+   }
+}
 
 module.exports.obtenerRespuestaCancelacionReunion = function(evento, reject, callback){
    var fecha = evento.start.dateTime
