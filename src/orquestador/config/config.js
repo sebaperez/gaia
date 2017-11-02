@@ -28,5 +28,10 @@ module.exports.config = {
    },
    ioApiUrls: {
       enviar: prod ? "http://104.131.40.146:4444/send" : (urlBase + "/io/send")
+   },
+   calendarConfig: {
+      sameElse: function () {
+         return 'dddd DD [de] MMMM [a la' + ((this.hours() !== 1) ? 's' : '') + '] LT';
+      }
    }
 };

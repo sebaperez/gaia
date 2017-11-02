@@ -29,7 +29,7 @@ module.exports.obtenerHueco = function (fechas, intervalos, ownerId, reject, cal
          log.error("[Calendario] Hubo un error en la respuesta del módulo Calendario.");
          reject(error || response.statusMessage)
       } else {
-         log.info("[Calendario] Hueco encontrado por el calendario: " + moment(body).calendar());
+         log.info("[Calendario] Hueco encontrado por el calendario: " + moment(body).calendar(null, config.calendarConfig));
          if(callback){
             callback(body)
          }

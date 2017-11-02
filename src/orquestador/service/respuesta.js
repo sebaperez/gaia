@@ -63,11 +63,12 @@ module.exports.obtenerMensajeConfirmacionReunion = function (owner, hueco, rejec
 
 module.exports.obtenerRespuestaCancelacionReunion = function(evento, reject, callback){
    var fecha = evento.start.dateTime
+   var fechaFormateada = moment(fecha).calendar(null, config.calendarConfig)
    if(callback){
-      callback("Quedó cancelada la reunión " + (hoyManiana(fecha)? "de " : "del ") + moment(fecha).calendar());
+      callback("Quedó cancelada la reunión " + esHoyOManiana(fechaFormateada)? "de " + fechaFormateada : "del " + fechaFormateada);
    }
 }
 
-function hoyManiana(fechaString) {
-   return fechaString.indexOf("hoy") > -1 || fechaString.indexOf("mañana") > -1
+function esHoyOManiana(fechaString) {
+   return fechaString.indexOf("hoy") == 0 || fechaString.indexOf("mañana") == 0
 }
