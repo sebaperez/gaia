@@ -22,7 +22,7 @@ module.exports.obtenerHueco = function (intervalos, intervalosRechazados, ownerI
          log.error("[Calendario] Hubo un error en la respuesta del módulo Calendario.");
          reject(error || response.statusMessage)
       } else {
-         log.info("[Calendario] Hueco encontrado por el calendario: " + moment(body).calendar(null, config.calendarConfig));
+         log.info("[Calendario] Hueco encontrado por el calendario: " + body);
          if(callback){
             callback(body)
          }
@@ -32,13 +32,13 @@ module.exports.obtenerHueco = function (intervalos, intervalosRechazados, ownerI
 
 function restarIntervalosDeTiempo(intervalos, intervalosParaRestar) {
    //TODO hacer la resta bien
-   intervalos[0].desde = moment(intervalos[0].desde).add(1, 'hours').format('YYYY-MM-DDTHH:mm:ssZ')
+   if(intervalosParaRestar && intervalosParaRestar.length > 0){
+      intervalos[0].desde = moment(intervalos[0].desde).add(1, 'hours').format('YYYY-MM-DDTHH:mm:ssZ')
+   }
    return intervalos
 }
 
 module.exports.unificarIntervalosYFechas = function (intervalos, fechas){
-   log.info("INTERVALOS", intervalos)
-   log.info("FECHAS", fechas)
    var intervalosYFechas = intervalos.slice();
    for (var i = 0; i < fechas.length; i++) {
       intervalosYFechas.push({
