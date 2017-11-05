@@ -26,7 +26,7 @@ module.exports.responderTexto = responderTexto
 
 module.exports.proponerNuevaReunion = function(owner, guest, mail, significado){
 
-   var intervalos = calendarioService.unificarIntervalosYFechas(significado.fechas, significado.intervalos)
+   var intervalos = calendarioService.unificarIntervalosYFechas(significado.intervalos, significado.fechas)
    var contenidoMailActual = mailHelper.extraerContenidoMailActual(mail);
    conversacionService.crearConversacion(owner, guest, contenidoMailActual, significado, errorResponse, function(nuevaConversacion){
       proponerHorarioYActualizarConversacion(intervalos, null, owner, guest, mail, nuevaConversacion, errorResponse)
@@ -41,7 +41,7 @@ module.exports.proponerNuevoHorarioReunion = function(owner, guest, mail, signif
 
    var contenidoMailActual = mailHelper.extraerContenidoMailActual(mail);
    conversacionService.agregarMensajeAConversacion(contenidoMailActual, conversacion);
-   var intervalos = calendarioService.unificarIntervalosYFechas(significado.fechas, significado.intervalos)
+   var intervalos = calendarioService.unificarIntervalosYFechas(significado.intervalos, significado.fechas)
    var intervalosRechazados = conversacionService.obtenerIntervalosDeIntencion(conversacion, "proponer_horario");
    proponerHorarioYActualizarConversacion(intervalos, intervalosRechazados, owner, guest, mail, conversacion, errorResponse);
    function errorResponse(error){
