@@ -8,7 +8,8 @@ log.level = 'debug';
 
 module.exports.obtenerHueco = function (intervalos, intervalosRechazados, ownerId, reject, callback) {
 
-   log.debug('[Calendario] Intervalos para buscar hueco: ' + JSON.stringify(intervalos));
+   log.debug('[Calendario] Intervalos para buscar hueco:', intervalos)
+   log.debug('[Calendario] Intervalos rechazados previamente:', intervalos)
 
    request.post({
       url: config.calendarioApiUrls.huecos,

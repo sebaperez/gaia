@@ -41,7 +41,7 @@ module.exports.proponerNuevoHorarioReunion = function(owner, guest, mail, signif
 
    var contenidoMailActual = mailHelper.extraerContenidoMailActual(mail);
    conversacionService.agregarMensajeAConversacion(contenidoMailActual, conversacion);
-   var intervalos = calendarioService.unificarIntervalosYFechas(significado.fechas, significado.intervalos)
+   var intervalos = calendarioService.unificarIntervalosYFechas(significado.intervalos, significado.fechas)
    var intervalosRechazados = conversacionService.obtenerIntervalosDeIntencion(conversacion, "proponer_horario");
    proponerHorarioYActualizarConversacion(intervalos, intervalosRechazados, owner, guest, mail, conversacion, errorResponse);
    function errorResponse(error){
