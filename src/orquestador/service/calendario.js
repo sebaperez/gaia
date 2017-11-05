@@ -6,21 +6,14 @@ process.env.TZ = 'America/Buenos_Aires'
 var log = require('log4js').getLogger();
 log.level = 'debug';
 
-module.exports.obtenerHueco = function (fechas, intervalos, ownerId, reject, callback) {
+module.exports.obtenerHueco = function (intervalos, intervalosRechazados, ownerId, reject, callback) {
 
-   var intervalosYFechas = intervalos.slice();
-   for (var i = 0; i < fechas.length; i++) {
-      intervalosYFechas.push({
-         desde: fechas[i].fecha,
-         hasta: calcularFechaHasta(fechas[i].fecha)
-      });
-   }
-   log.debug('[Calendario] Intervalos para buscar hueco: ' + JSON.stringify(intervalosYFechas));
+   log.debug('[Calendario] Intervalos para buscar hueco: ' + JSON.stringify(intervalos));
 
    request.post({
       url: config.calendarioApiUrls.huecos,
       json: true,
-      body: intervalosYFechas,
+      body: restarIntervalosDeTiempo(intervalos, intervalosRechazados),
       qs: {
          usuario: ownerId
       }
@@ -35,7 +28,25 @@ module.exports.obtenerHueco = function (fechas, intervalos, ownerId, reject, cal
          }
       }
    });
+}
 
+function restarIntervalosDeTiempo(intervalos, intervalosParaRestar) {
+   //TODO hacer la resta bien
+   intervalos[0].desde = moment(intervalos[0].desde).add(1, 'hours').format('YYYY-MM-DDTHH:mm:ssZ')
+   return intervalos
+}
+
+module.exports.unificarIntervalosYFechas = function (intervalos, fechas){
+   log.info("INTERVALOS", intervalos)
+   log.info("FECHAS", fechas)
+   var intervalosYFechas = intervalos.slice();
+   for (var i = 0; i < fechas.length; i++) {
+      intervalosYFechas.push({
+         desde: fechas[i].fecha,
+         hasta: calcularFechaHasta(fechas[i].fecha)
+      });
+   }
+   return intervalosYFechas
 }
 
 module.exports.agregarEvento = function (ownerId, inicioHuecoAceptado, guestNombre, reject, callback) {

@@ -5,6 +5,9 @@ var respuestaService = require('../service/respuesta');
 var ioService = require('../service/io');
 var log = require('log4js').getLogger();
 log.level = 'debug';
+var moment = require('moment');
+moment.locale('es')
+process.env.TZ = 'America/Buenos_Aires'
 
 
 module.exports.responderAMailVacio = function(owner, mail, reject, callback) {
@@ -21,31 +24,48 @@ function responderTexto(owner, mail, texto, reject, callback) {
 module.exports.responderTexto = responderTexto
 
 
-module.exports.proponerHorarioReunion = function(owner, guest, mail, significado){
+module.exports.proponerNuevaReunion = function(owner, guest, mail, significado){
 
-   calendarioService.obtenerHueco(significado.fechas, significado.intervalos, owner.id, errorResponse, function(horario) {
+   var intervalos = calendarioService.unificarIntervalosYFechas(significado.fechas, significado.intervalos)
+   var contenidoMailActual = mailHelper.extraerContenidoMailActual(mail);
+   conversacionService.crearConversacion(owner, guest, contenidoMailActual, significado, errorResponse, function(nuevaConversacion){
+      proponerHorarioYActualizarConversacion(intervalos, null, owner, guest, mail, conversacion, errorResponse)
+   });
+   function errorResponse(error){
+      log.error("Hubo un error en el módulo orquestador.", error)
+      responderTexto(owner, mail, "Lo siento, no estoy disponible en este momento. Contáctese directamente con " + owner.email)
+   }
+}
+
+module.exports.proponerNuevoHorarioReunion = function(owner, guest, mail, significado, conversacion){
+
+   var contenidoMailActual = mailHelper.extraerContenidoMailActual(mail);
+   conversacionService.agregarMensajeAConversacion(contenidoMailActual, conversacion);
+   var intervalos = calendarioService.unificarIntervalosYFechas(significado.fechas, significado.intervalos)
+   var intervalosRechazados = conversacionService.obtenerIntervalosDeIntencion(conversacion, "proponer_horario");
+   proponerHorarioYActualizarConversacion(intervalos, intervalosRechazados, owner, guest, mail, conversacion, errorResponse);
+   function errorResponse(error){
+      log.error("Hubo un error en el módulo orquestador.", error)
+      responderTexto(owner, mail, "Lo siento, no estoy disponible en este momento. Contáctese directamente con " + owner.email)
+   }
+};
+
+function proponerHorarioYActualizarConversacion(intervalos, intervalosRechazados, owner, guest, mail, conversacion, errorResponse){
+   calendarioService.obtenerHueco(intervalos, intervalosRechazados, owner.id, errorResponse, function(horario) {
       if(horario){
-         var contenidoMailActual = mailHelper.extraerContenidoMailActual(mail);
-         conversacionService.crearConversacion(owner, guest, contenidoMailActual, significado, errorResponse, function(nuevaConversacion){
-            respuestaService.obtenerMensajeCoordinacionAGuest(guest, horario, errorResponse, function(respuesta) {
-               var mensajeDeGaia = conversacionService.armarMensajeProponerHorario(respuesta, horario);
-               conversacionService.agregarMensajeAConversacion(mensajeDeGaia, nuevaConversacion)
-               conversacionService.actualizarConversacion(nuevaConversacion)
-               ioService.responderMail(owner.botEmail, guest.email, null, respuesta, mail);
-            });
+         var horarioHasta =
+         respuestaService.obtenerMensajeCoordinacionAGuest(guest, horario, errorResponse, function(respuesta) {
+            var mensajeDeGaia = conversacionService.armarMensajeProponerHorario(respuesta, horario, horarioHasta);
+            conversacionService.agregarMensajeAConversacion(mensajeDeGaia, conversacion)
+            conversacionService.actualizarConversacion(conversacion)
+            ioService.responderMail(owner.botEmail, guest.email, null, respuesta, mail);
          });
       } else {
          let respuesta = "Lo siento, no hay horarios disponibles para agendar la reunión.";
          ioService.responderMail(owner.botEmail, guest.email, null, respuesta, mail);
       }
-   });
+   })
 }
-
-
-module.exports.proponerNuevoHorarioReunion = function(owner, guest, mail, significado, conversacion){
-   log.error('Negociar reunión todavía no implementado.');
-   errorResponse()
-};
 
 
 module.exports.rechazarHorarioReunion = function(owner, guest, mail, significado, conversacion){
@@ -76,6 +96,10 @@ module.exports.cancelarReunionAgendada = function(owner, guest, mail, significad
    } else {
       responderTexto(owner, mail, "Disculpe, no sé a qué reunión se refiere.");
    }
+   function errorResponse(error){
+      log.error("Hubo un error en el módulo orquestador.", error)
+      responderTexto(owner, mail, "Lo siento, no estoy disponible en este momento. Contáctese directamente con " + owner.email)
+   }
 };
 
 
@@ -98,10 +122,8 @@ module.exports.confirmarReunion = function(owner, guest, mail, significado, conv
    } else {
       responderTexto(owner, mail, "Disculpe, no sé a qué reunión se refiere.");
    }
-}
-
-
-function errorResponse(error){
-   log.error("Hubo un error en el módulo orquestador.", error)
-   // responderTexto(owner, mail, "Lo siento, no estoy disponible en este momento. Contáctese directamente con " + owner.email)
+   function errorResponse(error){
+      log.error("Hubo un error en el módulo orquestador.", error)
+      responderTexto(owner, mail, "Lo siento, no estoy disponible en este momento. Contáctese directamente con " + owner.email)
+   }
 }

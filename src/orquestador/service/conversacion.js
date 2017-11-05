@@ -1,5 +1,8 @@
 var request = require('request');
 var config = require('../config/config').config;
+var moment = require('moment');
+moment.locale('es')
+process.env.TZ = 'America/Buenos_Aires'
 var log = require('log4js').getLogger();
 log.level = 'debug';
 
@@ -72,7 +75,7 @@ module.exports.actualizarConversacion = function(conversacion, reject, callback)
    });
 }
 
-module.exports.armarMensajeProponerHorario = function (respuesta, desde){
+module.exports.armarMensajeProponerHorario = function (respuesta, desde, hasta){
    return {
       "contenido": respuesta,
       "significado": {
@@ -80,7 +83,9 @@ module.exports.armarMensajeProponerHorario = function (respuesta, desde){
             "proponer_horario"
          ],
          "intervalos": [{
-            "desde": desde
+            "desde": desde,
+            "hasta": moment(desde).add(1, 'hours').format('YYYY-MM-DDTHH:mm:ssZ')
+
          }]
       }
    }
@@ -93,7 +98,8 @@ module.exports.armarMensajeConfirmarReunion = function (respuesta, evento) {
       "significado": {
          "intents": ["confirmar_reunion"],
          "intervalos": [{
-            "desde": evento.start.dateTime
+            "desde": evento.start.dateTime,
+            "hasta": evento.end.dateTime
          }]
       }
    }
@@ -106,7 +112,8 @@ module.exports.armarMensajeCancelacionReunion = function (respuesta, evento) {
       "significado": {
          "intents": ["confirmar_cancelacion"],
          "intervalos": [{
-            "desde": evento.start.dateTime
+            "desde": evento.start.dateTime,
+            "hasta": evento.end.dateTime
          }]
       }
    }
@@ -114,7 +121,7 @@ module.exports.armarMensajeCancelacionReunion = function (respuesta, evento) {
 
 module.exports.armarMensajePreguntarHorarios = function (contenido) {
    return {
-      "contenido": respuesta,
+      "contenido": contenido,
       "significado": {
          "intents": ["preguntar_horario"]
       }
@@ -133,3 +140,18 @@ module.exports.obtenerUltimoMensajeConSignificado = function (conversacion, sign
       return null;
    }
 }
+
+module.exports.obtenerIntervalosDeIntencion = function(conversacion, intencion){
+   var intervalos = []
+   conversacion.mensajes.forEach(function(m){
+      if(m.significado && m.significado.intents && m.significado.intents.indexOf(intencion) > -1){
+         if(m.significado.intervalos){
+            intervalos.push({
+               desde: m.significado.intervalos.desde,
+               hasta: m.significado.intervalos.hasta
+            })
+         }
+      }
+   })
+   return intervalos
+};

@@ -1,8 +1,6 @@
 module.exports.obtenerIntencion = function(significado) {
    if(significado && significado.intents) {
       return significado.intents[0];
-   } else {
-      return "desconocida"
    }
 }
 

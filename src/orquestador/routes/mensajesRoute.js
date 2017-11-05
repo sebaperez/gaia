@@ -12,7 +12,7 @@ router.post('/', function (req, res, next) {
 
    var mail = req.body;
    log.info('[Route] Mensaje recibido: ' + mail.subject);
-   res.status(200).send("Mensaje recibido [" + mail.subject + "]")
+   res.status(200).send("Mensaje recibido.")
    var botEmail = mailHelper.extraerBotEmail(mail)
 
    usuarioService.obtenerUsuario(botEmail, function() {
@@ -42,7 +42,7 @@ router.post('/', function (req, res, next) {
                if(ultimaConversacion && ultimaConversacion.abierto){
                   orquestadorService.proponerNuevoHorarioReunion(owner, guest, mail, significado, ultimaConversacion)
                } else {
-                  orquestadorService.proponerHorarioReunion(owner, guest, mail, significado)
+                  orquestadorService.proponerNuevaReunion(owner, guest, mail, significado)
                }
                break;
 
