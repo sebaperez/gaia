@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var orquestadorService = require("../service/orquestador")
 var usuarioService = require('../service/usuario');
+var ioService = require('../service/io');
 var conversacionService = require('../service/conversacion');
 var iaService = require('../service/ia');
 var mailHelper = require('../helpers/mailHelper')

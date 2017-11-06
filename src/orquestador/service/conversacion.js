@@ -146,10 +146,7 @@ module.exports.obtenerIntervalosDeIntencion = function(conversacion, intencion){
    conversacion.mensajes.forEach(function(m){
       if(m.significado && m.significado.intents && m.significado.intents.indexOf(intencion) > -1){
          if(m.significado.intervalos){
-            intervalos.push({
-               desde: m.significado.intervalos.desde,
-               hasta: m.significado.intervalos.hasta
-            })
+            intervalos = intervalos.concat(m.significado.intervalos)
          }
       }
    })

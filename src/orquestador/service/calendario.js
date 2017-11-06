@@ -3,18 +3,22 @@ var config = require('../config/config').config;
 var moment = require('moment');
 moment.locale('es')
 process.env.TZ = 'America/Buenos_Aires'
+var timeHelper = require('../helpers/timeHelper');
 var log = require('log4js').getLogger();
 log.level = 'debug';
 
 module.exports.obtenerHueco = function (intervalos, intervalosRechazados, ownerId, reject, callback) {
 
    log.debug('[Calendario] Intervalos para buscar hueco:', intervalos)
-   log.debug('[Calendario] Intervalos rechazados previamente:', intervalos)
+   log.debug('[Calendario] Intervalos rechazados previamente:', intervalosRechazados)
+
+   var intervalosBusqueda = restarIntervalosDeTiempo(intervalos, intervalosRechazados)
+   log.info('[Calendario] Intervalos a buscar en calendario', intervalosBusqueda)
 
    request.post({
       url: config.calendarioApiUrls.huecos,
       json: true,
-      body: restarIntervalosDeTiempo(intervalos, intervalosRechazados),
+      body: intervalosBusqueda,
       qs: {
          usuario: ownerId
       }
@@ -32,11 +36,17 @@ module.exports.obtenerHueco = function (intervalos, intervalosRechazados, ownerI
 }
 
 function restarIntervalosDeTiempo(intervalos, intervalosParaRestar) {
-   //TODO hacer la resta bien
    if(intervalosParaRestar && intervalosParaRestar.length > 0){
-      intervalos[0].desde = moment(intervalos[0].desde).add(1, 'hours').format('YYYY-MM-DDTHH:mm:ssZ')
+      var resultado = []
+      for (var i = 0; i < intervalos.length; i++) {
+         for (var r = 0; r < intervalosParaRestar.length; r++) {
+            resultado = resultado.concat(timeHelper.restarIntervalo(intervalos[i], intervalosParaRestar[r]))
+         }
+      }
+      return resultado;
+   } else {
+      return intervalos
    }
-   return intervalos
 }
 
 module.exports.unificarIntervalosYFechas = function (intervalos, fechas){

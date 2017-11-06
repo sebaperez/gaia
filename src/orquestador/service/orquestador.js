@@ -39,10 +39,10 @@ module.exports.proponerNuevaReunion = function(owner, guest, mail, significado){
 
 module.exports.proponerNuevoHorarioReunion = function(owner, guest, mail, significado, conversacion){
 
-   var contenidoMailActual = mailHelper.extraerContenidoMailActual(mail);
-   conversacionService.agregarMensajeAConversacion(contenidoMailActual, conversacion);
    var intervalos = calendarioService.unificarIntervalosYFechas(significado.intervalos, significado.fechas)
    var intervalosRechazados = conversacionService.obtenerIntervalosDeIntencion(conversacion, "proponer_horario");
+   var contenidoMailActual = mailHelper.extraerContenidoMailActual(mail);
+   conversacionService.agregarMensajeAConversacion(contenidoMailActual, conversacion);
    proponerHorarioYActualizarConversacion(intervalos, intervalosRechazados, owner, guest, mail, conversacion, errorResponse);
    function errorResponse(error){
       log.error("Hubo un error en el módulo orquestador.", error)
