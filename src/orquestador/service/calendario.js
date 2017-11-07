@@ -60,12 +60,16 @@ module.exports.unificarIntervalosYFechas = function (intervalos, fechas){
    return intervalosYFechas
 }
 
-module.exports.agregarEvento = function (ownerId, inicioHuecoAceptado, guestNombre, reject, callback) {
+module.exports.agregarEvento = function (owner, guest, descripcion, inicioHuecoAceptado, reject, callback) {
    var agendarUrl = config.calendarioApiUrls.agendar;
    var momentDesde = moment(inicioHuecoAceptado);
    momentHasta = momentDesde.add(1,'hours');
    var evento = {
-      description: "Reunión con " + guestNombre,
+      description: descripcion,
+      asistentes:[
+         {email: owner.email},
+         {email: guest.email}
+      ],
       fecha_desde: inicioHuecoAceptado,
       fecha_hasta: momentHasta.format('YYYY-MM-DDTHH:mm:ssZ')
    }
@@ -75,7 +79,7 @@ module.exports.agregarEvento = function (ownerId, inicioHuecoAceptado, guestNomb
       json: true,
       body: evento,
       qs: {
-         usuario: ownerId
+         usuario: owner.id
       }
    }, function (error, response, body) {
       if (reject && (error || response.statusCode != 200)) {

@@ -109,7 +109,7 @@ module.exports.confirmarReunion = function(owner, guest, mail, significado, conv
    var mensajeDePropuesta = conversacionService.obtenerUltimoMensajeConSignificado(conversacion, "proponer_horario");
    if(mensajeDePropuesta){
       var iniciohuecoAceptado = mensajeDePropuesta.significado.intervalos[0].desde;
-      calendarioService.agregarEvento(owner.id, iniciohuecoAceptado, guest.name || guest.email, errorResponse, function(evento){
+      calendarioService.agregarEvento(owner, guest, mail.subject, iniciohuecoAceptado, errorResponse, function(evento){
          respuestaService.obtenerMensajeConfirmacionReunion(owner, evento.start.dateTime, errorResponse, function(respuesta){
             var mensajeDeGaia = conversacionService.armarMensajeConfirmarReunion(respuesta, evento);
             conversacionService.agregarMensajeAConversacion(mensajeDeGaia, conversacion);

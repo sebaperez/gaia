@@ -60,7 +60,7 @@ exports.listar_eventos = function(auth, desde, hasta, callback) {
 }
 
 //Agregar un evento
-exports.agregar_evento = function(auth, descripcion, desde, hasta, callback, reject) {
+exports.agregar_evento = function(auth, descripcion, asistentes, desde, hasta, callback, reject) {
   var calendar = google.calendar('v3');
   calendar.events.insert({
     auth: auth,
@@ -74,7 +74,9 @@ exports.agregar_evento = function(auth, descripcion, desde, hasta, callback, rej
       'end': {
         'dateTime': hasta
       },
+      "attendees": asistentes
     },
+    sendNotification: true
 }, function(err, eventoCreado) {
     if (err) {
       console.log('Error: ' + err);

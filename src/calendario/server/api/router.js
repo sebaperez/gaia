@@ -163,12 +163,13 @@ module.exports = function(app) {
       var description = req.body.description
       var desde = req.body.fecha_desde
       var hasta = req.body.fecha_hasta
+      var emailsasistentes = req.body.asistentes
 
       usuariosHelper.obtenerUsuario(usuarioId, function(usuario){
 
          calendar_helper.load_credential(usuario, function(auth) {
 
-            calendar_helper.agregar_evento(auth, description, desde, hasta, function(eventoCreado) {
+            calendar_helper.agregar_evento(auth, description, emailsasistentes, desde, hasta, function(eventoCreado) {
                log.info("Evento creado:", eventoCreado)
                return res.status(200).json(eventoCreado).send()
             }, function(err){
