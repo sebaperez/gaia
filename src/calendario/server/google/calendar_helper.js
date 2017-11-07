@@ -76,7 +76,7 @@ exports.agregar_evento = function(auth, descripcion, asistentes, desde, hasta, c
       },
       "attendees": asistentes
     },
-    sendNotification: true
+    sendNotifications: true
 }, function(err, eventoCreado) {
     if (err) {
       console.log('Error: ' + err);
