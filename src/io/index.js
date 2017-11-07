@@ -25,11 +25,11 @@ server_out.listen(port, () => console.log(`Servidor server_out Iniciado en puert
 function get_client(mail){
 
 	var client = inbox.createConnection(993, "imap.zoho.com", {
-	  secureConnection: true,
-	  auth:{
-		      user: mail,
-		      pass: "UTNfrba1"
-		    }
+		secureConnection: true,
+		auth:{
+			user: mail,
+			pass: "UTNfrba1"
+		}
 	});
 
 	client.on("connect", function(){
@@ -53,53 +53,53 @@ function get_client(mail){
 		var messageStream = client.createMessageStream(message.UID)
 
 		getStream(messageStream).then(str => {
-				simpleParser(str, (err, mail)=>{
-					// Log por consola del mail recibido
-					console.log("---------- mensaje recibido!! ----------")
-					console.log(JSON.stringify(mail, null, 4))
-					console.log(" ---------- ---------- ---------- ---------- ---------- ----------")
-					// Se lo mandamos al orquestador
-					// "http://" + process.env.IP + ":5555/mensajes",
-					request.post({
-							url: "http://" + "45.55.187.250" + ":5555/mensajes",
-							json: true,
-							body: mail
-						     },
-						function (error, responde, body){
-							console.log("Respuesta del orquestado: ")
-							console.log(JSON.stringify(body, null, 4))
-						})
-					
-					/*
-					// Respondemos un dummy
-					var smtp = nodemailer.createTransport({
-						service: "Zoho",
-						auth: {
-							user: mail.to.text,
-							pass: "UTNfrba1"
-						}
-					});
-
-					smtp.sendMail({
-								from: mail.to.text,
-								to: mail.from.text,
-								subject: mail.subject,
-								text: "Por el momento no estamos online, proximamente!",
-								inReplyTo: mail.messageId
-				 			}, function(error, info){
-								if(error){
-									console.log(error);
-								}else{
-									console.log('Message sent: ' + info.response);
-								}
-					});
-					*/
+			simpleParser(str, (err, mail)=>{
+				// Log por consola del mail recibido
+				console.log("---------- mensaje recibido!! ----------")
+				console.log(JSON.stringify(mail, null, 4))
+				console.log(" ---------- ---------- ---------- ---------- ---------- ----------")
+				// Se lo mandamos al orquestador
+				// "http://" + process.env.IP + ":5555/mensajes",
+				request.post({
+					url: "http://45.55.187.250:5555/mensajes",
+					json: true,
+					body: mail
+				},
+				function (error, responde, body){
+					console.log("Respuesta del orquestado: ")
+					console.log(JSON.stringify(body, null, 4))
 				})
-			});
 
-	});
+				/*
+				// Respondemos un dummy
+				var smtp = nodemailer.createTransport({
+				service: "Zoho",
+				auth: {
+				user: mail.to.text,
+				pass: "UTNfrba1"
+			}
+		});
 
-	return client
+		smtp.sendMail({
+		from: mail.to.text,
+		to: mail.from.text,
+		subject: mail.subject,
+		text: "Por el momento no estamos online, proximamente!",
+		inReplyTo: mail.messageId
+	}, function(error, info){
+	if(error){
+	console.log(error);
+}else{
+console.log('Message sent: ' + info.response);
+}
+});
+*/
+})
+});
+
+});
+
+return client
 }
 
 get_client("clara@gaiameet.com").connect();

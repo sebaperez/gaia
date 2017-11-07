@@ -1,3 +1,4 @@
+var config = require('../config/config').config;
 var moment = require('moment');
 moment.locale('es')
 process.env.TZ = 'America/Buenos_Aires'
@@ -34,3 +35,7 @@ module.exports.restarIntervalo = function (intervalo, intervaloAExcluir){
    }
    return resultado
 }
+
+module.exports.humanizarFecha = function(fechaISO){
+   return moment(fechaISO).calendar(null, config.calendarConfig);
+};
