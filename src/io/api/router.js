@@ -12,26 +12,19 @@ module.exports = function(app) {
 		console.log("--> inReplyTo " + req.body.inReplyTo);
 
 		var smtp = nodemailer.createTransport({
-						service: "Zoho",
-						auth: {
-							user: req.body.from,
-							pass: "UTNfrba1"
-						}
-					});
+			service: "Zoho",
+			auth: {
+				user: req.body.from,
+				pass: "UTNfrba1"
+			}
+		});
 
-		smtp.sendMail({
-					from: req.body.from,
-					to: req.body.to,
-					cc: req.body.cc,
-					subject: req.body.subject,
-					text: req.body.text,
-					inReplyTo: req.body.inReplyTo
-	 			}, function(error, info){
-					if(error){
-						console.log(error);
-					}else{
-						console.log('Message sent: ' + info.response);
-					}
+		smtp.sendMail(req.body, function(error, info){
+			if(error){
+				console.log(error);
+			}else{
+				console.log('Message sent: ' + info.response);
+			}
 		});
 
 		res.status(200).json({"ok":"ok"});
