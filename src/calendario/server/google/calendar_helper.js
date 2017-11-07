@@ -93,6 +93,7 @@ exports.quitar_evento = function(auth,event_id,callback,reject) {
     auth: auth,
     calendarId: 'primary',
     eventId: event_id,
+    sendNotifications: true
   }, function(err, eventoBorrado) {
       if (err) {
         console.log('Error: ' + err);
