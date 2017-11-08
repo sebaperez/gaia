@@ -13,11 +13,11 @@ router.post('/', function (req, res, next) {
 
    var mail = req.body;
    log.info('[Route] Mensaje recibido: ' + mail.subject);
-   res.status(200).send("Mensaje recibido.")
    var botEmail = mailHelper.extraerBotEmail(mail)
 
    usuarioService.obtenerUsuario(botEmail, function() {
       ioService.responderMail(botEmail, mail.from.value[0].address, null, "Creo que se confundió de mail", mail);
+      res.status(400).send("No se encontró el usuario")
 
    }, function (owner) {
       var guest = mailHelper.extraerGuest(owner, mail)
@@ -29,6 +29,7 @@ router.post('/', function (req, res, next) {
 
       iaService.interpretarMensaje(contenidoMailActual, function() {
          orquestadorService.responderTexto(owner, mail, "Disculpe, no entendí lo que quiso decir")
+         res.status(400).send("No se pudo identificar la intención")
 
       }, function (significado) {
          log.info("[Route] La intencion del mensaje: [" + significado.intents + "]");
@@ -40,6 +41,7 @@ router.post('/', function (req, res, next) {
             switch(mailHelper.obtenerIntencion(significado)) {
 
                case 'solicitar_reunion':
+               res.status(200).send("Mensaje recibido. Intención: solicitar_reunion")
                if(ultimaConversacion && ultimaConversacion.abierto){
                   orquestadorService.proponerNuevoHorarioReunion(owner, guest, mail, significado, ultimaConversacion)
                } else {
@@ -48,6 +50,7 @@ router.post('/', function (req, res, next) {
                break;
 
                case 'aceptar_reunion':
+               res.status(200).send("Mensaje recibido. Intención: aceptar_reunion")
                if(ultimaConversacion && ultimaConversacion.abierto) {
                   orquestadorService.confirmarReunion(owner, guest, mail, significado, ultimaConversacion)
                } else {
@@ -56,6 +59,7 @@ router.post('/', function (req, res, next) {
                break;
 
                case 'cancelar_reunion':
+               res.status(200).send("Mensaje recibido. Intención: cancelar_reunion")
                if(ultimaConversacion){
                   if(ultimaConversacion.abierto){
                      orquestadorService.rechazarHorarioReunion(owner, guest, mail, significado, ultimaConversacion)
@@ -66,11 +70,13 @@ router.post('/', function (req, res, next) {
                break;
 
                case 'posponer_reunion':
+               res.status(200).send("Mensaje recibido. Intención: posponer_reunion")
                log.warn('[Route] Posponer reunión todavía no implementado.');
                errorResponse()
                break;
 
                default:
+               res.status(400).send("No se pudo identificar la intención")
                log.error('[Route] Intencion(es) ' + significado.intents + ' no soportadas.');
                orquestadorService.responderTexto(owner, mail, "Disculpe, no entendí lo que quiso decir")
             }

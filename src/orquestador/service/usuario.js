@@ -12,12 +12,14 @@ module.exports.obtenerUsuario = function(botEmail, reject, callback) {
          var owner = JSON.parse(body)[0];
          if(owner) {
             return callback(owner);
+         } else{
+            reject()
          }
       } else if(error) {
          log.error("[Usuario] Error en el modulo de usuarios")
          return reject()
       } else {
-         return reject();
+         return reject()
       }
    });
 }
