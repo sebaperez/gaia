@@ -21,6 +21,9 @@ router.post('/', function (req, res, next) {
 
    }, function (owner) {
       var guest = mailHelper.extraerGuest(owner, mail)
+      if(owner.blacklistedContacts.indexOf(guest.email) > -1) {
+         return orquestadorService.redirigirAOwner(owner, mail, 'Esta dirección está incluida dentro de la blacklist. Comuníquese directamente o elimine el mail de la blacklist')
+      }
       var contenidoMailActual = mailHelper.extraerContenidoMailActual(mail);
       if(!contenidoMailActual) {
          return orquestadorService.responderTexto(owner, mail, 'Me llegó el mail vacío.')

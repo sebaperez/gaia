@@ -37,6 +37,14 @@ module.exports.proponerNuevaReunion = function(owner, guest, mail, significado){
    }
 }
 
+
+module.exports.redirigirAOwner = function(owner, mail, mensaje){
+
+      log.info("Mail en blacklist")
+      ioService.responderMail(owner.botEmail, owner.email, null, mensaje, mail, reject, callback)
+}
+
+
 module.exports.proponerNuevoHorarioReunion = function(owner, guest, mail, significado, conversacion){
 
    var intervalos = calendarioService.unificarIntervalosYFechas(significado.intervalos, significado.fechas)
