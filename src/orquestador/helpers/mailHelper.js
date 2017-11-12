@@ -37,5 +37,5 @@ module.exports.extraerGuest = function(owner, mail){
 
 module.exports.extraerContenidoMailActual = function(mail){
    //TODO agregar soporte para outlook
-   return mail.text.split("----------", 1)[0].split("_______________")[0].trim();
+   return mail.text.split("----------", 1)[0].split("_______________")[0].split("\n2017")[0].trim();
 }

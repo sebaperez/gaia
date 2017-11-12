@@ -23,7 +23,7 @@ module.exports.responderMail = function (mailRemitente, mailDestinatario, mailCC
    // ESTILO GMAIL
    var headerMailRespondido = '<br><br><br><div class="gmail_extra"><br>' +
    '<div class="gmail_quote">' +
-   'El ' + moment().format("d [de] MMMM [de] YYYY, HH:mm") + ', '+ mail.from.value[0].name +'<span dir="ltr">&lt;<a href="mailto:'+ mail.from.value[0].address +'" target="_blank">'+ mail.from.value[0].address +'</a>&gt;</span> escribió:<br>' +
+   'El ' + moment().format("dd [de] MMMM [de] YYYY, HH:mm") + ', '+ mail.from.value[0].name +'<span dir="ltr">&lt;<a href="mailto:'+ mail.from.value[0].address +'" target="_blank">'+ mail.from.value[0].address +'</a>&gt;</span> escribió:<br>' +
    '<blockquote class="gmail_quote" style="margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">' +
    '<div dir="ltr"><span>'
    var footerMailRespondido = '</span><br></div></blockquote></div><br></div>'
