@@ -228,15 +228,17 @@ var admin = {
 			admin.setTitle("Conversaciones");
 			admin.setContent("Cargando...");
 			admin.user.getConversaciones(function(data) {
+				var o;
 				content += '<div class="row"><div class="col-sm-12"><div class="card">';
 				content += '<div class="card-header"><h2>Conversaciones<small>Aquí se listan los ultimos mensajes recibidos por tu asistente (<b>' + admin.user.data.botName + '</b>)</small></h2>';
 				content += '<div class="card-body card-padding"><div class="media-demo">';
 				for (i = 0; i < data.length; i++) {
 
-					contenido = data[i].mensajes[0].contenido || "";
-					contenido = contenido.replace(/\n/, "<br>");
-
-					content += '<div class="media"><div class="media-body"><h4 class="media-heading">Con: ' + data[i].guest + ' - ' + (new Date(data[i].createdAt)).toString() + '</h4>' + contenido + '</div></div>';
+					for (o = 0; o < data[i].mensajes.length; o++) {
+						contenido = data[i].mensajes[o].contenido || "";
+						contenido = contenido.replace(/\n/, "<br>");
+						content += '<div class="media"><div class="media-body"><h4 class="media-heading">Con: ' + data[i].guest + ' - ' + (new Date(data[i].createdAt)).toString() + '</h4>' + contenido + '</div></div>';
+					}
 				}
 				content += '</div></div>';
 				content += '</div></div></div>';
