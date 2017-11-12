@@ -70,10 +70,10 @@ module.exports.obtenerRespuestaCancelacionReunion = function(evento, reject, cal
    var fecha = evento.start.dateTime
    var fechaFormateada = moment(fecha).calendar(null, config.calendarConfig)
    if(callback){
-      callback("Quedó cancelada la reunión " + esHoyOManiana(fechaFormateada)? "de " + fechaFormateada : "del " + fechaFormateada);
+      callback("Quedó cancelada la reunión " + (esHoyOManiana(fechaFormateada)? "de " + fechaFormateada : "del " + fechaFormateada));
    }
 }
 
 function esHoyOManiana(fechaString) {
-   return fechaString.indexOf("hoy") == 0 || fechaString.indexOf("mañana") == 0
+   return fechaString.indexOf("hoy") > -1 || fechaString.indexOf("mañana") > -1
 }
