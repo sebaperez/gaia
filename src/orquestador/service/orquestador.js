@@ -37,6 +37,14 @@ module.exports.proponerNuevaReunion = function(owner, guest, mail, significado){
    }
 }
 
+
+module.exports.redirigirAOwner = function(owner, mail, mensaje){
+
+      log.info("Mail en blacklist")
+      ioService.responderMail(owner.botEmail, owner.email, null, mensaje, mail, reject, callback)
+}
+
+
 module.exports.proponerNuevoHorarioReunion = function(owner, guest, mail, significado, conversacion){
 
    var intervalos = calendarioService.unificarIntervalosYFechas(significado.intervalos, significado.fechas)
@@ -89,6 +97,7 @@ module.exports.cancelarReunionAgendada = function(owner, guest, mail, significad
          respuestaService.obtenerRespuestaCancelacionReunion(mensajeDePropuesta.evento, errorResponse, function(respuesta){
             var mensajeDeGaia = conversacionService.armarMensajeCancelacionReunion(respuesta, mensajeDePropuesta.evento);
             conversacionService.agregarMensajeAConversacion(mensajeDeGaia, conversacion);
+            conversacion.abierto = false
             conversacionService.actualizarConversacion(conversacion)
             ioService.responderMail(owner.botEmail, guest.email, owner.email, respuesta, mail);
          });
