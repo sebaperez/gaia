@@ -97,6 +97,7 @@ module.exports.cancelarReunionAgendada = function(owner, guest, mail, significad
          respuestaService.obtenerRespuestaCancelacionReunion(mensajeDePropuesta.evento, errorResponse, function(respuesta){
             var mensajeDeGaia = conversacionService.armarMensajeCancelacionReunion(respuesta, mensajeDePropuesta.evento);
             conversacionService.agregarMensajeAConversacion(mensajeDeGaia, conversacion);
+            conversacion.abierto = false
             conversacionService.actualizarConversacion(conversacion)
             ioService.responderMail(owner.botEmail, guest.email, owner.email, respuesta, mail);
          });
