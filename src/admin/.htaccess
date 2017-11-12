@@ -1,0 +1,3 @@
+RewriteEngine On
+RewriteCond %{HTTP_HOST} ^gaiameet.com$
+RewriteRule ^(.*)$ http://admin.gaiameet.com/$1 [L,R=301]
